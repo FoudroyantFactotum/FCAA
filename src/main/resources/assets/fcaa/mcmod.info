@@ -1,0 +1,21 @@
+[
+{
+  "modid": "fcaa",
+  "name": "Fou's Conservatory of Arcane Apparatuses",
+  "description": "//TODO",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": [
+    "FoudroyantFactotum"
+  ],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [
+  ],
+  "parent":"",
+  "dependencies": [
+  ]
+}
+]

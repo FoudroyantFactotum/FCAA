@@ -1,0 +1,70 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+    }
+}
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'java'
+apply plugin: 'idea'
+
+idea {
+  project {
+    languageLevel = '1.8'
+  }
+}
+
+ext.configFile = file "build.properties"
+configFile.withReader {
+    def prop = new Properties()
+    prop.load(it)
+    project.ext.config = new ConfigSlurper().parse prop
+}
+
+version = config.mod_version
+group = config.group_name
+archivesBaseName = "[${config.minecraft_version}]${config.mod_id}"
+
+minecraft {
+    version = config.minecraft_version + "-" + config.forge_version // grab latest forge
+    runDir = "run"
+    mappings = "stable_20"
+    replace '@MOD_VERSION@', version
+}
+
+processResources
+{
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include '**/*.info'
+        include '**/*.properties'
+
+        expand ([
+            'version':project.version,
+            'mcversion':project.minecraft.version,
+            'forge_version': config.forge_version
+           ])
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+dependencies{
+}
+
+jar {
+        manifest {
+        attributes 'FMLCorePlugin': 'mod.fou.fcaa.utility.asm.MOD_ASM',
+                   'FMLCorePluginContainsFMLMod': 'false'
+    }
+}
