@@ -1,4 +1,4 @@
-package mod.fou.fcaa.TestBlock;
+package mod.fou.fcaa.Blocks;
 
 import mod.fou.fcaa.TheMod;
 import net.minecraft.block.Block;

@@ -1,4 +1,4 @@
-package mod.fou.fcaa.init.annotations;
+package mod.fou.fcaa.utility.annotations;
 
 
 import java.lang.annotation.ElementType;
