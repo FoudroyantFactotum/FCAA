@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package mod.fou.fcaa.Blocks;
+package mod.fou.fcaa.blocks;
 
 import mod.fou.fcaa.TheMod;
 import net.minecraft.block.Block;

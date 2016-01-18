@@ -13,9 +13,9 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package mod.fou.fcaa.Blocks.Structure;
+package mod.fou.fcaa.blocks.Structure;
 
-import mod.fou.fcaa.Blocks.FCAA_TE;
+import mod.fou.fcaa.blocks.FCAA_TE;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 
 public abstract class FCAA_TESR<E extends FCAA_TE> extends TileEntitySpecialRenderer<E>

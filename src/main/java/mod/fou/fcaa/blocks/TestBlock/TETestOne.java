@@ -13,19 +13,10 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package mod.fou.fcaa.Blocks.Structure.PlayerPiano;
+package mod.fou.fcaa.blocks.TestBlock;
 
-import net.minecraft.util.IStringSerializable;
+import net.minecraft.tileentity.TileEntity;
 
-public enum PianoState implements IStringSerializable
+public class TETestOne extends TileEntity
 {
-    piano,
-    key_white,
-    key_black;
-
-    @Override
-    public String getName()
-    {
-        return name();
-    }
 }

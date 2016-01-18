@@ -13,11 +13,11 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package mod.fou.fcaa.Blocks.Structure;
+package mod.fou.fcaa.blocks.Structure;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
-import mod.fou.fcaa.Blocks.FCAA_TE;
+import mod.fou.fcaa.blocks.FCAA_TE;
 import mod.fou.fcaa.structure.IStructure.ITEStructure;
 import mod.fou.fcaa.structure.coordinates.BlockPosUtil;
 import mod.fou.fcaa.structure.registry.StructureRegistry;
@@ -40,9 +40,8 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
-import static mod.fou.fcaa.Blocks.Structure.BlockStructure.getMirror;
-import static mod.fou.fcaa.Blocks.Structure.BlockStructure.getOrientation;
-import static mod.fou.fcaa.Blocks.Structure.TEStructure.*;
+import static mod.fou.fcaa.blocks.Structure.BlockStructure.MIRROR;
+import static mod.fou.fcaa.blocks.Structure.TEStructure.*;
 import static mod.fou.fcaa.structure.coordinates.TransformLAG.localToGlobal;
 import static net.minecraft.block.BlockDirectional.FACING;
 
@@ -118,7 +117,7 @@ public final class TEStructureShape extends FCAA_TE implements ITEStructure, ISi
             masterLocation = Optional.of(localToGlobal(
                     -local.getX(), -local.getY(), -local.getZ(),
                     pos.getX(), pos.getY(), pos.getZ(),
-                    (EnumFacing) state.getValue(FACING), getMirror(state),
+                    state.getValue(FACING), state.getValue(MIRROR),
                     sb.getPattern().getBlockBounds()));
         }
 
@@ -142,8 +141,8 @@ public final class TEStructureShape extends FCAA_TE implements ITEStructure, ISi
                         Blocks.air.getDefaultState() :
                         localToGlobal(
                                 block,
-                                getOrientation(state),
-                                getMirror(state)
+                                state.getValue(FACING),
+                                state.getValue(MIRROR)
                         );
             }
         }

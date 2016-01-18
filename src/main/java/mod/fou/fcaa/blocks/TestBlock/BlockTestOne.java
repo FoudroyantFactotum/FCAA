@@ -13,9 +13,9 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package mod.fou.fcaa.Blocks.TestBlock;
+package mod.fou.fcaa.blocks.TestBlock;
 
-import mod.fou.fcaa.Blocks.FCAA_Block;
+import mod.fou.fcaa.blocks.FCAA_Block;
 import mod.fou.fcaa.utility.annotations.Auto_Block;
 import mod.fou.fcaa.utility.annotations.Auto_Instance;
 import net.minecraft.block.material.Material;

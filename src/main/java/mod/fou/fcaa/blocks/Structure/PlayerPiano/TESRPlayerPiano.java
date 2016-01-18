@@ -13,9 +13,9 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package mod.fou.fcaa.Blocks.Structure.PlayerPiano;
+package mod.fou.fcaa.blocks.Structure.PlayerPiano;
 
-import mod.fou.fcaa.Blocks.Structure.FCAA_TESR;
+import mod.fou.fcaa.blocks.Structure.FCAA_TESR;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
@@ -24,8 +24,8 @@ import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.util.BlockPos;
 import org.lwjgl.opengl.GL11;
 
-import static mod.fou.fcaa.Blocks.Structure.PlayerPiano.BlockPlayerPiano.propPiano;
-import static mod.fou.fcaa.Blocks.Structure.PlayerPiano.PianoState.key_white;
+import static mod.fou.fcaa.blocks.Structure.PlayerPiano.BlockPlayerPiano.propPiano;
+import static mod.fou.fcaa.blocks.Structure.PlayerPiano.PianoState.key_white;
 
 public class TESRPlayerPiano extends FCAA_TESR<TEPlayerPiano>
 {

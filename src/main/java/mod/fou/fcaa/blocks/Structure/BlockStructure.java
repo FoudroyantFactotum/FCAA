@@ -13,10 +13,10 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package mod.fou.fcaa.Blocks.Structure;
+package mod.fou.fcaa.blocks.Structure;
 
 import com.google.common.base.Objects;
-import mod.fou.fcaa.Blocks.FCAA_Block;
+import mod.fou.fcaa.blocks.FCAA_Block;
 import mod.fou.fcaa.structure.IStructure.IPatternHolder;
 import mod.fou.fcaa.structure.IStructure.IStructureAspects;
 import mod.fou.fcaa.structure.IStructure.ITEStructure;
@@ -87,10 +87,7 @@ public abstract class BlockStructure extends FCAA_Block implements IPatternHolde
 
     public int getMetaFromState(IBlockState state)
     {
-        final EnumFacing facing = getOrientation(state);
-        final boolean mirror = getMirror(state);
-
-        return facing.getHorizontalIndex() | (mirror? 1<<2:0);
+        return state.getValue(FACING).getHorizontalIndex() | (state.getValue(MIRROR)? 1<<2:0);
     }
 
     @Override
@@ -141,11 +138,8 @@ public abstract class BlockStructure extends FCAA_Block implements IPatternHolde
     {
         super.onBlockPlacedBy(world, pos, state, placer, stack);
 
-        final EnumFacing orientation = getOrientation(state);
-        final boolean mirror = getMirror(state);
-
         formStructure(world, pos, state, 0x2);
-        updateExternalNeighbours(world, pos, getPattern(), orientation, mirror, false);
+        updateExternalNeighbours(world, pos, getPattern(), state.getValue(FACING), state.getValue(MIRROR), false);
     }
 
     @Override
@@ -174,14 +168,14 @@ public abstract class BlockStructure extends FCAA_Block implements IPatternHolde
     }
 
     @Override
-    public void addCollisionBoxesToList(World world, BlockPos pos, IBlockState state, AxisAlignedBB mask, List list, Entity collidingEntity)
+    public void addCollisionBoxesToList(World world, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
     {
         if (getPattern().getCollisionBoxes() != null)
         {
             localToGlobalCollisionBoxes(
                     pos.getX(), pos.getY(), pos.getZ(),
                     mask, list, getPattern().getCollisionBoxes(),
-                    getOrientation(state), getMirror(state),
+                    state.getValue(FACING), state.getValue(MIRROR),
                     getPattern().getBlockBounds()
             );
         }
@@ -258,16 +252,6 @@ public abstract class BlockStructure extends FCAA_Block implements IPatternHolde
 
     public static final PropertyBool MIRROR = PropertyBool.create("mirror");
 
-    public static boolean getMirror(IBlockState state)
-    {
-        return (Boolean) state.getValue(MIRROR);
-    }
-
-    public static EnumFacing getOrientation(IBlockState state)
-    {
-        return (EnumFacing) state.getValue(FACING);
-    }
-
     @Override
     public StructureDefinition getPattern()
     {
@@ -310,17 +294,17 @@ public abstract class BlockStructure extends FCAA_Block implements IPatternHolde
                 continue;
             }
 
-            final boolean mirror = getMirror(state);
-            final EnumFacing orientation = getOrientation(state);
+            final boolean mirror = state.getValue(MIRROR);
+            final EnumFacing orientation = state.getValue(FACING);
 
-            final BlockPos nPos = BlockPosUtil.of(pos, localToGlobal(f, getOrientation(state), mirror));
+            final BlockPos nPos = BlockPosUtil.of(pos, localToGlobal(f, state.getValue(FACING), mirror));
             final IBlockState nState = world.getBlockState(nPos);
 
             if ((nState.getBlock() instanceof BlockStructure || nState.getBlock() instanceof BlockStructureShape) &&
                 (state.getBlock()  instanceof BlockStructure || state.getBlock()  instanceof BlockStructureShape))
             {
-                final boolean nmirror = getMirror(nState);
-                final EnumFacing norientation = getOrientation(nState);
+                final boolean nmirror = nState.getValue(MIRROR);
+                final EnumFacing norientation = nState.getValue(FACING);
 
                 if (mirror == nmirror && orientation == norientation)
                 {
@@ -346,8 +330,8 @@ public abstract class BlockStructure extends FCAA_Block implements IPatternHolde
 
     public void formStructure(World world, BlockPos origin, IBlockState state, int flag)
     {
-        final EnumFacing orientation = getOrientation(state);
-        final boolean isMirrored = getMirror(state);
+        final EnumFacing orientation = state.getValue(FACING);
+        final boolean isMirrored = state.getValue(MIRROR);
         final IBlockState shapeState = BlockStructureShape.INSTANCE
                 .getDefaultState()
                 .withProperty(MIRROR, isMirrored)

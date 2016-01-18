@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package mod.fou.fcaa.Blocks.Structure;
+package mod.fou.fcaa.blocks.Structure;
 
 import mod.fou.fcaa.structure.registry.StructureDefinition;
 import net.minecraft.entity.player.EntityPlayer;

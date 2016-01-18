@@ -2,6 +2,7 @@
   "forge_marker": 1,
   "defaults": {
     "transform": "forge:default-block",
+    "model": "fcaa:PlayerPiano/PlayerPiano-Body.obj",
     "textures": {
       "pianoPlayer": "fcaa:PianoPlayer"
     },
@@ -125,10 +126,10 @@
         "translation": [1, 1, 1.5]
       }
     },
-    
-    
-    
-    
+
+
+
+
     "facing=north,mirror=false,ps=key_black": {
       "model": "fcaa:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {
         "translation": [0, 0, 1]

@@ -13,9 +13,9 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package mod.fou.fcaa.Blocks.Structure;
+package mod.fou.fcaa.blocks.Structure;
 
-import mod.fou.fcaa.Blocks.FCAA_Block;
+import mod.fou.fcaa.blocks.FCAA_Block;
 import mod.fou.fcaa.init.InitBlock;
 import mod.fou.fcaa.structure.IStructure.ITEStructure;
 import mod.fou.fcaa.structure.registry.StructureRegistry;
@@ -40,7 +40,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.List;
 import java.util.Random;
 
-import static mod.fou.fcaa.Blocks.Structure.BlockStructure.*;
+import static mod.fou.fcaa.blocks.Structure.BlockStructure.*;
 import static mod.fou.fcaa.structure.coordinates.TransformLAG.localToGlobalCollisionBoxes;
 import static net.minecraft.block.BlockDirectional.FACING;
 
@@ -80,8 +80,8 @@ public class BlockStructureShape extends FCAA_Block implements ITileEntityProvid
 
     public int getMetaFromState(IBlockState state)
     {
-        final EnumFacing facing = getOrientation(state);
-        final boolean mirror = getMirror(state);
+        final EnumFacing facing = state.getValue(FACING);
+        final boolean mirror = state.getValue(MIRROR);
 
         return facing.getHorizontalIndex() | (mirror? 1<<2:0);
     }
@@ -152,7 +152,7 @@ public class BlockStructureShape extends FCAA_Block implements ITileEntityProvid
 
             localToGlobalCollisionBoxes(mloc.getX(), mloc.getY(), mloc.getZ(),
                     mask, list, sb.getPattern().getCollisionBoxes(),
-                    getOrientation(state), getMirror(state),
+                    state.getValue(FACING), state.getValue(MIRROR),
                     sb.getPattern().getBlockBounds()
             );
         }
@@ -202,16 +202,16 @@ public class BlockStructureShape extends FCAA_Block implements ITileEntityProvid
         {
             sb.breakStructure(world,
                     te.getMasterBlockLocation(),
-                    getOrientation(state),
-                    getMirror(state),
+                    state.getValue(FACING),
+                    state.getValue(MIRROR),
                     isPlayerCreative,
                     isPlayerSneaking
             );
             updateExternalNeighbours(world,
                     te.getMasterBlockLocation(),
                     sb.getPattern(),
-                    getOrientation(state),
-                    getMirror(state),
+                    state.getValue(FACING),
+                    state.getValue(MIRROR),
                     false
             );
 

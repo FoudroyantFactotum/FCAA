@@ -13,9 +13,9 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package mod.fou.fcaa.Blocks.Structure.PlayerPiano;
+package mod.fou.fcaa.blocks.Structure.PlayerPiano;
 
-import mod.fou.fcaa.Blocks.Structure.TEStructureTemplate;
+import mod.fou.fcaa.blocks.Structure.TEStructureTemplate;
 import mod.fou.fcaa.structure.registry.StructureDefinition;
 import net.minecraft.util.EnumFacing;
 

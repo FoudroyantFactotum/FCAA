@@ -13,11 +13,11 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package mod.fou.fcaa.Blocks.Structure.PlayerPiano;
+package mod.fou.fcaa.blocks.Structure.PlayerPiano;
 
 import com.google.common.collect.ImmutableMap;
-import mod.fou.fcaa.Blocks.Structure.BlockStructure;
-import mod.fou.fcaa.Blocks.Structure.TEStructure;
+import mod.fou.fcaa.blocks.Structure.BlockStructure;
+import mod.fou.fcaa.blocks.Structure.TEStructure;
 import mod.fou.fcaa.structure.StructureDefinitionBuilder;
 import mod.fou.fcaa.structure.coordinates.BlockPosUtil;
 import mod.fou.fcaa.utility.annotations.Auto_Instance;
@@ -49,7 +49,7 @@ public final class BlockPlayerPiano extends BlockStructure
                 .getBaseState()
                 .withProperty(FACING, EnumFacing.SOUTH)
                 .withProperty(MIRROR, false)
-                .withProperty(propPiano, PianoState.piano)
+                .withProperty(propPiano, PianoState.key_white)
         );
     }
 

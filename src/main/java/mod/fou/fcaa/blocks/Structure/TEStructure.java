@@ -13,11 +13,11 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package mod.fou.fcaa.Blocks.Structure;
+package mod.fou.fcaa.blocks.Structure;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
-import mod.fou.fcaa.Blocks.FCAA_TE;
+import mod.fou.fcaa.blocks.FCAA_TE;
 import mod.fou.fcaa.structure.IStructure.IStructureFluidHandler;
 import mod.fou.fcaa.structure.IStructure.IStructureSidedInventory;
 import mod.fou.fcaa.structure.IStructure.ITEStructure;
@@ -41,7 +41,9 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import static mod.fou.fcaa.blocks.Structure.BlockStructure.MIRROR;
 import static mod.fou.fcaa.structure.coordinates.TransformLAG.*;
+import static net.minecraft.block.BlockDirectional.FACING;
 
 public abstract class TEStructure extends FCAA_TE implements ITEStructure, IStructureSidedInventory, IStructureFluidHandler
 {
@@ -114,8 +116,8 @@ public abstract class TEStructure extends FCAA_TE implements ITEStructure, IStru
                         Blocks.air.getDefaultState() :
                         localToGlobal(
                                 block,
-                                BlockStructure.getOrientation(state),
-                                BlockStructure.getMirror(state)
+                                state.getValue(FACING),
+                                state.getValue(MIRROR)
                         );
             }
         }
@@ -292,8 +294,8 @@ public abstract class TEStructure extends FCAA_TE implements ITEStructure, IStru
             }
 
             final IBlockState state = getWorld().getBlockState(pos);
-            final EnumFacing orientation = BlockStructure.getOrientation(state);
-            final boolean mirror = BlockStructure.getMirror(state);
+            final EnumFacing orientation = state.getValue(FACING);
+            final boolean mirror = state.getValue(MIRROR);
 
             renderBounds = Optional.of(localToGlobalBoundingBox(pos, local, sb.getPattern(), orientation, mirror));
         }
