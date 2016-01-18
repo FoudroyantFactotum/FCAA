@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package mod.fou.fcaa.midi;
+package mod.fou.fcaa.midi.generation;
 
 import mod.fou.fcaa.utility.Log.Logger;
 import org.apache.commons.lang3.tuple.ImmutablePair;

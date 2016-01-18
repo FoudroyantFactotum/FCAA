@@ -16,12 +16,16 @@
 package mod.fou.fcaa;
 
 import mod.fou.fcaa.init.InitBlock;
-import mod.fou.fcaa.midi.MidiTexture;
+import mod.fou.fcaa.midi.generation.MidiTexture;
+import mod.fou.fcaa.proxy.RenderProxy;
+import mod.fou.fcaa.structure.coordinates.TransformLAG;
 import mod.fou.fcaa.structure.registry.StructureRegistry;
 import mod.fou.fcaa.utility.Log.Logger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
@@ -38,10 +42,15 @@ public class TheMod
     @Instance
     public static TheMod instance;
 
+    @SidedProxy(clientSide = "mod.fou.fcaa.proxy.ClientRenderProxy", serverSide = "mod.fou.fcaa.proxy.RenderProxy")
+    public static RenderProxy render;
+
     @EventHandler
     public static void preInit(FMLPreInitializationEvent event)
     {
         Logger.info("==========preInit==========");
+        OBJLoader.instance.addDomain(MOD_ID);
+        TransformLAG.initStatic();
         InitBlock.init();
     }
 

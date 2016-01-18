@@ -22,17 +22,48 @@ import mod.fou.fcaa.structure.StructureDefinitionBuilder;
 import mod.fou.fcaa.structure.coordinates.BlockPosUtil;
 import mod.fou.fcaa.utility.annotations.Auto_Instance;
 import mod.fou.fcaa.utility.annotations.Auto_Structure;
-import net.minecraft.block.BlockDirectional;
+import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-@Auto_Structure(name = "playerPiano", tileEntity = TEPlayerPiano.class)
-public class BlockPlayerPiano extends BlockStructure
+import static net.minecraft.block.BlockDirectional.FACING;
+
+@Auto_Structure(name = "playerPiano", tileEntity = TEPlayerPiano.class, TESR = TESRPlayerPiano.class)
+public final class BlockPlayerPiano extends BlockStructure
 {
     @Auto_Instance
     public static final BlockPlayerPiano INSTANCE = null;
+
+    public static final PropertyEnum<PianoState> propPiano = PropertyEnum.create("ps", PianoState.class);
+
+    public BlockPlayerPiano()
+    {
+        setDefaultState(
+                this.blockState
+                .getBaseState()
+                .withProperty(FACING, EnumFacing.SOUTH)
+                .withProperty(MIRROR, false)
+                .withProperty(propPiano, PianoState.piano)
+        );
+    }
+
+    @Override
+    protected BlockState createBlockState()
+    {
+        return new BlockState(this, FACING, MIRROR, propPiano);
+    }
+
+    @Override
+    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
+    {
+        return state.withProperty(propPiano, PianoState.piano);
+    }
 
     @Override
     public boolean hasTileEntity(IBlockState state)
@@ -43,7 +74,7 @@ public class BlockPlayerPiano extends BlockStructure
     @Override
     public TileEntity createTileEntity(World world, IBlockState state)
     {
-        return new TEPlayerPiano(getPattern(), state.getValue(BlockDirectional.FACING), state.getValue(MIRROR));
+        return new TEPlayerPiano(getPattern(), state.getValue(FACING), state.getValue(MIRROR));
     }
 
     @Override
@@ -53,20 +84,33 @@ public class BlockPlayerPiano extends BlockStructure
     }
 
     @Override
+    public boolean onStructureBlockActivated(World world, BlockPos pos, EntityPlayer player, BlockPos callPos, EnumFacing side, BlockPos local, float sx, float sy, float sz)
+    {
+        if (local.equals(BlockPos.ORIGIN))
+        {
+            world.setBlockState(pos, getDefaultState().withProperty(propPiano, PianoState.piano));
+        }
+
+        return super.onStructureBlockActivated(world, pos, player, callPos, side, local, sx, sy, sz);
+    }
+
+    @Override
     public StructureDefinitionBuilder getStructureBuild()
     {
         final StructureDefinitionBuilder builder = new StructureDefinitionBuilder();
 
         builder.assignConstructionDef(ImmutableMap.of(
-                'p', "minecraft:dirt"
+                'j', "minecraft:jukebox",
+                'p', "minecraft:planks"
+
         ));
 
         builder.assignConstructionBlocks(
                 new String[]{
-                        "  "
+                        "pp"
                 },
                 new String[]{
-                        "  "
+                        "jj"
                 }
         );
 

@@ -100,9 +100,15 @@ public abstract class BlockStructure extends FCAA_Block implements IPatternHolde
     }
 
     @Override
+    public boolean isOpaqueCube()
+    {
+        return false;
+    }
+
+    @Override
     public int getRenderType()
     {
-        return -1;
+        return 3;
     }
 
     @Override

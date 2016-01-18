@@ -13,29 +13,19 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package mod.fou.fcaa.utility.annotations;
+package mod.fou.fcaa.proxy;
 
+import mod.fou.fcaa.Blocks.FCAA_TE;
 import mod.fou.fcaa.Blocks.Structure.FCAA_TESR;
-import mod.fou.fcaa.Blocks.Structure.TEStructure;
-import mod.fou.fcaa.init.InitBlock;
-import mod.fou.fcaa.structure.ItemBlockStructure;
+import net.minecraft.block.Block;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface Auto_Structure
+public class RenderProxy
 {
-    String name();
+    public void preInit() { }
 
-    Class<? extends TEStructure> tileEntity();
+    public void init() { }
 
-    String tab() default InitBlock.ModTab.main;
+    public <E extends FCAA_TE> void registerTESR(Class<E> te, FCAA_TESR<E> tesr) { }
 
-    Class<? extends ItemBlockStructure> item() default ItemBlockStructure.class;
-
-    Class<? extends FCAA_TESR> TESR() default FCAA_TESR.class;
+    public void registerBlockAsItemModel(Block block) { }
 }

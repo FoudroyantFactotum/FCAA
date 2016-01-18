@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package mod.fou.fcaa.midi;
+package mod.fou.fcaa.midi.generation;
 
 import mod.fou.fcaa.utility.Log.Logger;
 import net.minecraft.client.renderer.GlStateManager;
@@ -57,17 +57,16 @@ public class MidiTexture extends AbstractTexture
         {
             this.deleteGlTexture();
 
-            synchronized (net.minecraftforge.fml.client.SplashProgress.class)
-            {
-                GlStateManager.bindTexture(this.getGlTextureId());
+            GlStateManager.bindTexture(this.getGlTextureId());
+            
+            final ByteBuffer bb = (ByteBuffer) BufferUtils
+                    .createByteBuffer(res.getRight().length)
+                    .put(res.getRight())
+                    .flip();
 
-
-                final ByteBuffer bb = (ByteBuffer) BufferUtils.createByteBuffer(res.getRight().length).put(res.getRight()).flip();
-
-                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGB8, GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE) - 1, 88, 0,
-                        GL11.GL_RGB, GL11.GL_BYTE, bb
-                );
-            }
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGB8, GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE), 88, 0,
+                    GL11.GL_RGB, GL11.GL_BYTE, bb
+            );
         }
     }
 
@@ -109,8 +108,8 @@ public class MidiTexture extends AbstractTexture
                 {
                     if (vel == 0 && lastEvent[note] != -1)
                     {
-                        final int lineStart = (int) (note*xSize + lastEvent[note]/sequence.getTickLength()*xSize) * pixelComponents;
-                        final int lineEnd = (int) (note*xSize + event.getTick()/sequence.getTickLength()*xSize) * pixelComponents;
+                        final int lineStart = (int) (note * xSize + lastEvent[note] / sequence.getTickLength() * xSize) * pixelComponents;
+                        final int lineEnd = (int) (note * xSize + event.getTick() / sequence.getTickLength() * xSize) * pixelComponents;
 
                         Arrays.fill(img, lineStart, lineEnd, Byte.MAX_VALUE);
 
@@ -138,6 +137,6 @@ public class MidiTexture extends AbstractTexture
 
         io.close();
 
-        Logger.info(String.format("startTime: %s endTime: %s totalTime: %s file: %s", startTime, endTime, endTime-startTime, test.getLeft()));
+        Logger.info(String.format("startTime: %s endTime: %s totalTime: %s file: %s", startTime, endTime, endTime - startTime, test.getLeft()));
     }
 }

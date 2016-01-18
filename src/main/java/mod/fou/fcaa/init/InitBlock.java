@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.ClassPath;
 import mod.fou.fcaa.Blocks.FCAA_Block;
 import mod.fou.fcaa.Blocks.Structure.BlockStructure;
+import mod.fou.fcaa.Blocks.Structure.FCAA_TESR;
 import mod.fou.fcaa.TheMod;
 import mod.fou.fcaa.structure.registry.StructureRegistry;
 import mod.fou.fcaa.utility.Clazz;
@@ -166,6 +167,10 @@ public class InitBlock
                         if (!ModTab.none.equals(annot.tab()))//todo better error handling
                             block.setCreativeTab(ModTab.tabs.get(annot.tab()));
 
+                        if (annot.TESR() != FCAA_TESR.class)
+                            TheMod.render.registerTESR(annot.tileEntity(), annot.TESR().newInstance());
+
+                        TheMod.render.registerBlockAsItemModel(block);
                     }
                 } catch (ClassNotFoundException e)//todo better errors
                 {

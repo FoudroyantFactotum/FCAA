@@ -92,13 +92,9 @@ public class ToolBuildForm extends Item
                     res.cancel(true);
                 }
             }
-            catch (InterruptedException e)
+            catch (InterruptedException | ExecutionException e)
             {
-                Logger.severe(e.getMessage());
-            }
-            catch (ExecutionException e)
-            {
-                Logger.severe(e.getMessage());
+                Logger.info(e.getMessage());
             }
         }
 

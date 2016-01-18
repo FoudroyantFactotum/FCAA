@@ -1,0 +1,179 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "transform": "forge:default-block",
+    "textures": {
+      "pianoPlayer": "fcaa:PianoPlayer"
+    },
+    "custom": {
+      "flip-v": true
+    }
+  },
+  "variants": {
+    "normal": [{}],
+    "inventory": [{
+      "transform": {
+        "thirdperson": {
+          "translation": [0, 0, 0.0],
+          "rotation": [{"y": 0}, {"z": 180}],
+          "scale": 0.2
+        },
+        "firstperson": {
+          "rotation": {"y": -90 },
+          "translation": [0, 0.18, 0],
+          "scale": 0.55
+        },
+        "gui": {
+          "translation": [0.01, 0.02, -0.03],
+          "rotation": {"y": 90 },
+          "scale": 0.31
+        }
+      }
+    }],
+    "facing=north,mirror=false,ps=piano": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-Body.obj", "transform": {
+        "translation": [0, 0, 1]
+    }},
+    "facing=east,mirror=false,ps=piano": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-Body.obj", "transform": {
+        "rotation": {"y": 270 },
+        "translation": [-1, 0, 0]
+    }},
+    "facing=south,mirror=false,ps=piano": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-Body.obj", "transform": {
+          "rotation": {"y": 180 },
+        "translation": [0, 0, -1]
+    }},
+    "facing=west,mirror=false,ps=piano": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-Body.obj", "transform": {
+        "rotation": {"y": 90 },
+        "translation": [1, 0, 0]
+    }},
+    "facing=north,mirror=true,ps=piano": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-Body.obj", "transform": {
+        "scale": [-1,1,1],
+        "translation": [-1.5, 1, 1]
+      }
+    },
+    "facing=east,mirror=true,ps=piano": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-Body.obj", "transform": {
+        "scale": [-1,1,1],
+        "rotation": {"y": 270 },
+        "translation": [-1, 1, -1.5]
+      }
+    },
+    "facing=south,mirror=true,ps=piano": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-Body.obj", "transform": {
+        "scale": [-1,1,1],
+        "rotation": {"y": 180 },
+        "translation": [1.5, 1, -1]
+      }
+    },
+    "facing=west,mirror=true,ps=piano": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-Body.obj", "transform": {
+        "scale": [-1,1,1],
+        "rotation": {"y": 90 },
+        "translation": [1, 1, 1.5]
+      }
+    },
+    
+    
+    
+    "facing=north,mirror=false,ps=key_white": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {
+        "translation": [0, 0, 1]
+    }},
+    "facing=east,mirror=false,ps=key_white": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {
+        "rotation": {"y": 270 },
+        "translation": [-1, 0, 0]
+    }},
+    "facing=south,mirror=false,ps=key_white": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {
+          "rotation": {"y": 180 },
+        "translation": [0, 0, -1]
+    }},
+    "facing=west,mirror=false,ps=key_white": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {
+        "rotation": {"y": 90 },
+        "translation": [1, 0, 0]
+    }},
+    "facing=north,mirror=true,ps=key_white": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {
+        "scale": [-1,1,1],
+        "translation": [-1.5, 1, 1]
+      }
+    },
+    "facing=east,mirror=true,ps=key_white": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {
+        "scale": [-1,1,1],
+        "rotation": {"y": 270 },
+        "translation": [-1, 1, -1.5]
+      }
+    },
+    "facing=south,mirror=true,ps=key_white": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {
+        "scale": [-1,1,1],
+        "rotation": {"y": 180 },
+        "translation": [1.5, 1, -1]
+      }
+    },
+    "facing=west,mirror=true,ps=key_white": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {
+        "scale": [-1,1,1],
+        "rotation": {"y": 90 },
+        "translation": [1, 1, 1.5]
+      }
+    },
+    
+    
+    
+    
+    "facing=north,mirror=false,ps=key_black": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {
+        "translation": [0, 0, 1]
+    }},
+    "facing=east,mirror=false,ps=key_black": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {
+        "rotation": {"y": 270 },
+        "translation": [-1, 0, 0]
+    }},
+    "facing=south,mirror=false,ps=key_black": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {
+          "rotation": {"y": 180 },
+        "translation": [0, 0, -1]
+    }},
+    "facing=west,mirror=false,ps=key_black": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {
+        "rotation": {"y": 90 },
+        "translation": [1, 0, 0]
+    }},
+    "facing=north,mirror=true,ps=key_black": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {
+        "scale": [-1,1,1],
+        "translation": [-1.5, 1, 1]
+      }
+    },
+    "facing=east,mirror=true,ps=key_black": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {
+        "scale": [-1,1,1],
+        "rotation": {"y": 270 },
+        "translation": [-1, 1, -1.5]
+      }
+    },
+    "facing=south,mirror=true,ps=key_black": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {
+        "scale": [-1,1,1],
+        "rotation": {"y": 180 },
+        "translation": [1.5, 1, -1]
+      }
+    },
+    "facing=west,mirror=true,ps=key_black": {
+      "model": "fcaa:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {
+        "scale": [-1,1,1],
+        "rotation": {"y": 90 },
+        "translation": [1, 1, 1.5]
+      }
+    }
+  }
+}
