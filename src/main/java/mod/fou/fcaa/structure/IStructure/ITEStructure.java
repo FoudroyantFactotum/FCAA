@@ -15,7 +15,7 @@
  */
 package mod.fou.fcaa.structure.IStructure;
 
-import mod.fou.fcaa.Blocks.Structure.BlockStructure;
+import mod.fou.fcaa.blocks.Structure.BlockStructure;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockPos;
 

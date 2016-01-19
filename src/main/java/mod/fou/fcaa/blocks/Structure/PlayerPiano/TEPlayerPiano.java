@@ -21,6 +21,9 @@ import net.minecraft.util.EnumFacing;
 
 public class TEPlayerPiano extends TEStructureTemplate
 {
+    volatile float[] keyOffset = new float[88];
+    public double songReadHeadPos;
+
     public TEPlayerPiano()
     {
         //noop

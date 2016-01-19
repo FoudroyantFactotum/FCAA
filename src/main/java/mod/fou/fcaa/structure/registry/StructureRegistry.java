@@ -16,7 +16,7 @@
 package mod.fou.fcaa.structure.registry;
 
 import com.google.common.collect.Lists;
-import mod.fou.fcaa.Blocks.Structure.BlockStructure;
+import mod.fou.fcaa.blocks.Structure.BlockStructure;
 import mod.fou.fcaa.utility.Log.Logger;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;

@@ -15,8 +15,8 @@
  */
 package mod.fou.fcaa.utility.annotations;
 
-import mod.fou.fcaa.Blocks.Structure.FCAA_TESR;
-import mod.fou.fcaa.Blocks.Structure.TEStructure;
+import mod.fou.fcaa.blocks.Structure.FCAA_TESR;
+import mod.fou.fcaa.blocks.Structure.TEStructure;
 import mod.fou.fcaa.init.InitBlock;
 import mod.fou.fcaa.structure.ItemBlockStructure;
 

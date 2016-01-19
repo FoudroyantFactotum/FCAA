@@ -15,7 +15,7 @@
  */
 package mod.fou.fcaa.structure;
 
-import mod.fou.fcaa.Blocks.Structure.BlockStructure;
+import mod.fou.fcaa.blocks.Structure.BlockStructure;
 import mod.fou.fcaa.structure.IStructure.IPartBlockState;
 import mod.fou.fcaa.structure.net.StructurePacket;
 import mod.fou.fcaa.structure.net.StructurePacketOption;
@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-import static mod.fou.fcaa.Blocks.Structure.BlockStructure.updateExternalNeighbours;
+import static mod.fou.fcaa.blocks.Structure.BlockStructure.updateExternalNeighbours;
 import static mod.fou.fcaa.structure.coordinates.TransformLAG.*;
 
 public class ToolBuildForm extends Item

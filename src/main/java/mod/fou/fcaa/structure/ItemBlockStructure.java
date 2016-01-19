@@ -15,7 +15,7 @@
  */
 package mod.fou.fcaa.structure;
 
-import mod.fou.fcaa.Blocks.Structure.BlockStructure;
+import mod.fou.fcaa.blocks.Structure.BlockStructure;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,7 +27,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-import static mod.fou.fcaa.Blocks.Structure.BlockStructure.MIRROR;
+import static mod.fou.fcaa.blocks.Structure.BlockStructure.MIRROR;
 import static mod.fou.fcaa.structure.coordinates.TransformLAG.localToGlobal;
 import static mod.fou.fcaa.structure.coordinates.TransformLAG.mutLocalToGlobal;
 import static net.minecraft.block.BlockDirectional.FACING;

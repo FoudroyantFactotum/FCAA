@@ -16,7 +16,7 @@
 package mod.fou.fcaa.structure.net;
 
 import io.netty.buffer.ByteBuf;
-import mod.fou.fcaa.Blocks.Structure.BlockStructure;
+import mod.fou.fcaa.blocks.Structure.BlockStructure;
 import mod.fou.fcaa.structure.registry.StructureRegistry;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.state.IBlockState;
@@ -31,8 +31,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-import static mod.fou.fcaa.Blocks.Structure.BlockStructure.bindLocalToGlobal;
-import static mod.fou.fcaa.Blocks.Structure.BlockStructure.updateExternalNeighbours;
+import static mod.fou.fcaa.blocks.Structure.BlockStructure.bindLocalToGlobal;
+import static mod.fou.fcaa.blocks.Structure.BlockStructure.updateExternalNeighbours;
 import static mod.fou.fcaa.structure.coordinates.TransformLAG.localToGlobal;
 
 //todo fix and clean up this packet code

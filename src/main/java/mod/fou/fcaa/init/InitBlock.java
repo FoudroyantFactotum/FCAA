@@ -17,10 +17,10 @@ package mod.fou.fcaa.init;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.ClassPath;
-import mod.fou.fcaa.Blocks.FCAA_Block;
-import mod.fou.fcaa.Blocks.Structure.BlockStructure;
-import mod.fou.fcaa.Blocks.Structure.FCAA_TESR;
 import mod.fou.fcaa.TheMod;
+import mod.fou.fcaa.blocks.FCAA_Block;
+import mod.fou.fcaa.blocks.Structure.BlockStructure;
+import mod.fou.fcaa.blocks.Structure.FCAA_TESR;
 import mod.fou.fcaa.structure.registry.StructureRegistry;
 import mod.fou.fcaa.utility.Clazz;
 import mod.fou.fcaa.utility.annotations.Auto_Block;

@@ -49,7 +49,7 @@ public final class BlockPlayerPiano extends BlockStructure
                 .getBaseState()
                 .withProperty(FACING, EnumFacing.SOUTH)
                 .withProperty(MIRROR, false)
-                .withProperty(propPiano, PianoState.key_white)
+                .withProperty(propPiano, PianoState.piano)
         );
     }
 

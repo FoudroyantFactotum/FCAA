@@ -15,8 +15,8 @@
  */
 package mod.fou.fcaa.proxy;
 
-import mod.fou.fcaa.Blocks.FCAA_TE;
-import mod.fou.fcaa.Blocks.Structure.FCAA_TESR;
+import mod.fou.fcaa.blocks.FCAA_TE;
+import mod.fou.fcaa.blocks.Structure.FCAA_TESR;
 import net.minecraft.block.Block;
 
 public class RenderProxy

@@ -17,7 +17,7 @@ package mod.fou.fcaa.structure.coordinates;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
-import mod.fou.fcaa.Blocks.Structure.TEStructure;
+import mod.fou.fcaa.blocks.Structure.TEStructure;
 import mod.fou.fcaa.structure.IStructure.IPartBlockState;
 import mod.fou.fcaa.structure.registry.StateCorrecter.IStructurePatternStateCorrecter;
 import mod.fou.fcaa.structure.registry.StateCorrecter.StairsMinecraftRotation;
