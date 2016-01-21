@@ -60,8 +60,11 @@ public class TheMod
         StructureRegistry.loadRegisteredPatterns();
         Minecraft.getMinecraft().getTextureManager()
                 .loadTexture(
-                        new ResourceLocation("fcaa", "midi/Hindustan(1918).img"),
-                        new MidiTexture(new ResourceLocation("fcaa", "midi/Hindustan(1918).mid"))
+                        midiimg,
+                        new MidiTexture(midiFile)
                 );
     }
+
+    public static final ResourceLocation midiFile = new ResourceLocation("fcaa", "midi/Hindustan(1918).mid");
+    public static final ResourceLocation midiimg = new ResourceLocation("fcaa", "midi/Hindustan(1918).img");
 }

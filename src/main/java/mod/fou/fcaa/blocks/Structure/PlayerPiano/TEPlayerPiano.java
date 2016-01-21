@@ -19,10 +19,16 @@ import mod.fou.fcaa.blocks.Structure.TEStructureTemplate;
 import mod.fou.fcaa.structure.registry.StructureDefinition;
 import net.minecraft.util.EnumFacing;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 public class TEPlayerPiano extends TEStructureTemplate
 {
-    volatile float[] keyOffset = new float[88];
-    public double songReadHeadPos;
+    public static final Executor e = Executors.newSingleThreadExecutor();
+
+    public volatile float[] keyOffset = new float[88];
+    public volatile boolean[] keyIsDown = new boolean[88];
+    public volatile double songPos;
 
     public TEPlayerPiano()
     {

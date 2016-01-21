@@ -46,9 +46,7 @@ public class TESRPlayerPiano extends FCAA_TESR<TEPlayerPiano>
         int[] bk = {1, 4, 6, 9, 11, 13, 16, 18, 21, 23, 25, 28, 30, 33, 35, 37, 40, 42, 45, 47, 49, 52, 54, 57, 59, 61, 64, 66, 69, 71, 73, 76, 78, 81, 83, 85};
 
         for (int v : bk)
-        {
             blackKeyNo.set(v, true);
-        }
     }
 
     // TODO: 19/01/16 fix mirror render
@@ -108,13 +106,9 @@ public class TESRPlayerPiano extends FCAA_TESR<TEPlayerPiano>
 
         //Piano Roll Music
         final double displayAmount = 500/8048.0;
-        final double shift = te.songReadHeadPos;
+        final double shift = te.songPos;
 
-        te.songReadHeadPos += 0.0002;
-
-        if (te.songReadHeadPos > 1)
-            te.songReadHeadPos = 0;
-
+        bindTexture(rl);
 
         wr.setTranslation(x, y+0.8, z-0.8);
         wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
@@ -129,12 +123,8 @@ public class TESRPlayerPiano extends FCAA_TESR<TEPlayerPiano>
             wr.pos(0.67103, 0.46830, 1.25589).tex(0.5*displayAmount + shift, 0).endVertex();
             wr.pos(1.33031, 0.46830, 1.25589).tex(0.5*displayAmount + shift, 1).endVertex();
         }
-
-        bindTexture(rl);
-
         tess.draw();
         wr.setTranslation(0.0D, 0.0D, 0.0D);
-        //bindTexture(TextureMap.locationBlocksTexture);
 
         RenderHelper.enableStandardItemLighting();
     }

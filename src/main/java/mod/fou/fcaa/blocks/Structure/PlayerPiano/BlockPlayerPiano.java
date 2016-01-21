@@ -18,6 +18,7 @@ package mod.fou.fcaa.blocks.Structure.PlayerPiano;
 import com.google.common.collect.ImmutableMap;
 import mod.fou.fcaa.blocks.Structure.BlockStructure;
 import mod.fou.fcaa.blocks.Structure.TEStructure;
+import mod.fou.fcaa.midi.midiPlayer.TestPlayer;
 import mod.fou.fcaa.structure.StructureDefinitionBuilder;
 import mod.fou.fcaa.structure.coordinates.BlockPosUtil;
 import mod.fou.fcaa.utility.annotations.Auto_Instance;
@@ -86,9 +87,9 @@ public final class BlockPlayerPiano extends BlockStructure
     @Override
     public boolean onStructureBlockActivated(World world, BlockPos pos, EntityPlayer player, BlockPos callPos, EnumFacing side, BlockPos local, float sx, float sy, float sz)
     {
-        if (local.equals(BlockPos.ORIGIN))
+        if (world.isRemote)
         {
-            world.setBlockState(pos, getDefaultState().withProperty(propPiano, PianoState.piano));
+            TEPlayerPiano.e.execute(new TestPlayer());
         }
 
         return super.onStructureBlockActivated(world, pos, player, callPos, side, local, sx, sy, sz);
