@@ -1,0 +1,21 @@
+[
+{
+  "modid": "fousarchive",
+  "name": "Fou's Archive",
+  "description": "//TODO",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": [
+    "Foudroyant Factotum"
+  ],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [
+  ],
+  "parent":"",
+  "dependencies": [
+  ]
+}
+]
