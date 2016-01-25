@@ -13,10 +13,11 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package com.foudroyantfactotum.mod.fousarchive.blocks;
+package com.foudroyantfactotum.mod.fousarchive.blocks.Structure;
 
-import net.minecraft.tileentity.TileEntity;
+import com.foudroyantfactotum.mod.fousarchive.blocks.FA_TE;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 
-public class FCAA_TE extends TileEntity
+public abstract class FA_TESR<E extends FA_TE> extends TileEntitySpecialRenderer<E>
 {
 }

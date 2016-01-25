@@ -17,7 +17,8 @@ package com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano;
 
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.BlockStructure;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.TEStructure;
-import com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer.TestPlayer;
+import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
+import com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer.MidiPianoPlayer;
 import com.foudroyantfactotum.mod.fousarchive.structure.StructureDefinitionBuilder;
 import com.foudroyantfactotum.mod.fousarchive.structure.coordinates.BlockPosUtil;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Instance;
@@ -26,7 +27,9 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -47,10 +50,10 @@ public final class BlockPlayerPiano extends BlockStructure
     {
         setDefaultState(
                 this.blockState
-                .getBaseState()
-                .withProperty(FACING, EnumFacing.SOUTH)
-                .withProperty(MIRROR, false)
-                .withProperty(propPiano, PianoState.piano)
+                        .getBaseState()
+                        .withProperty(FACING, EnumFacing.SOUTH)
+                        .withProperty(MIRROR, false)
+                        .withProperty(propPiano, PianoState.piano)
         );
     }
 
@@ -87,9 +90,45 @@ public final class BlockPlayerPiano extends BlockStructure
     @Override
     public boolean onStructureBlockActivated(World world, BlockPos pos, EntityPlayer player, BlockPos callPos, EnumFacing side, BlockPos local, float sx, float sy, float sz)
     {
-        if (world.isRemote)
+        final TileEntity ute = world.getTileEntity(pos);
+
+        if (ute instanceof TEPlayerPiano)
         {
-            TEPlayerPiano.e.execute(new TestPlayer());
+            final TEPlayerPiano te = (TEPlayerPiano) ute;
+            final ItemStack uStackItem = player.inventory.getCurrentItem();
+
+            if (te.loadedSong == null)
+            {
+                if (uStackItem != null && uStackItem.getItem() instanceof ItemPianoRoll)
+                {
+                    if (!player.capabilities.isCreativeMode)
+                        player.inventory.removeStackFromSlot(player.inventory.currentItem);
+
+                    te.loadedSong = (ItemPianoRoll) uStackItem.getItem();
+                }
+            } else
+            {
+                if (te.hasSongTerminated)
+                {
+                    if (player.isSneaking())
+                    {
+                        if (!player.capabilities.isCreativeMode)
+                            world.spawnEntityInWorld(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(te.loadedSong, 1)));
+
+                        te.loadedSong = null;
+                        te.songPos = 0.0;
+                    } else {
+                        te.isSongPlaying = true;
+                        te.isSongRunning = true;
+                        te.hasSongTerminated = false;
+
+                        TEPlayerPiano.midiService.execute(new MidiPianoPlayer(te, te.songPos));
+                    }
+                } else if (te.isSongPlaying)
+                {
+                    te.isSongPlaying = false;
+                }
+            }
         }
 
         return super.onStructureBlockActivated(world, pos, player, callPos, side, local, sx, sy, sz);
@@ -115,9 +154,9 @@ public final class BlockPlayerPiano extends BlockStructure
                 }
         );
 
-        builder.assignToolFormPosition(BlockPosUtil.of(0,0,0));
+        builder.assignToolFormPosition(BlockPosUtil.of(0, 0, 0));
 
-        builder.setConfiguration(BlockPosUtil.of(0,0,0),
+        builder.setConfiguration(BlockPosUtil.of(0, 0, 0),
                 new String[]{
                         "M-"
                 },
@@ -126,7 +165,7 @@ public final class BlockPlayerPiano extends BlockStructure
                 }
         );
 
-        builder.setCollisionBoxes(new float[]{0,0,0 ,0,0,0});
+        builder.setCollisionBoxes(new float[]{0, 0, 0, 0, 0, 0});
 
         return builder;
     }

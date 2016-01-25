@@ -15,7 +15,7 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.blocks.TestBlock;
 
-import com.foudroyantfactotum.mod.fousarchive.blocks.FCAA_Block;
+import com.foudroyantfactotum.mod.fousarchive.blocks.FA_Block;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Block;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Instance;
 import net.minecraft.block.material.Material;
@@ -27,7 +27,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 @Auto_Block(name = "testBlockOne", tileEntity = TETestOne.class)
-public class BlockTestOne extends FCAA_Block
+public class BlockTestOne extends FA_Block
 {
     @Auto_Instance
     public static final BlockTestOne INSTANCE = null;

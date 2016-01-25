@@ -20,9 +20,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 
 
-public abstract class FCAA_Block extends Block
+public abstract class FA_Block extends Block
 {
-    public FCAA_Block(Material materialIn)
+    public FA_Block(Material materialIn)
     {
         super(materialIn);
     }

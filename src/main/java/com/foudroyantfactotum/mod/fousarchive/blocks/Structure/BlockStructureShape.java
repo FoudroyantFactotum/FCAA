@@ -15,7 +15,7 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure;
 
-import com.foudroyantfactotum.mod.fousarchive.blocks.FCAA_Block;
+import com.foudroyantfactotum.mod.fousarchive.blocks.FA_Block;
 import com.foudroyantfactotum.mod.fousarchive.init.InitBlock;
 import com.foudroyantfactotum.mod.fousarchive.structure.IStructure.ITEStructure;
 import com.foudroyantfactotum.mod.fousarchive.structure.registry.StructureRegistry;
@@ -44,7 +44,7 @@ import static com.foudroyantfactotum.mod.fousarchive.structure.coordinates.Trans
 import static net.minecraft.block.BlockDirectional.FACING;
 
 @Auto_Block(name = "structureShape", tab = InitBlock.ModTab.none, tileEntity = TEStructureShape.class)
-public class BlockStructureShape extends FCAA_Block implements ITileEntityProvider
+public class BlockStructureShape extends FA_Block implements ITileEntityProvider
 {
     @Auto_Instance
     public static final BlockStructureShape INSTANCE = null;

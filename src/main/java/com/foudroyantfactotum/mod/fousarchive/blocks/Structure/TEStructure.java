@@ -15,7 +15,7 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure;
 
-import com.foudroyantfactotum.mod.fousarchive.blocks.FCAA_TE;
+import com.foudroyantfactotum.mod.fousarchive.blocks.FA_TE;
 import com.foudroyantfactotum.mod.fousarchive.structure.IStructure.IStructureFluidHandler;
 import com.foudroyantfactotum.mod.fousarchive.structure.IStructure.IStructureSidedInventory;
 import com.foudroyantfactotum.mod.fousarchive.structure.IStructure.ITEStructure;
@@ -44,7 +44,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static net.minecraft.block.BlockDirectional.FACING;
 
-public abstract class TEStructure extends FCAA_TE implements ITEStructure, IStructureSidedInventory, IStructureFluidHandler
+public abstract class TEStructure extends FA_TE implements ITEStructure, IStructureSidedInventory, IStructureFluidHandler
 {
     static final String BLOCK_INFO = "blockINFO";
     static final String BLOCK_PATTERN_NAME = "blockPatternHash";
@@ -251,16 +251,22 @@ public abstract class TEStructure extends FCAA_TE implements ITEStructure, IStru
     @Override
     public void readFromNBT(NBTTagCompound nbt)
     {
-        super.readFromNBT(nbt);
+        try
+        {
+            super.readFromNBT(nbt);
 
-        final int blockInfo = nbt.getInteger(BLOCK_INFO);
+            final int blockInfo = nbt.getInteger(BLOCK_INFO);
 
-        definitionHash = nbt.getInteger(BLOCK_PATTERN_NAME);
+            definitionHash = nbt.getInteger(BLOCK_PATTERN_NAME);
 
-        orientation = EnumFacing.VALUES[blockInfo >> BlockPosUtil.BLOCKPOS_BITLEN & 0x7];
-        mirror = (blockInfo >> BlockPosUtil.BLOCKPOS_BITLEN & StructurePacket.flagMirrored) != 0;
+            orientation = EnumFacing.VALUES[blockInfo >> BlockPosUtil.BLOCKPOS_BITLEN & 0x7];
+            mirror = (blockInfo >> BlockPosUtil.BLOCKPOS_BITLEN & StructurePacket.flagMirrored) != 0;
 
-        transformDirectionsOnLoad(getMasterBlockInstance().getPattern());
+            transformDirectionsOnLoad(getMasterBlockInstance().getPattern());
+        } catch (NullPointerException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override

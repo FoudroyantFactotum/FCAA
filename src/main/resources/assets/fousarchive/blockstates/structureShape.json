@@ -2,13 +2,13 @@
   "forge_marker": 1,
   "defaults": {
     "transform": "forge:default-block",
-    "model": "minecraft:cube_all"
+    "model": "minecraft:cube_all",
+    "textures":{
+      "all": "blocks/glass_red"
+    }
   },
   "variants": {
-    "normal": [
-      {
-      }
-    ],
+    "normal": [{}],
     "inventory": [
       {
         "transform": {

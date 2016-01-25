@@ -36,7 +36,8 @@ import java.util.Arrays;
 
 public class MidiTexture extends AbstractTexture
 {
-    final ResourceLocation rl;
+    private final ResourceLocation rl;
+    private String songName = "noName";
 
     public MidiTexture(ResourceLocation rl)
     {
@@ -72,6 +73,8 @@ public class MidiTexture extends AbstractTexture
             GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGB, xSize, ySize, 0,
                     GL11.GL_RGB, GL11.GL_BYTE, bb
             );
+
+            songName = res.getLeft();
         }
     }
 

@@ -16,9 +16,9 @@
 package com.foudroyantfactotum.mod.fousarchive.init;
 
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
-import com.foudroyantfactotum.mod.fousarchive.blocks.FCAA_Block;
+import com.foudroyantfactotum.mod.fousarchive.blocks.FA_Block;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.BlockStructure;
-import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FCAA_TESR;
+import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
 import com.foudroyantfactotum.mod.fousarchive.structure.registry.StructureRegistry;
 import com.foudroyantfactotum.mod.fousarchive.utility.Clazz;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Block;
@@ -89,7 +89,7 @@ public class InitBlock
             final Field mField = Field.class.getDeclaredField("modifiers");
             mField.setAccessible(true);
 
-            for (final ClassPath.ClassInfo i : Clazz.getClassListFrom(FCAA_Block.class.getPackage()))
+            for (final ClassPath.ClassInfo i : Clazz.getClassListFrom(FA_Block.class.getPackage()))
             {
                 try
                 {
@@ -167,7 +167,7 @@ public class InitBlock
                         if (!ModTab.none.equals(annot.tab()))//todo better error handling
                             block.setCreativeTab(ModTab.tabs.get(annot.tab()));
 
-                        if (annot.TESR() != FCAA_TESR.class)
+                        if (annot.TESR() != FA_TESR.class)
                             TheMod.render.registerTESR(annot.tileEntity(), annot.TESR().newInstance());
 
                         TheMod.render.registerBlockAsItemModel(block);

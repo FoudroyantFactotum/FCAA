@@ -15,7 +15,7 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.utility.annotations;
 
-import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FCAA_TESR;
+import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.TEStructure;
 import com.foudroyantfactotum.mod.fousarchive.init.InitBlock;
 import com.foudroyantfactotum.mod.fousarchive.structure.ItemBlockStructure;
@@ -37,5 +37,5 @@ public @interface Auto_Structure
 
     Class<? extends ItemBlockStructure> item() default ItemBlockStructure.class;
 
-    Class<? extends FCAA_TESR> TESR() default FCAA_TESR.class;
+    Class<? extends FA_TESR> TESR() default FA_TESR.class;
 }

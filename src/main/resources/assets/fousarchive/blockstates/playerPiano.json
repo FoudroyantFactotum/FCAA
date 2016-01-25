@@ -2,9 +2,9 @@
   "forge_marker": 1,
   "defaults": {
     "transform": "forge:default-block",
-    "model": "fcaa:PlayerPiano/PlayerPiano-Body.obj",
+    "model": "fousarchive:PlayerPiano/PlayerPiano-Body.obj",
     "textures": {
-      "pianoPlayer": "fcaa:PianoPlayer"
+      "pianoPlayer": "fousarchive:PianoPlayer"
     },
     "custom": {
       "flip-v": true
@@ -31,31 +31,31 @@
         }
       }
     }],
-    "facing=north,mirror=false,ps=piano": {"model": "fcaa:PlayerPiano/PlayerPiano-Body.obj", "transform": {"translation": [0, 0, 1]}},
-    "facing=east,mirror=false,ps=piano":  {"model": "fcaa:PlayerPiano/PlayerPiano-Body.obj", "transform": {"rotation": {"y": 270 }, "translation": [-1, 0, 0]}},
-    "facing=south,mirror=false,ps=piano": {"model": "fcaa:PlayerPiano/PlayerPiano-Body.obj", "transform": {"rotation": {"y": 180 }, "translation": [0, 0, -1]}},
-    "facing=west,mirror=false,ps=piano":  {"model": "fcaa:PlayerPiano/PlayerPiano-Body.obj", "transform": {"rotation": {"y": 90 },  "translation": [1, 0, 0]}},
-    "facing=north,mirror=true,ps=piano":  {"model": "fcaa:PlayerPiano/PlayerPiano-Body.obj", "transform": {"scale": [-1,1,1],       "translation": [-1.5, 1, 1]}},
-    "facing=east,mirror=true,ps=piano":   {"model": "fcaa:PlayerPiano/PlayerPiano-Body.obj", "transform": {"scale": [-1,1,1], "rotation": {"y": 270 }, "translation": [-1, 1, -1.5]}},
-    "facing=south,mirror=true,ps=piano":  {"model": "fcaa:PlayerPiano/PlayerPiano-Body.obj", "transform": {"scale": [-1,1,1], "rotation": {"y": 180 }, "translation": [1.5, 1, -1]}},
-    "facing=west,mirror=true,ps=piano":   {"model": "fcaa:PlayerPiano/PlayerPiano-Body.obj", "transform": {"scale": [-1,1,1], "rotation": {"y": 90 },  "translation": [1, 1, 1.5]}},
+    "facing=north,mirror=false,ps=piano": {"model": "fousarchive:PlayerPiano/PlayerPiano-Body.obj", "transform": {"translation": [0, 0, 1]}},
+    "facing=east,mirror=false,ps=piano":  {"model": "fousarchive:PlayerPiano/PlayerPiano-Body.obj", "transform": {"rotation": {"y": 270 }, "translation": [-1, 0, 0]}},
+    "facing=south,mirror=false,ps=piano": {"model": "fousarchive:PlayerPiano/PlayerPiano-Body.obj", "transform": {"rotation": {"y": 180 }, "translation": [0, 0, -1]}},
+    "facing=west,mirror=false,ps=piano":  {"model": "fousarchive:PlayerPiano/PlayerPiano-Body.obj", "transform": {"rotation": {"y": 90 },  "translation": [1, 0, 0]}},
+    "facing=north,mirror=true,ps=piano":  {"model": "fousarchive:PlayerPiano/PlayerPiano-Body.obj", "transform": {"scale": [-1,1,1],       "translation": [-1.5, 1, 1]}},
+    "facing=east,mirror=true,ps=piano":   {"model": "fousarchive:PlayerPiano/PlayerPiano-Body.obj", "transform": {"scale": [-1,1,1], "rotation": {"y": 270 }, "translation": [-1, 1, -1.5]}},
+    "facing=south,mirror=true,ps=piano":  {"model": "fousarchive:PlayerPiano/PlayerPiano-Body.obj", "transform": {"scale": [-1,1,1], "rotation": {"y": 180 }, "translation": [1.5, 1, -1]}},
+    "facing=west,mirror=true,ps=piano":   {"model": "fousarchive:PlayerPiano/PlayerPiano-Body.obj", "transform": {"scale": [-1,1,1], "rotation": {"y": 90 },  "translation": [1, 1, 1.5]}},
 
-    "facing=north,mirror=false,ps=key_white": {"model": "fcaa:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {"translation": [-0.036, 0, 1]}},
-    "facing=east,mirror=false,ps=key_white":  {"model": "fcaa:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {"rotation": {"y": 270 }, "translation": [-1, 0, -0.036]}},
-    "facing=south,mirror=false,ps=key_white": {"model": "fcaa:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {"rotation": {"y": 180 }, "translation": [0.036, 0, -1]}},
-    "facing=west,mirror=false,ps=key_white":  {"model": "fcaa:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {"rotation": {"y": 90 },  "translation": [1, 0, 0.036]}},
-    "facing=north,mirror=true,ps=key_white":  {"model": "fcaa:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {"scale": [-1,1,1],       "translation": [-1.5, 1, 1]}},
-    "facing=east,mirror=true,ps=key_white":   {"model": "fcaa:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {"scale": [-1,1,1], "rotation": {"y": 270 }, "translation": [-1, 1, -1.5]}},
-    "facing=south,mirror=true,ps=key_white":  {"model": "fcaa:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {"scale": [-1,1,1], "rotation": {"y": 180 }, "translation": [1.5, 1, -1]}},
-    "facing=west,mirror=true,ps=key_white":   {"model": "fcaa:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {"scale": [-1,1,1], "rotation": {"y": 90 },  "translation": [1, 1, 1.5]}},
+    "facing=north,mirror=false,ps=key_white": {"model": "fousarchive:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {"translation": [-0.036, 0, 1]}},
+    "facing=east,mirror=false,ps=key_white":  {"model": "fousarchive:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {"rotation": {"y": 270 }, "translation": [-1, 0, -0.036]}},
+    "facing=south,mirror=false,ps=key_white": {"model": "fousarchive:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {"rotation": {"y": 180 }, "translation": [0.036, 0, -1]}},
+    "facing=west,mirror=false,ps=key_white":  {"model": "fousarchive:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {"rotation": {"y": 90 },  "translation": [1, 0, 0.036]}},
+    "facing=north,mirror=true,ps=key_white":  {"model": "fousarchive:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {"scale": [-1,1,1],       "translation": [-1.5, 1, 1]}},
+    "facing=east,mirror=true,ps=key_white":   {"model": "fousarchive:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {"scale": [-1,1,1], "rotation": {"y": 270 }, "translation": [-1, 1, -1.5]}},
+    "facing=south,mirror=true,ps=key_white":  {"model": "fousarchive:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {"scale": [-1,1,1], "rotation": {"y": 180 }, "translation": [1.5, 1, -1]}},
+    "facing=west,mirror=true,ps=key_white":   {"model": "fousarchive:PlayerPiano/PlayerPiano-KeyWhite.obj", "transform": {"scale": [-1,1,1], "rotation": {"y": 90 },  "translation": [1, 1, 1.5]}},
 
-    "facing=north,mirror=false,ps=key_black": {"model": "fcaa:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {"translation": [-0.072, 0, 1]}},
-    "facing=east,mirror=false,ps=key_black":  {"model": "fcaa:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {"rotation": {"y": 270 }, "translation": [-1, 0, -0.072]}},
-    "facing=south,mirror=false,ps=key_black": {"model": "fcaa:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {"rotation": {"y": 180 }, "translation": [0.072, 0, -1]}},
-    "facing=west,mirror=false,ps=key_black":  {"model": "fcaa:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {"rotation": {"y": 90 },  "translation": [1, 0, 0.072]}},
-    "facing=north,mirror=true,ps=key_black":  {"model": "fcaa:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {"scale": [-1,1,1],       "translation": [-1.5, 1, 1]}},
-    "facing=east,mirror=true,ps=key_black":   {"model": "fcaa:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {"scale": [-1,1,1], "rotation": {"y": 270 }, "translation": [-1, 1, -1.5]}},
-    "facing=south,mirror=true,ps=key_black":  {"model": "fcaa:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {"scale": [-1,1,1], "rotation": {"y": 180 }, "translation": [1.5, 1, -1]}},
-    "facing=west,mirror=true,ps=key_black":   {"model": "fcaa:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {"scale": [-1,1,1], "rotation": {"y": 90 },  "translation": [1, 1, 1.5]}}
+    "facing=north,mirror=false,ps=key_black": {"model": "fousarchive:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {"translation": [-0.072, 0, 1]}},
+    "facing=east,mirror=false,ps=key_black":  {"model": "fousarchive:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {"rotation": {"y": 270 }, "translation": [-1, 0, -0.072]}},
+    "facing=south,mirror=false,ps=key_black": {"model": "fousarchive:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {"rotation": {"y": 180 }, "translation": [0.072, 0, -1]}},
+    "facing=west,mirror=false,ps=key_black":  {"model": "fousarchive:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {"rotation": {"y": 90 },  "translation": [1, 0, 0.072]}},
+    "facing=north,mirror=true,ps=key_black":  {"model": "fousarchive:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {"scale": [-1,1,1],       "translation": [-1.5, 1, 1]}},
+    "facing=east,mirror=true,ps=key_black":   {"model": "fousarchive:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {"scale": [-1,1,1], "rotation": {"y": 270 }, "translation": [-1, 1, -1.5]}},
+    "facing=south,mirror=true,ps=key_black":  {"model": "fousarchive:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {"scale": [-1,1,1], "rotation": {"y": 180 }, "translation": [1.5, 1, -1]}},
+    "facing=west,mirror=true,ps=key_black":   {"model": "fousarchive:PlayerPiano/PlayerPiano-KeyBlack.obj", "transform": {"scale": [-1,1,1], "rotation": {"y": 90 },  "translation": [1, 1, 1.5]}}
   }
 }

@@ -15,7 +15,7 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure;
 
-import com.foudroyantfactotum.mod.fousarchive.blocks.FCAA_TE;
+import com.foudroyantfactotum.mod.fousarchive.blocks.FA_TE;
 import com.foudroyantfactotum.mod.fousarchive.structure.IStructure.ITEStructure;
 import com.foudroyantfactotum.mod.fousarchive.structure.coordinates.BlockPosUtil;
 import com.foudroyantfactotum.mod.fousarchive.structure.registry.StructureRegistry;
@@ -44,7 +44,7 @@ import static com.foudroyantfactotum.mod.fousarchive.blocks.Structure.TEStructur
 import static com.foudroyantfactotum.mod.fousarchive.structure.coordinates.TransformLAG.localToGlobal;
 import static net.minecraft.block.BlockDirectional.FACING;
 
-public final class TEStructureShape extends FCAA_TE implements ITEStructure, ISidedInventory, IFluidHandler
+public final class TEStructureShape extends FA_TE implements ITEStructure, ISidedInventory, IFluidHandler
 {
     private BlockPos local = BlockPos.ORIGIN;
     private int definitionHash = -1;

@@ -16,6 +16,7 @@
 package com.foudroyantfactotum.mod.fousarchive;
 
 import com.foudroyantfactotum.mod.fousarchive.init.InitBlock;
+import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
 import com.foudroyantfactotum.mod.fousarchive.proxy.RenderProxy;
 import com.foudroyantfactotum.mod.fousarchive.structure.coordinates.TransformLAG;
@@ -28,6 +29,11 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 
 import static net.minecraftforge.fml.common.Mod.EventHandler;
 import static net.minecraftforge.fml.common.Mod.Instance;
@@ -42,29 +48,60 @@ public class TheMod
     @Instance
     public static TheMod instance;
 
-    @SidedProxy(clientSide = "mod.fou.fcaa.proxy.ClientRenderProxy", serverSide = "mod.fou.fcaa.proxy.RenderProxy")
+    @SidedProxy(
+            clientSide = "com.foudroyantfactotum.mod.fousarchive.proxy.ClientRenderProxy",
+            serverSide = "com.foudroyantfactotum.mod.fousarchive.proxy.RenderProxy")
     public static RenderProxy render;
 
+    private static File sourceLocation;
+
     @EventHandler
-    public static void preInit(FMLPreInitializationEvent event)
+    public static void preInit(FMLPreInitializationEvent event) throws IOException
     {
         Logger.info("==========preInit==========");
         OBJLoader.instance.addDomain(MOD_ID);
         TransformLAG.initStatic();
         InitBlock.init();
+
+        sourceLocation = event.getSourceFile();
     }
 
     @EventHandler
     public static void init(FMLInitializationEvent event)
     {
         StructureRegistry.loadRegisteredPatterns();
-        Minecraft.getMinecraft().getTextureManager()
-                .loadTexture(
-                        midiimg,
-                        new MidiTexture(midiFile)
-                );
+        Arrays.stream(new File(sourceLocation, "assets/" + MOD_ID + "/midi").listFiles())
+                .map(File::getName)
+                .map(s -> new ResourceLocation(MOD_ID, "midi/" + s))
+                .forEach(resource ->
+                {
+                        Minecraft.getMinecraft().getTextureManager()
+                                .loadTexture(resource, new MidiTexture(resource));
+
+                    Logger.info("Name: " + resource.getResourcePath() + " : " + resource.getResourcePath().lastIndexOf('.'));
+                    Logger.info(getSpaces(resource.getResourcePath().lastIndexOf('.')+5) + '^');
+
+                    final String name = resource.getResourcePath()
+                            .substring(resource.getResourcePath().lastIndexOf('/')+1, resource.getResourcePath().length()-4);
+
+                    Logger.info("nameClean: " + name);
+
+                    final ItemPianoRoll item = new ItemPianoRoll(resource);
+                    item.setUnlocalizedName(name);
+                    item.setCreativeTab(InitBlock.ModTab.tabs.get(InitBlock.ModTab.main));
+
+                    GameRegistry.registerItem(item, name);
+
+                });
     }
 
-    public static final ResourceLocation midiFile = new ResourceLocation("fcaa", "midi/Hindustan(1918).mid");
-    public static final ResourceLocation midiimg = new ResourceLocation("fcaa", "midi/Hindustan(1918).img");
+    private static String getSpaces(int v)
+    {
+        final StringBuilder builder = new StringBuilder(v);
+
+        for (int i = 0; i < v; ++i)
+            builder.append(' ');
+
+        return builder.toString();
+    }
 }

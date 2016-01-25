@@ -15,7 +15,7 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure;
 
-import com.foudroyantfactotum.mod.fousarchive.blocks.FCAA_Block;
+import com.foudroyantfactotum.mod.fousarchive.blocks.FA_Block;
 import com.foudroyantfactotum.mod.fousarchive.structure.IStructure.IPatternHolder;
 import com.foudroyantfactotum.mod.fousarchive.structure.IStructure.IStructureAspects;
 import com.foudroyantfactotum.mod.fousarchive.structure.IStructure.ITEStructure;
@@ -53,7 +53,7 @@ import java.util.Random;
 import static com.foudroyantfactotum.mod.fousarchive.structure.coordinates.TransformLAG.*;
 import static net.minecraft.block.BlockDirectional.FACING;
 
-public abstract class BlockStructure extends FCAA_Block implements IPatternHolder, IStructureAspects//, IWailaDataProvider
+public abstract class BlockStructure extends FA_Block implements IPatternHolder, IStructureAspects//, IWailaDataProvider
 {
     private int regHash = 0;
     private StructureDefinition structureDefinition = null;
