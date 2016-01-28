@@ -1,6 +1,7 @@
 package com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer;
 
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.TEPlayerPiano;
+import com.foudroyantfactotum.mod.fousarchive.midi.MidiMultiplexSynth;
 import com.foudroyantfactotum.mod.fousarchive.utility.Log.Logger;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
@@ -28,17 +29,23 @@ public class MidiPianoPlayer implements Runnable
         if (te.isInvalid())
             return;
 
-        final InputStream midiStream = Minecraft.getMinecraft().getResourceManager().getResource(te.loadedSong.getSongResource()).getInputStream();
-        final Sequencer sequencer = MidiSystem.getSequencer();
-        final Synthesizer synthesizer = MidiSystem.getSynthesizer();
+        final InputStream midiStream;
+        final Sequencer sequencer;
+        final MidiMultiplexSynth.MultiplexMidiReceiver receiver;
+
+        synchronized (MidiSystem.class)
+        {
+            midiStream = Minecraft.getMinecraft().getResourceManager().getResource(te.loadedSong.getSongResource()).getInputStream();
+            sequencer = MidiSystem.getSequencer();
+            receiver = MidiMultiplexSynth.INSTANCE.getNewReceiver();
+        }
 
         sequencer.open();
         sequencer.setSequence(midiStream);
 
         //why is the sequencer already hooked into a synth. gah
-        sequencer.getTransmitters().get(0).setReceiver(new EventSieve(synthesizer.getReceiver()));
+        sequencer.getTransmitters().get(0).setReceiver(new EventSieve(receiver));
 
-        synthesizer.open();
         sequencer.setTickPosition((long) (startPos * sequencer.getTickLength()));
         sequencer.start();
         {
@@ -59,14 +66,7 @@ public class MidiPianoPlayer implements Runnable
                         {
                             if (te.keyIsDown[key])
                             {
-                                synthesizer.getReceiver()
-                                        .send(new ShortMessage(
-                                                        ShortMessage.NOTE_OFF,
-                                                        key + 21,
-                                                        0
-                                                ),
-                                                sequencer.getTickPosition()
-                                        );
+                                receiver.turnNotesOff();
                                 te.keyIsDown[key] = false;
                             }
                         }
@@ -88,8 +88,7 @@ public class MidiPianoPlayer implements Runnable
                     final int playerDistance =
                             (int) (Math.abs(Minecraft.getMinecraft().thePlayer.getPosition().distanceSq(te.getPos()) / 300 - 1) * 127);
 
-                    for (MidiChannel c : synthesizer.getChannels())
-                        c.controlChange(7, playerDistance);
+                    receiver.changeVolumeLevel(playerDistance);
 
                     te.songPos = (double) sequencer.getTickPosition() / sequencer.getTickLength();
 
@@ -107,19 +106,23 @@ public class MidiPianoPlayer implements Runnable
         te.isSongRunning = false;
         te.hasSongTerminated = true;
         sequencer.stop();
-        synthesizer.close();
 
         Logger.info("Client: last: " + te.toString() + " : " + Arrays.toString(te.keyOffset));
     }
 
-    @SideOnly(Side.SERVER)
     private void playServer() throws IOException, MidiUnavailableException, InvalidMidiDataException, InterruptedException
     {
         if (te.isInvalid())
             return;
 
-        final InputStream midiStream = Minecraft.getMinecraft().getResourceManager().getResource(te.loadedSong.getSongResource()).getInputStream();
-        final Sequencer sequencer = MidiSystem.getSequencer();
+        final InputStream midiStream;
+        final Sequencer sequencer;
+
+        synchronized (MidiSystem.class)
+        {
+            midiStream = Minecraft.getMinecraft().getResourceManager().getResource(te.loadedSong.getSongResource()).getInputStream();
+            sequencer = MidiSystem.getSequencer();
+        }
 
         sequencer.open();
         sequencer.setSequence(midiStream);
@@ -148,7 +151,7 @@ public class MidiPianoPlayer implements Runnable
 
                     te.songPos = (double) sequencer.getTickPosition() / sequencer.getTickLength();
 
-                    Logger.info("Server: " + te);
+                    //Logger.info("Server: " + te);
 
                     Thread.sleep(1);
                 }

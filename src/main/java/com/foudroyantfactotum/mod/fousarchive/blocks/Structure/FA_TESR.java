@@ -15,9 +15,9 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure;
 
-import com.foudroyantfactotum.mod.fousarchive.blocks.FA_TE;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.tileentity.TileEntity;
 
-public abstract class FA_TESR<E extends FA_TE> extends TileEntitySpecialRenderer<E>
+public abstract class FA_TESR<E extends TileEntity> extends TileEntitySpecialRenderer<E>
 {
 }

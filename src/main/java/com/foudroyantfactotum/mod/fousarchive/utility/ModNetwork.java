@@ -16,7 +16,7 @@
 package com.foudroyantfactotum.mod.fousarchive.utility;
 
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
-import com.foudroyantfactotum.mod.fousarchive.structure.net.StructurePacket;
+import com.foudroyantfactotum.tool.structure.net.StructurePacket;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;

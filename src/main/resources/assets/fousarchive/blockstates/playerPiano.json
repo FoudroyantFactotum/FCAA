@@ -11,7 +11,7 @@
     }
   },
   "variants": {
-    "normal": [{}],
+    "normal": [{ }],
     "inventory": [{
       "transform": {
         "thirdperson": {

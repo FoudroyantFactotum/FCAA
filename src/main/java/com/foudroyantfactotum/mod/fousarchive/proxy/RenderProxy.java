@@ -15,9 +15,9 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.proxy;
 
-import com.foudroyantfactotum.mod.fousarchive.blocks.FA_TE;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
 import net.minecraft.block.Block;
+import net.minecraft.tileentity.TileEntity;
 
 public class RenderProxy
 {
@@ -25,7 +25,7 @@ public class RenderProxy
 
     public void init() { }
 
-    public <E extends FA_TE> void registerTESR(Class<E> te, FA_TESR<E> tesr) { }
+    public <E extends TileEntity> void registerTESR(Class<E> te, FA_TESR<E> tesr) { }
 
     public void registerBlockAsItemModel(Block block) { }
 }

@@ -16,9 +16,9 @@
 package com.foudroyantfactotum.mod.fousarchive.utility.annotations;
 
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
-import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.TEStructure;
 import com.foudroyantfactotum.mod.fousarchive.init.InitBlock;
-import com.foudroyantfactotum.mod.fousarchive.structure.ItemBlockStructure;
+import com.foudroyantfactotum.tool.structure.item.StructureBlockItem;
+import com.foudroyantfactotum.tool.structure.tileentity.StructureTE;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -31,11 +31,11 @@ public @interface Auto_Structure
 {
     String name();
 
-    Class<? extends TEStructure> tileEntity();
+    Class<? extends StructureTE> tileEntity();
 
     String tab() default InitBlock.ModTab.main;
 
-    Class<? extends ItemBlockStructure> item() default ItemBlockStructure.class;
+    Class<? extends StructureBlockItem> item() default StructureBlockItem.class;
 
     Class<? extends FA_TESR> TESR() default FA_TESR.class;
 }

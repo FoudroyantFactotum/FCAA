@@ -15,14 +15,14 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano;
 
-import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.BlockStructure;
-import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.TEStructure;
+import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_StructureBlock;
 import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer.MidiPianoPlayer;
-import com.foudroyantfactotum.mod.fousarchive.structure.StructureDefinitionBuilder;
-import com.foudroyantfactotum.mod.fousarchive.structure.coordinates.BlockPosUtil;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Instance;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Structure;
+import com.foudroyantfactotum.tool.structure.coordinates.BlockPosUtil;
+import com.foudroyantfactotum.tool.structure.tileentity.StructureTE;
+import com.foudroyantfactotum.tool.structure.utillity.StructureDefinitionBuilder;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
@@ -39,7 +39,7 @@ import net.minecraft.world.World;
 import static net.minecraft.block.BlockDirectional.FACING;
 
 @Auto_Structure(name = "playerPiano", tileEntity = TEPlayerPiano.class, TESR = TESRPlayerPiano.class)
-public final class BlockPlayerPiano extends BlockStructure
+public final class BlockPlayerPiano extends FA_StructureBlock
 {
     @Auto_Instance
     public static final BlockPlayerPiano INSTANCE = null;
@@ -82,7 +82,7 @@ public final class BlockPlayerPiano extends BlockStructure
     }
 
     @Override
-    public void spawnBreakParticle(World world, TEStructure te, BlockPos local, float sx, float sy, float sz)
+    public void spawnBreakParticle(World world, StructureTE te, BlockPos local, float sx, float sy, float sz)
     {
 
     }

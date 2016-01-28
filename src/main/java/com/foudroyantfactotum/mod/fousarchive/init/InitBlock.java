@@ -17,14 +17,15 @@ package com.foudroyantfactotum.mod.fousarchive.init;
 
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
 import com.foudroyantfactotum.mod.fousarchive.blocks.FA_Block;
-import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.BlockStructure;
+import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_ShapeBlock;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
-import com.foudroyantfactotum.mod.fousarchive.structure.registry.StructureRegistry;
 import com.foudroyantfactotum.mod.fousarchive.utility.Clazz;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Block;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Instance;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Ore;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Structure;
+import com.foudroyantfactotum.tool.structure.StructureRegistry;
+import com.foudroyantfactotum.tool.structure.block.StructureBlock;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.ClassPath;
 import net.minecraft.block.Block;
@@ -117,6 +118,7 @@ public class InitBlock
                         if (clazz.isAnnotationPresent(Auto_Ore.class))
                             OreDictionary.registerOre(annot.name(), block);
 
+                        TheMod.render.registerBlockAsItemModel(block);
                     }
                 } catch (ClassNotFoundException e)//todo better errors
                 {
@@ -142,7 +144,7 @@ public class InitBlock
             final Field mField = Field.class.getDeclaredField("modifiers");
             mField.setAccessible(true);
 
-            for (final ClassPath.ClassInfo i : Clazz.getClassListFrom(BlockStructure.class.getPackage()))
+            for (final ClassPath.ClassInfo i : Clazz.getClassListFrom(FA_ShapeBlock.class.getPackage()))
             {
                 try
                 {
@@ -152,7 +154,7 @@ public class InitBlock
                     if (annot != null)
                     {
                         final Field fINSTANCE = getInstanceField(clazz);
-                        final BlockStructure block = (BlockStructure) clazz.newInstance();
+                        final StructureBlock block = (StructureBlock) clazz.newInstance();
 
                         fINSTANCE.setAccessible(true);
                         mField.setInt(fINSTANCE, fINSTANCE.getModifiers() & ~Modifier.FINAL);
@@ -162,7 +164,7 @@ public class InitBlock
                         GameRegistry.registerBlock(block, annot.item(), annot.name());//consider null items?
                         GameRegistry.registerTileEntity(annot.tileEntity(), "tile." + annot.name());
 
-                        StructureRegistry.registerStructureForLoad(block);
+                        StructureRegistry.registerStructureForLoad(block, FA_ShapeBlock.INSTANCE);
 
                         if (!ModTab.none.equals(annot.tab()))//todo better error handling
                             block.setCreativeTab(ModTab.tabs.get(annot.tab()));

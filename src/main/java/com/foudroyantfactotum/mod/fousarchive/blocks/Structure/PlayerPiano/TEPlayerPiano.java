@@ -15,10 +15,10 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano;
 
-import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.TEStructureTemplate;
 import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer.MidiPianoPlayer;
-import com.foudroyantfactotum.mod.fousarchive.structure.registry.StructureDefinition;
+import com.foudroyantfactotum.tool.structure.registry.StructureDefinition;
+import com.foudroyantfactotum.tool.structure.tileentity.StructureTemplate;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -29,7 +29,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class TEPlayerPiano extends TEStructureTemplate implements ITickable
+public class TEPlayerPiano extends StructureTemplate implements ITickable
 {
     public static final ExecutorService midiService = Executors.newCachedThreadPool();
     public static final String ITEM_LOADED_SONG = "itemPianoRoll";

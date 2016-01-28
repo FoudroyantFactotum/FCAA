@@ -30,6 +30,8 @@ configFile.withReader {
 version = config.mod_version
 group = config.group_name
 archivesBaseName = "[${config.minecraft_version}]${config.mod_id}"
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 minecraft {
     version = config.minecraft_version + "-" + config.forge_version // grab latest forge
@@ -59,12 +61,40 @@ processResources
     }
 }
 
-dependencies{
+dependencies {
+    repositories {
+        maven {
+            url 'http://repository.steamnsteel.info/artifactory/foudroyantfactotum-libs-stable'
+        }
+    }
+    deobfCompile(group: 'com.foudroyantfactotum', name: 'Structure', version: '1.8.9-0.1', classifier: 'universal')
 }
 
 jar {
         manifest {
-        attributes 'FMLCorePlugin': 'mod.fou.fcaa.utility.asm.MOD_ASM',
+        attributes 'FMLCorePlugin': 'com.foudroyantfactotum.mod.fousarchive.utility.asm.MOD_ASM',
                    'FMLCorePluginContainsFMLMod': 'false'
     }
 }
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+    }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+
+shadowJar {
+    dependencies {
+        include(dependency('deobf.snapshot.20160120.com.foudroyantfactotum:Structure:1.8.9-0.1'))
+    }
+    relocate 'com.foudroyantfactotum.tool.structure',
+             'com.foudroyantfactotum.mod.fousarchive.shaded.com.foudroyantfactotum.tool.structure'
+    classifier = 'universal'
+}
+
+reobf.jar.task.dependsOn shadowJar

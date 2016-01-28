@@ -15,17 +15,17 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.proxy;
 
-import com.foudroyantfactotum.mod.fousarchive.blocks.FA_TE;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
 import net.minecraft.block.Block;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class ClientRenderProxy extends RenderProxy
 {
-    public <E extends FA_TE> void registerTESR(Class<E> te, FA_TESR<E> tesr)
+    public <E extends TileEntity> void registerTESR(Class<E> te, FA_TESR<E> tesr)
     {
         ClientRegistry.bindTileEntitySpecialRenderer(te, tesr);
     }
