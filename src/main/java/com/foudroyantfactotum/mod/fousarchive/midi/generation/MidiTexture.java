@@ -93,7 +93,6 @@ public class MidiTexture extends AbstractTexture
     private static ImmutablePair<String, byte[]> getMidiTrack(InputStream io, int xSize, int ySize) throws InvalidMidiDataException, IOException
     {
         final Sequence sequence = MidiSystem.getSequence(io);
-        final Track[] midiTrack = sequence.getTracks();
         final byte pixelComponents = 3;
 
         String songName = "noName";
@@ -102,43 +101,46 @@ public class MidiTexture extends AbstractTexture
 
         Arrays.fill(lastEvent, -1);
 
-        for (int i = 0; i < midiTrack[0].size(); i++)
+        for (Track track : sequence.getTracks())
         {
-            final MidiEvent event = midiTrack[0].get(i);
-            final MidiMessage midimsg = event.getMessage();
-
-            if (midimsg instanceof MetaMessage)
+            for (int i = 0; i < track.size(); i++)
             {
-                final MetaMessage metamsg = (MetaMessage) midimsg;
-                final String data = new String(metamsg.getData());
+                final MidiEvent event = track.get(i);
+                final MidiMessage midimsg = event.getMessage();
 
-                if (data.startsWith("/title:"))
+                if (midimsg instanceof MetaMessage)
                 {
-                    songName = data.substring(8, data.length() - 1);
-                }
-            } else if (midimsg instanceof ShortMessage)
-            {
-                final ShortMessage shortmsg = (ShortMessage) midimsg;
-                final int note = shortmsg.getData1() - 18;
-                final int vel = shortmsg.getData2();
+                    final MetaMessage metamsg = (MetaMessage) midimsg;
+                    final String data = new String(metamsg.getData());
 
-                if (note < 0 || note > 88) continue;
-
-                if (note < ySize && note > -1)
+                    if (data.startsWith("/title:"))
+                    {
+                        songName = data.substring(8, data.length() - 1);
+                    }
+                } else if (midimsg instanceof ShortMessage)
                 {
-                    if (vel == 0 && lastEvent[note] != -1)
+                    final ShortMessage shortmsg = (ShortMessage) midimsg;
+                    final int note = shortmsg.getData1() - 18;
+                    final int vel = shortmsg.getData2();
+
+                    if (note < 0 || note > 88) continue;
+
+                    if (note < ySize && note > -1)
                     {
-                        final int line = note * xSize;
-                        final int lineStart = (int) (line + (lastEvent[note]*xSize / (double)sequence.getTickLength())) * pixelComponents;
-                        final int lineEnd = (int) (line + (event.getTick()*xSize / (double)sequence.getTickLength())) * pixelComponents;
+                        if (vel == 0 && lastEvent[note] != -1)
+                        {
+                            final int line = note * xSize;
+                            final int lineStart = (int) (line + (lastEvent[note] * xSize / (double) sequence.getTickLength())) * pixelComponents;
+                            final int lineEnd = (int) (line + (event.getTick() * xSize / (double) sequence.getTickLength())) * pixelComponents;
 
-                        Arrays.fill(img, lineStart, lineEnd, Byte.MAX_VALUE);
+                            Arrays.fill(img, lineStart, lineEnd, Byte.MAX_VALUE);
 
-                        lastEvent[note] = -1;
+                            lastEvent[note] = -1;
 
-                    } else if (lastEvent[note] == -1)
-                    {
-                        lastEvent[note] = event.getTick();
+                        } else if (lastEvent[note] == -1)
+                        {
+                            lastEvent[note] = event.getTick();
+                        }
                     }
                 }
             }

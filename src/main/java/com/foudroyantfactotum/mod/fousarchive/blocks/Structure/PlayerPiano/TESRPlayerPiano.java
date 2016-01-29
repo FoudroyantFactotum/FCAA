@@ -15,7 +15,6 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano;
 
-import com.foudroyantfactotum.mod.fousarchive.TheMod;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.state.IBlockState;
@@ -26,7 +25,6 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 import java.util.BitSet;
@@ -37,8 +35,6 @@ import static com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPian
 
 public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
 {
-    public final ResourceLocation rl = new ResourceLocation(TheMod.MOD_ID, "midi/Cleopatra(1918).mid");
-
     private static final BitSet blackKeyNo = new BitSet(88);
     private static final float keySize = 0.036f;
 
@@ -111,7 +107,7 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
             final double displayAmount = 500 / 8048.0;
             final double shift = te.songPos;
 
-            bindTexture(rl);
+            bindTexture(te.loadedSong.getSongResource());
 
             wr.setTranslation(x, y + 0.8, z - 0.8);
             wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);

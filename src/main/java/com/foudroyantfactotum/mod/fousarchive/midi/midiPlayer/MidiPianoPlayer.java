@@ -2,7 +2,7 @@ package com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer;
 
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.TEPlayerPiano;
 import com.foudroyantfactotum.mod.fousarchive.midi.MidiMultiplexSynth;
-import com.foudroyantfactotum.mod.fousarchive.utility.Log.Logger;
+import com.sun.media.sound.RealTimeSequencerProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -10,7 +10,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.sound.midi.*;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
 public class MidiPianoPlayer implements Runnable
 {
@@ -36,7 +35,7 @@ public class MidiPianoPlayer implements Runnable
         synchronized (MidiSystem.class)
         {
             midiStream = Minecraft.getMinecraft().getResourceManager().getResource(te.loadedSong.getSongResource()).getInputStream();
-            sequencer = MidiSystem.getSequencer();
+            sequencer = (Sequencer) new RealTimeSequencerProvider().getDevice(null);
             receiver = MidiMultiplexSynth.INSTANCE.getNewReceiver();
         }
 
@@ -44,7 +43,8 @@ public class MidiPianoPlayer implements Runnable
         sequencer.setSequence(midiStream);
 
         //why is the sequencer already hooked into a synth. gah
-        sequencer.getTransmitters().get(0).setReceiver(new EventSieve(receiver));
+        //sequencer.getTransmitters().get(0).setReceiver(new EventSieve(receiver));
+        sequencer.getTransmitter().setReceiver(new EventSieve(receiver));
 
         sequencer.setTickPosition((long) (startPos * sequencer.getTickLength()));
         sequencer.start();
@@ -106,8 +106,9 @@ public class MidiPianoPlayer implements Runnable
         te.isSongRunning = false;
         te.hasSongTerminated = true;
         sequencer.stop();
+        receiver.close();
 
-        Logger.info("Client: last: " + te.toString() + " : " + Arrays.toString(te.keyOffset));
+        //Logger.info("Client: last: " + te.toString() + " : " + Arrays.toString(te.keyOffset));
     }
 
     private void playServer() throws IOException, MidiUnavailableException, InvalidMidiDataException, InterruptedException
@@ -121,14 +122,11 @@ public class MidiPianoPlayer implements Runnable
         synchronized (MidiSystem.class)
         {
             midiStream = Minecraft.getMinecraft().getResourceManager().getResource(te.loadedSong.getSongResource()).getInputStream();
-            sequencer = MidiSystem.getSequencer();
+            sequencer = (Sequencer) new RealTimeSequencerProvider().getDevice(null);
         }
 
         sequencer.open();
         sequencer.setSequence(midiStream);
-
-        //why is the sequencer already hooked into a synth. gah
-        sequencer.getTransmitters().get(0).setReceiver(new NullSieve());
 
         sequencer.setTickPosition((long) (startPos * sequencer.getTickLength()));
         sequencer.start();
@@ -166,7 +164,7 @@ public class MidiPianoPlayer implements Runnable
         te.hasSongTerminated = true;
         sequencer.stop();
 
-        Logger.info("Server: last: " + te);
+        //Logger.info("Server: last: " + te);
     }
 
     private boolean allKeysInRightPosition(float[] keyOffset)
@@ -209,13 +207,35 @@ public class MidiPianoPlayer implements Runnable
             {
                 if (te.isSongPlaying)
                 {
-                    rec.send(midiMessage, l);
+                    rec.send(midiMessage, 0);
                 } else
                     return;
 
                 if (midiMessage instanceof ShortMessage)
                 {
                     final ShortMessage sm = (ShortMessage) midiMessage;
+
+                    /*switch (sm.getCommand())
+                    {
+                        case ShortMessage.MIDI_TIME_CODE: Logger.info("MIDI_TIME_CODE"); break;
+                        case ShortMessage.SONG_POSITION_POINTER: Logger.info("SONG_POSITION_POINTER"); break;
+                        case ShortMessage.SONG_SELECT: Logger.info("SONG_SELECT");break;
+                        case ShortMessage.TUNE_REQUEST: Logger.info("TUNE_REQUEST");break;
+                        case ShortMessage.END_OF_EXCLUSIVE: Logger.info("END_OF_EXCLUSIVE");break;
+                        case ShortMessage.TIMING_CLOCK: Logger.info("TIME_CLOCK");break;
+                        case ShortMessage.START: Logger.info("START");break;
+                        case ShortMessage.CONTINUE: Logger.info("CONTINUE");break;
+                        case ShortMessage.STOP: Logger.info("STOP");break;
+                        case ShortMessage.ACTIVE_SENSING: Logger.info("ACTIVE_SENSING");break;
+                        case ShortMessage.SYSTEM_RESET: Logger.info("SYSTEM_RESET");break;
+                        case ShortMessage.NOTE_OFF: Logger.info("NOTE_OFF");break;
+                        case ShortMessage.NOTE_ON: Logger.info("NOTE_ON");break;
+                        case ShortMessage.POLY_PRESSURE: Logger.info("POLY_PRESSURE");break;
+                        case ShortMessage.CONTROL_CHANGE: Logger.info("CONTROL_CHANGE " + sm.getData1() + " : " + sm.getData2());break;
+                        case ShortMessage.PROGRAM_CHANGE: Logger.info("PROGRAM_CHANGE");break;
+                        case ShortMessage.CHANNEL_PRESSURE: Logger.info("CHANNEL_PRESSURE"); break;
+                        case ShortMessage.PITCH_BEND: Logger.info("PITCH_BEND");break;
+                    }*/
 
                     if (sm.getData1() - 21 > -1 && sm.getData1() - 21 < te.keyOffset.length)
                     {
@@ -236,21 +256,6 @@ public class MidiPianoPlayer implements Runnable
         public void close()
         {
             rec.close();
-        }
-    }
-
-    private class NullSieve implements Receiver
-    {
-        @Override
-        public void send(MidiMessage midiMessage, long l)
-        {
-            //noop
-        }
-
-        @Override
-        public void close()
-        {
-            //noop
         }
     }
 }

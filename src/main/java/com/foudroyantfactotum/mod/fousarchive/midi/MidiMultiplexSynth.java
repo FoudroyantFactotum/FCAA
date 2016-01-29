@@ -9,8 +9,8 @@ public enum MidiMultiplexSynth
 {
     INSTANCE;
 
-    public static final byte channelsPerSynth = 10; //upto max of 16
-    public static final byte additionalChannels = 5;
+    public static final byte channelsPerSynth = 9; //upto max of 16. channel 10 is always used for drums only.
+    public static final byte additionalChannels = 3;
     private final List<Synthesizer> synths = new LinkedList<>();
     private final List<MultiplexMidiReceiver> receivers = new ArrayList<>();
 
@@ -26,7 +26,7 @@ public enum MidiMultiplexSynth
             synths.add(synthesizer);
         }
 
-        final MultiplexMidiReceiver mmr = new MultiplexMidiReceiver(receivers.size());
+        final MultiplexMidiReceiver mmr = new MultiplexMidiReceiver(receivers.size(), synths.get(receivers.size()/channelsPerSynth));
         receivers.add(mmr);
 
         return mmr;
@@ -35,41 +35,42 @@ public enum MidiMultiplexSynth
     private synchronized void removeAllocatedChannel(int channel)
     {
         receivers.remove(channel);
+        synths.get(channel/channelsPerSynth).getChannels()[channel%channelsPerSynth].resetAllControllers();
 
         for (int cid=channel; cid < receivers.size(); ++cid)
         {
             final MultiplexMidiReceiver mmr = receivers.get(cid);
 
-            synchronized (mmr)
-            {
-                mmr.config(mmr.channel-1);
-            }
+            mmr.config(mmr.channel-1, synths.get((mmr.channel-1)/channelsPerSynth));
 
-            //remove extra synths if threshold passes
-            final int pns = (mmr.channel+additionalChannels) / channelsPerSynth;
-            if (mmr.synthID != pns)
-            {
-                synths.remove(pns).close();
-            }
+        }
+
+        //remove extra synths if threshold passes
+        final int uSyntht = (receivers.size()+additionalChannels) / channelsPerSynth;
+        final int uSynthb = (receivers.size()+additionalChannels-1) / channelsPerSynth;
+        final int cSynth = receivers.size()/channelsPerSynth;
+        if (uSyntht > cSynth && synths.size() > uSyntht && uSyntht != uSynthb)
+        {
+            synths.remove(uSyntht).close();
         }
     }
 
-    public class MultiplexMidiReceiver implements Receiver
+    public static class MultiplexMidiReceiver implements Receiver
     {
         private int channel;
-        private int synthID;
         private int channelID;
+        private Synthesizer synthesizer;
 
-        private MultiplexMidiReceiver(int channel)
+        private MultiplexMidiReceiver(int channel, Synthesizer synthesizer)
         {
-            config(channel);
+            config(channel, synthesizer);
         }
 
-        void config(int channel)
+        synchronized void config(int channel, Synthesizer synthesizer)
         {
             this.channel = channel;
-            this.synthID = channel/channelsPerSynth;
             this.channelID = channel%channelsPerSynth;
+            this.synthesizer = synthesizer;
         }
 
         @Override
@@ -84,25 +85,25 @@ public enum MidiMultiplexSynth
                     sm.setMessage(sm.getCommand(), channelID, sm.getData1(), sm.getData2());
                 }
 
-                synths.get(synthID).getReceiver().send(mm, l);
+                synthesizer.getReceiver().send(mm, l);
             }
             catch (MidiUnavailableException | InvalidMidiDataException e) { }
         }
 
         public synchronized void turnNotesOff()
         {
-            synths.get(synthID).getChannels()[channelID].allNotesOff();
+            synthesizer.getChannels()[channelID].allNotesOff();
         }
 
         public synchronized void changeVolumeLevel(int vol)
         {
-            synths.get(synthID).getChannels()[channelID].controlChange(7, vol);
+            synthesizer.getChannels()[channelID].controlChange(7, vol);
         }
 
         @Override
         public void close()
         {
-            removeAllocatedChannel(channel);
+            MidiMultiplexSynth.INSTANCE.removeAllocatedChannel(channel);
         }
     }
 }

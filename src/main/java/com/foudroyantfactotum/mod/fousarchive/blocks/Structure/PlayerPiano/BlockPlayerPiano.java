@@ -142,7 +142,6 @@ public final class BlockPlayerPiano extends FA_StructureBlock
         builder.assignConstructionDef(ImmutableMap.of(
                 'j', "minecraft:jukebox",
                 'p', "minecraft:planks"
-
         ));
 
         builder.assignConstructionBlocks(
