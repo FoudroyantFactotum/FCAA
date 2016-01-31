@@ -48,11 +48,11 @@ public final class BlockPlayerPiano extends FA_StructureBlock
 
     public BlockPlayerPiano()
     {
+        super(false);
         setDefaultState(
                 this.blockState
                         .getBaseState()
                         .withProperty(FACING, EnumFacing.SOUTH)
-                        .withProperty(MIRROR, false)
                         .withProperty(propPiano, PianoState.piano)
         );
     }
@@ -60,7 +60,7 @@ public final class BlockPlayerPiano extends FA_StructureBlock
     @Override
     protected BlockState createBlockState()
     {
-        return new BlockState(this, FACING, MIRROR, propPiano);
+        return new BlockState(this, FACING, propPiano);
     }
 
     @Override
@@ -78,7 +78,7 @@ public final class BlockPlayerPiano extends FA_StructureBlock
     @Override
     public TileEntity createTileEntity(World world, IBlockState state)
     {
-        return new TEPlayerPiano(getPattern(), state.getValue(FACING), state.getValue(MIRROR));
+        return new TEPlayerPiano(getPattern(), state.getValue(FACING));
     }
 
     @Override
@@ -117,12 +117,14 @@ public final class BlockPlayerPiano extends FA_StructureBlock
 
                         te.loadedSong = null;
                         te.songPos = 0.0;
-                    } else {
+                    } else
+                    {
                         te.isSongPlaying = true;
                         te.isSongRunning = true;
                         te.hasSongTerminated = false;
 
                         TEPlayerPiano.midiService.execute(new MidiPianoPlayer(te, te.songPos));
+                        te.markDirty();
                     }
                 } else if (te.isSongPlaying)
                 {

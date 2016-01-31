@@ -22,14 +22,13 @@ import com.foudroyantfactotum.tool.structure.tileentity.StructureTemplate;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class TEPlayerPiano extends StructureTemplate implements ITickable
+public class TEPlayerPiano extends StructureTemplate
 {
     public static final ExecutorService midiService = Executors.newCachedThreadPool();
     public static final String ITEM_LOADED_SONG = "itemPianoRoll";
@@ -55,9 +54,9 @@ public class TEPlayerPiano extends StructureTemplate implements ITickable
         //noop
     }
 
-    public TEPlayerPiano(StructureDefinition sd, EnumFacing orientation, boolean mirror)
+    public TEPlayerPiano(StructureDefinition sd, EnumFacing orientation)
     {
-        super(sd, orientation, mirror);
+        super(sd, orientation, false);
     }
 
     @Override
@@ -65,7 +64,7 @@ public class TEPlayerPiano extends StructureTemplate implements ITickable
     {
         super.writeToNBT(nbt);
 
-        nbt.setString(ITEM_LOADED_SONG, loadedSong == null? "" : loadedSong.getUnlocalizedName());
+        nbt.setString(ITEM_LOADED_SONG, loadedSong == null? "" : loadedSong.getRegistryName());
         nbt.setDouble(SONG_POSITION, songPos);
         nbt.setBoolean(IS_SONG_PLAYING, isSongPlaying);
         nbt.setBoolean(IS_SONG_RUNNING, isSongRunning);
@@ -82,26 +81,33 @@ public class TEPlayerPiano extends StructureTemplate implements ITickable
         isSongPlaying = nbt.getBoolean(IS_SONG_PLAYING);
         isSongRunning = nbt.getBoolean(IS_SONG_RUNNING);
         hasSongTerminated = nbt.getBoolean(HAS_SONG_TERMINATED);
+
+        if (worldObj != null && worldObj.isRemote)
+        {
+            configureMusicState();
+        }
+    }
+
+    private void configureMusicState()
+    {
+        if (!hasSongTerminated)
+            midiService.execute(new MidiPianoPlayer(this, songPos));
     }
 
     @Override
     public void onChunkUnload()
     {
+        invalidate();
         super.onChunkUnload();
     }
 
     @Override
     public void onLoad()
     {
-        super.onLoad();
-        if (!hasSongTerminated)
-            midiService.execute(new MidiPianoPlayer(this, songPos));
-    }
-
-    @Override
-    public void update()
-    {
-        //Logger.info(this.toString());
+        if (worldObj != null && !worldObj.isRemote)
+        {
+            configureMusicState();
+        }
     }
 
     @Override

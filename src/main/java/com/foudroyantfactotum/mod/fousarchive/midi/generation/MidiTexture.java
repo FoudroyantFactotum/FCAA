@@ -23,6 +23,8 @@ import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL14;
 
 import javax.imageio.ImageIO;
 import javax.sound.midi.*;
@@ -70,12 +72,28 @@ public class MidiTexture extends AbstractTexture
                     .put(res.getRight())
                     .flip();
 
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, 0);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MIN_LOD, 0.0f);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LOD, 0.0f);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, 0.0f);
+
             GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGB, xSize, ySize, 0,
                     GL11.GL_RGB, GL11.GL_BYTE, bb
             );
 
             songName = res.getLeft();
         }
+    }
+
+    public boolean hasTexureID()
+    {
+        return glTextureId != -1;
+    }
+
+    public ResourceLocation resourceLocation()
+    {
+        return rl;
     }
 
     @Override
@@ -99,10 +117,10 @@ public class MidiTexture extends AbstractTexture
         final byte[] img = new byte[xSize * ySize * pixelComponents];
         final long[] lastEvent = new long[88];
 
-        Arrays.fill(lastEvent, -1);
-
         for (Track track : sequence.getTracks())
         {
+            Arrays.fill(lastEvent, -1);
+
             for (int i = 0; i < track.size(); i++)
             {
                 final MidiEvent event = track.get(i);

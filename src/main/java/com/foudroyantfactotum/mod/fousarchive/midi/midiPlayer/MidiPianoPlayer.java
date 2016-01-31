@@ -1,9 +1,25 @@
+/*
+ * Copyright (c) 2016 Foudroyant Factotum
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 3 of the License, or (at your option) any
+ * later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, see <http://www.gnu.org/licenses>.
+ */
 package com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer;
 
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.TEPlayerPiano;
 import com.foudroyantfactotum.mod.fousarchive.midi.MidiMultiplexSynth;
 import com.sun.media.sound.RealTimeSequencerProvider;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -42,8 +58,6 @@ public class MidiPianoPlayer implements Runnable
         sequencer.open();
         sequencer.setSequence(midiStream);
 
-        //why is the sequencer already hooked into a synth. gah
-        //sequencer.getTransmitters().get(0).setReceiver(new EventSieve(receiver));
         sequencer.getTransmitter().setReceiver(new EventSieve(receiver));
 
         sequencer.setTickPosition((long) (startPos * sequencer.getTickLength()));
@@ -51,7 +65,7 @@ public class MidiPianoPlayer implements Runnable
         {
             try
             {
-                while (sequencer.isRunning() && !te.isInvalid())
+                while (sequencer.isRunning() && !te.isInvalid() && Minecraft.getMinecraft().thePlayer != null)
                 {
                     if (!te.isSongRunning && allKeysInRightPosition(te.keyOffset))
                     {
@@ -85,16 +99,30 @@ public class MidiPianoPlayer implements Runnable
                         }
                     }
 
-                    final int playerDistance =
-                            (int) (Math.abs(Minecraft.getMinecraft().thePlayer.getPosition().distanceSq(te.getPos()) / 300 - 1) * 127);
+                    //change audio level for player
+                    final int audioLevel;
 
-                    receiver.changeVolumeLevel(playerDistance);
+                    if (Minecraft.getMinecraft().thePlayer != null)
+                    {
+                        final BlockPos playerPos = Minecraft.getMinecraft().thePlayer.getPosition();
+                        final double distance = playerPos.distanceSq(te.getPos());
+
+                        if (distance > 35)
+                        {
+                            audioLevel = (int) (Math.abs(1 - Math.min((distance-35)/800, 1.0)) * 127);
+                        } else {
+                            audioLevel = 127;
+                        }
+
+                    } else {
+                        audioLevel = 0;
+                    }
+
+                    receiver.changeVolumeLevel(audioLevel);
 
                     te.songPos = (double) sequencer.getTickPosition() / sequencer.getTickLength();
 
-                    //Logger.info("Client: " + te.toString() + " : " + Arrays.toString(te.keyOffset));
-
-                    Thread.sleep(1);
+                    Thread.sleep(2);
                 }
             } catch (NullPointerException | ClassCastException e)
             {
@@ -108,12 +136,15 @@ public class MidiPianoPlayer implements Runnable
         sequencer.stop();
         receiver.close();
 
-        //Logger.info("Client: last: " + te.toString() + " : " + Arrays.toString(te.keyOffset));
+        if (te.songPos == 1.0)
+        {
+            te.songPos = 0.0;
+        }
     }
 
     private void playServer() throws IOException, MidiUnavailableException, InvalidMidiDataException, InterruptedException
     {
-        if (te.isInvalid())
+        if (te.isInvalid() || te.loadedSong == null)
             return;
 
         final InputStream midiStream;
@@ -149,8 +180,6 @@ public class MidiPianoPlayer implements Runnable
 
                     te.songPos = (double) sequencer.getTickPosition() / sequencer.getTickLength();
 
-                    //Logger.info("Server: " + te);
-
                     Thread.sleep(1);
                 }
             } catch (NullPointerException | ClassCastException e)
@@ -164,7 +193,11 @@ public class MidiPianoPlayer implements Runnable
         te.hasSongTerminated = true;
         sequencer.stop();
 
-        //Logger.info("Server: last: " + te);
+        if (te.songPos == 1.0)
+        {
+            te.songPos = 0.0;
+        }
+        te.markDirty();
     }
 
     private boolean allKeysInRightPosition(float[] keyOffset)

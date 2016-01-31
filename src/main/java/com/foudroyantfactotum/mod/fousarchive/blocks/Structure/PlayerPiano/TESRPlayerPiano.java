@@ -16,6 +16,7 @@
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano;
 
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
+import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -30,17 +31,16 @@ import org.lwjgl.opengl.GL11;
 import java.util.BitSet;
 
 import static com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.BlockPlayerPiano.propPiano;
-import static com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.PianoState.key_black;
-import static com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.PianoState.key_white;
+import static com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.PianoState.*;
 
 public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
 {
-    private static final BitSet blackKeyNo = new BitSet(88);
-    private static final float keySize = 0.036f;
+    private static final BitSet blackKeyNo = new BitSet(85);
+    private static final float keySize = 0.0375f;
 
     public TESRPlayerPiano()
     {
-        int[] bk = {1, 4, 6, 9, 11, 13, 16, 18, 21, 23, 25, 28, 30, 33, 35, 37, 40, 42, 45, 47, 49, 52, 54, 57, 59, 61, 64, 66, 69, 71, 73, 76, 78, 81, 83, 85};
+        int[] bk = {1, 4, 6, 9, 11, 13, 16, 18, 21, 23, 25, 28, 30, 33, 35, 37, 40, 42, 45, 47, 49, 52, 54, 57, 59, 61, 64, 66, 69, 71, 73, 76, 78, 81, 83};
 
         for (int v : bk)
             blackKeyNo.set(v, true);
@@ -56,9 +56,11 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         final WorldRenderer wr = tess.getWorldRenderer();
 
         final BlockPos pos = te.getPos();
-        final IBlockState statePiano = getWorld().getBlockState(pos);
+        final IBlockState statePiano = getWorld().getBlockState(pos).withProperty(propPiano, piano_body);
         final IBlockState stateKeyWhite = statePiano.withProperty(propPiano, key_white);
         final IBlockState stateKeyBlack = statePiano.withProperty(propPiano, key_black);
+
+        final IBakedModel modelPianoBody = brd.getBlockModelShapes().getModelForState(statePiano);
         final IBakedModel modelKeyWhite = brd.getBlockModelShapes().getModelForState(stateKeyWhite);
         final IBakedModel modelKeyBlack = brd.getBlockModelShapes().getModelForState(stateKeyBlack);
 
@@ -79,9 +81,12 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
 
         wr.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
         wr.color(255, 255, 255, 255);
+        wr.setTranslation(rx,ry,rz);
+
+        brd.getBlockModelRenderer().renderModel(te.getWorld(), modelPianoBody, statePiano, te.getPos(), wr);
 
         //render keys
-        for (int key = 0; key < 88; ++key)
+        for (int key = 0; key < 85; ++key)
         {
             rx -= keySize * orientation.getFrontOffsetZ();
             rz += keySize * orientation.getFrontOffsetX();
@@ -94,7 +99,8 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
                 rx += keySize * orientation.getFrontOffsetZ();
                 rz -= keySize * orientation.getFrontOffsetX();
 
-            } else {
+            } else
+            {
                 brd.getBlockModelRenderer().renderModel(te.getWorld(), modelKeyWhite, stateKeyWhite, te.getPos(), wr);
             }
         }
@@ -107,20 +113,24 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
             final double displayAmount = 500 / 8048.0;
             final double shift = te.songPos;
 
-            bindTexture(te.loadedSong.getSongResource());
+            GlStateManager.bindTexture(
+                    LiveImage.INSTANCE.getSong(
+                            te.loadedSong.getSongResource()
+                    ).getGlTextureId()
+            );
 
-            wr.setTranslation(x, y + 0.8, z - 0.8);
+            wr.setTranslation(x-0.02, y + 0.8, z - 0.8);
             wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
             {
-                wr.pos(0.7103, 0.66802, 1.350171).tex(0.0 * displayAmount + shift, 0).endVertex();
-                wr.pos(1.33031, 0.66802, 1.350171).tex(0.0 * displayAmount + shift, 1).endVertex();
-                wr.pos(1.33031, 0.46830 + 0.41802, 1.25589).tex(-0.5 * displayAmount + shift, 1).endVertex();
-                wr.pos(0.7103, 0.46830 + 0.41802, 1.25589).tex(-0.5 * displayAmount + shift, 0).endVertex();
+                wr.pos(1.33031+0.08, 0.88632, 1.25589).tex(0.5 * displayAmount + shift, 1).endVertex();
+                wr.pos(0.7103-0.08, 0.88632, 1.25589).tex(0.5 * displayAmount + shift, 0).endVertex();
+                wr.pos(0.7103-0.08, 0.66802, 1.350171).tex(shift, 0).endVertex();
+                wr.pos(1.33031+0.08, 0.66802, 1.350171).tex(shift, 1).endVertex();
 
-                wr.pos(1.33031, 0.66802, 1.350171).tex(shift, 1).endVertex();
-                wr.pos(0.7103, 0.66802, 1.350171).tex(shift, 0).endVertex();
-                wr.pos(0.67103, 0.46830, 1.25589).tex(0.5 * displayAmount + shift, 0).endVertex();
-                wr.pos(1.33031, 0.46830, 1.25589).tex(0.5 * displayAmount + shift, 1).endVertex();
+                wr.pos(1.33031+0.08, 0.66802, 1.350171).tex(shift, 1).endVertex();
+                wr.pos(0.7103-0.08, 0.66802, 1.350171).tex(shift, 0).endVertex();
+                wr.pos(0.7103-0.08, 0.46830, 1.25589).tex(-0.5*displayAmount +shift, 0).endVertex();
+                wr.pos(1.33031+0.08, 0.46830, 1.25589).tex(-0.5*displayAmount + shift, 1).endVertex();
             }
             tess.draw();
         }

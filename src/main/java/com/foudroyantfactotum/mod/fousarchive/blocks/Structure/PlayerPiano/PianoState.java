@@ -20,6 +20,7 @@ import net.minecraft.util.IStringSerializable;
 public enum PianoState implements IStringSerializable
 {
     piano,
+    piano_body,
     key_white,
     key_black;
 
