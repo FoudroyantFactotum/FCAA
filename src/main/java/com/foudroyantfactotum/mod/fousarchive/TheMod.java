@@ -80,8 +80,17 @@ public class TheMod
             Scanner scanner = new Scanner(stream).useDelimiter("\n");
 
             while (scanner.hasNext())
-                registerPianoRoll(new ResourceLocation(MOD_ID, "midi/"+scanner.next()));
+            {
+                final ResourceLocation rl = new ResourceLocation(MOD_ID, "midi/" + scanner.next());
+
+                LiveImage.INSTANCE.registerSong(new MidiTexture(rl));
+                ItemPianoRoll.addPianoRoll(rl);
+            }
         }
+
+        ItemPianoRoll.INSTANCE = new ItemPianoRoll();
+        ItemPianoRoll.INSTANCE.setCreativeTab(InitBlock.ModTab.tabs.get(InitBlock.ModTab.main));
+        GameRegistry.registerItem(ItemPianoRoll.INSTANCE, ItemPianoRoll.INSTANCE.getUnlocalizedName());
     }
 
     private static void registerPianoRoll(ResourceLocation resource)
@@ -92,10 +101,10 @@ public class TheMod
         final String name = resource.getResourcePath()
                 .substring(resource.getResourcePath().lastIndexOf('/')+1, resource.getResourcePath().length()-4);
 
-        final ItemPianoRoll item = new ItemPianoRoll(resource);
+       /* final ItemPianoRoll item = new ItemPianoRoll(resource);
         item.setUnlocalizedName(name);
         item.setCreativeTab(InitBlock.ModTab.tabs.get(InitBlock.ModTab.main));
 
-        GameRegistry.registerItem(item, name);
+        GameRegistry.registerItem(item, name);*/
     }
 }

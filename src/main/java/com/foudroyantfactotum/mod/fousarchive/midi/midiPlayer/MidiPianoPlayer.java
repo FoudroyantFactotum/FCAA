@@ -16,6 +16,7 @@
 package com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer;
 
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.TEPlayerPiano;
+import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.midi.MidiMultiplexSynth;
 import com.sun.media.sound.RealTimeSequencerProvider;
 import net.minecraft.client.Minecraft;
@@ -41,7 +42,7 @@ public class MidiPianoPlayer implements Runnable
     @SideOnly(Side.CLIENT)
     public void playClient() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException
     {
-        if (te.isInvalid())
+        if (te.isInvalid() || te.loadedSong == -1)
             return;
 
         final InputStream midiStream;
@@ -50,7 +51,7 @@ public class MidiPianoPlayer implements Runnable
 
         synchronized (MidiSystem.class)
         {
-            midiStream = Minecraft.getMinecraft().getResourceManager().getResource(te.loadedSong.getSongResource()).getInputStream();
+            midiStream = Minecraft.getMinecraft().getResourceManager().getResource(ItemPianoRoll.getPianoRoll(te.loadedSong)).getInputStream();
             sequencer = (Sequencer) new RealTimeSequencerProvider().getDevice(null);
             receiver = MidiMultiplexSynth.INSTANCE.getNewReceiver();
         }
@@ -144,7 +145,7 @@ public class MidiPianoPlayer implements Runnable
 
     private void playServer() throws IOException, MidiUnavailableException, InvalidMidiDataException, InterruptedException
     {
-        if (te.isInvalid() || te.loadedSong == null)
+        if (te.isInvalid() || te.loadedSong == -1)
             return;
 
         final InputStream midiStream;
@@ -152,7 +153,7 @@ public class MidiPianoPlayer implements Runnable
 
         synchronized (MidiSystem.class)
         {
-            midiStream = Minecraft.getMinecraft().getResourceManager().getResource(te.loadedSong.getSongResource()).getInputStream();
+            midiStream = Minecraft.getMinecraft().getResourceManager().getResource(ItemPianoRoll.getPianoRoll(te.loadedSong)).getInputStream();
             sequencer = (Sequencer) new RealTimeSequencerProvider().getDevice(null);
         }
 

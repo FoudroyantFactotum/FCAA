@@ -20,7 +20,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -39,7 +38,6 @@ import java.util.Arrays;
 public class MidiTexture extends AbstractTexture
 {
     private final ResourceLocation rl;
-    private String songName = "noName";
 
     public MidiTexture(ResourceLocation rl)
     {
@@ -51,7 +49,7 @@ public class MidiTexture extends AbstractTexture
     {
         final int xSize = GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE);
         final int ySize = 88;
-        ImmutablePair<String, byte[]> res = null;
+        byte[] res = null;
 
         try (final InputStream io = resourceManager.getResource(rl).getInputStream())
         {
@@ -66,10 +64,10 @@ public class MidiTexture extends AbstractTexture
             this.deleteGlTexture();
 
             GlStateManager.bindTexture(this.getGlTextureId());
-            
+
             final ByteBuffer bb = (ByteBuffer) BufferUtils
-                    .createByteBuffer(res.getRight().length)
-                    .put(res.getRight())
+                    .createByteBuffer(res.length)
+                    .put(res)
                     .flip();
 
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, 0);
@@ -81,8 +79,6 @@ public class MidiTexture extends AbstractTexture
             GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGB, xSize, ySize, 0,
                     GL11.GL_RGB, GL11.GL_BYTE, bb
             );
-
-            songName = res.getLeft();
         }
     }
 
@@ -108,14 +104,13 @@ public class MidiTexture extends AbstractTexture
 
     }
 
-    private static ImmutablePair<String, byte[]> getMidiTrack(InputStream io, int xSize, int ySize) throws InvalidMidiDataException, IOException
+    private static byte[] getMidiTrack(InputStream io, int xSize, int ySize) throws InvalidMidiDataException, IOException
     {
         final Sequence sequence = MidiSystem.getSequence(io);
         final byte pixelComponents = 3;
 
-        String songName = "noName";
         final byte[] img = new byte[xSize * ySize * pixelComponents];
-        final long[] lastEvent = new long[88];
+        final long[] lastEvent = new long[85];
 
         for (Track track : sequence.getTracks())
         {
@@ -126,45 +121,33 @@ public class MidiTexture extends AbstractTexture
                 final MidiEvent event = track.get(i);
                 final MidiMessage midimsg = event.getMessage();
 
-                if (midimsg instanceof MetaMessage)
-                {
-                    final MetaMessage metamsg = (MetaMessage) midimsg;
-                    final String data = new String(metamsg.getData());
-
-                    if (data.startsWith("/title:"))
-                    {
-                        songName = data.substring(8, data.length() - 1);
-                    }
-                } else if (midimsg instanceof ShortMessage)
+                if (midimsg instanceof ShortMessage)
                 {
                     final ShortMessage shortmsg = (ShortMessage) midimsg;
                     final int note = shortmsg.getData1() - 18;
                     final int vel = shortmsg.getData2();
 
-                    if (note < 0 || note > 88) continue;
+                    if (note < -1 || note > 84) continue;
 
-                    if (note < ySize && note > -1)
+                    if (vel == 0 && lastEvent[note] != -1)
                     {
-                        if (vel == 0 && lastEvent[note] != -1)
-                        {
-                            final int line = note * xSize;
-                            final int lineStart = (int) (line + (lastEvent[note] * xSize / (double) sequence.getTickLength())) * pixelComponents;
-                            final int lineEnd = (int) (line + (event.getTick() * xSize / (double) sequence.getTickLength())) * pixelComponents;
+                        final int line = note * xSize;
+                        final int lineStart = (int) (line + (lastEvent[note] * xSize / (double) sequence.getTickLength())) * pixelComponents;
+                        final int lineEnd = (int) (line + (event.getTick() * xSize / (double) sequence.getTickLength())) * pixelComponents;
 
-                            Arrays.fill(img, lineStart, lineEnd, Byte.MAX_VALUE);
+                        Arrays.fill(img, lineStart, lineEnd, Byte.MAX_VALUE);
 
-                            lastEvent[note] = -1;
+                        lastEvent[note] = -1;
 
-                        } else if (lastEvent[note] == -1)
-                        {
-                            lastEvent[note] = event.getTick();
-                        }
+                    } else if (lastEvent[note] == -1)
+                    {
+                        lastEvent[note] = event.getTick();
                     }
                 }
             }
         }
 
-        return ImmutablePair.of(songName, img);
+        return img;
     }
 
     public static void main(String[] args) throws IOException, InvalidMidiDataException
@@ -172,16 +155,16 @@ public class MidiTexture extends AbstractTexture
         final InputStream io = new FileInputStream("");
         final long startTime = System.currentTimeMillis();
 
-        final ImmutablePair<String, byte[]> test = getMidiTrack(io, 8192, 88);
+        final byte[] test = getMidiTrack(io, 8192, 88);
 
         final long endTime = System.currentTimeMillis();
 
         io.close();
 
-        Logger.info(String.format("startTime: %s endTime: %s totalTime: %s file: %s", startTime, endTime, endTime - startTime, test.getLeft()));
+        Logger.info(String.format("startTime: %s endTime: %s totalTime: %s", startTime, endTime, endTime - startTime));
 
 
-        ImageIO.write(toBufferImage(test.getRight(), 8192, 88), "png", new File(String.format("/tmp/%s.png", test.getLeft())));
+        ImageIO.write(toBufferImage(test, 8192, 88), "png", new File("/tmp/Song.png"));
     }
 
     private static BufferedImage toBufferImage(byte[] img, int xSize, int ySize)
@@ -192,9 +175,9 @@ public class MidiTexture extends AbstractTexture
         {
             for (int y = 0; y < ySize; ++y)
             {
-                final int pixel = (y*xSize + x)*3;
+                final int pixel = (y * xSize + x) * 3;
 
-                bimg.setRGB(x, y, img[pixel] << 16 | img[pixel+1] << 8 | img[pixel+2]);
+                bimg.setRGB(x, y, img[pixel] << 16 | img[pixel + 1] << 8 | img[pixel + 2]);
             }
         }
 

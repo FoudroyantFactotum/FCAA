@@ -16,6 +16,7 @@
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano;
 
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
+import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.state.IBlockState;
@@ -107,7 +108,7 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
 
         tess.draw();
 
-        if (te.loadedSong != null)
+        if (te.loadedSong != -1)
         {
             //Piano Roll Music
             final double displayAmount = 500 / 8048.0;
@@ -115,7 +116,7 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
 
             GlStateManager.bindTexture(
                     LiveImage.INSTANCE.getSong(
-                            te.loadedSong.getSongResource()
+                            ItemPianoRoll.getPianoRoll(te.loadedSong)
                     ).getGlTextureId()
             );
 

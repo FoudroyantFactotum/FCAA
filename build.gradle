@@ -61,13 +61,13 @@ processResources
     }
 }
 
-repositories {
-    maven {
-        url 'http://repository.steamnsteel.info/artifactory/foudroyantfactotum-libs-stable'
+dependencies {
+    repositories {
+        maven {
+            url 'http://repository.steamnsteel.info/artifactory/foudroyantfactotum-libs-stable'
+        }
     }
-    dependencies {
-        deobfCompile(group: 'com.foudroyantfactotum', name: 'Structure', version: '1.8.9-0.1', classifier: 'universal')
-    }
+    deobfCompile(group: 'com.foudroyantfactotum', name: 'Structure', version: '1.8.9-0.1', classifier: 'universal')
 }
 
 jar {
@@ -90,7 +90,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 shadowJar {
     dependencies {
-        include(dependency('deobf.snapshot.20160120.com.foudroyantfactotum:Structure:1.8.9-0.1'))
+        include(dependency('deobf.snapshot.21160122.com.foudroyantfactotum:Structure:1.8.9-0.1'))
     }
     relocate 'com.foudroyantfactotum.tool.structure',
              'com.foudroyantfactotum.mod.fousarchive.shaded.com.foudroyantfactotum.tool.structure'

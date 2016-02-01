@@ -19,7 +19,6 @@ import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer.MidiPianoPlayer;
 import com.foudroyantfactotum.tool.structure.registry.StructureDefinition;
 import com.foudroyantfactotum.tool.structure.tileentity.StructureTemplate;
-import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
@@ -47,7 +46,7 @@ public class TEPlayerPiano extends StructureTemplate
     public volatile boolean isSongRunning = false;
     public volatile boolean hasSongTerminated = true;
 
-    public ItemPianoRoll loadedSong;
+    public int loadedSong = -1;
 
     public TEPlayerPiano()
     {
@@ -64,7 +63,7 @@ public class TEPlayerPiano extends StructureTemplate
     {
         super.writeToNBT(nbt);
 
-        nbt.setString(ITEM_LOADED_SONG, loadedSong == null? "" : loadedSong.getRegistryName());
+        nbt.setInteger(ITEM_LOADED_SONG, loadedSong);
         nbt.setDouble(SONG_POSITION, songPos);
         nbt.setBoolean(IS_SONG_PLAYING, isSongPlaying);
         nbt.setBoolean(IS_SONG_RUNNING, isSongRunning);
@@ -76,7 +75,7 @@ public class TEPlayerPiano extends StructureTemplate
     {
         super.readFromNBT(nbt);
 
-        loadedSong = (ItemPianoRoll) Item.getByNameOrId(nbt.getString(ITEM_LOADED_SONG));
+        loadedSong = nbt.getInteger(ITEM_LOADED_SONG);
         songPos = nbt.getDouble(SONG_POSITION);
         isSongPlaying = nbt.getBoolean(IS_SONG_PLAYING);
         isSongRunning = nbt.getBoolean(IS_SONG_RUNNING);
@@ -113,6 +112,6 @@ public class TEPlayerPiano extends StructureTemplate
     @Override
     public String toString()
     {
-        return "te.state: " + isSongPlaying + " : " + isSongRunning + " : " + hasSongTerminated + " : " + songPos + " : " + (loadedSong == null? " " : loadedSong.getUnlocalizedName());
+        return "te.state: " + isSongPlaying + " : " + isSongRunning + " : " + hasSongTerminated + " : " + songPos + " : " + ItemPianoRoll.getPianoRoll(loadedSong);
     }
 }

@@ -97,14 +97,14 @@ public final class BlockPlayerPiano extends FA_StructureBlock
             final TEPlayerPiano te = (TEPlayerPiano) ute;
             final ItemStack uStackItem = player.inventory.getCurrentItem();
 
-            if (te.loadedSong == null)
+            if (te.loadedSong == -1)
             {
                 if (uStackItem != null && uStackItem.getItem() instanceof ItemPianoRoll)
                 {
                     if (!player.capabilities.isCreativeMode)
                         player.inventory.removeStackFromSlot(player.inventory.currentItem);
 
-                    te.loadedSong = (ItemPianoRoll) uStackItem.getItem();
+                    te.loadedSong = uStackItem.getItemDamage();
                 }
             } else
             {
@@ -113,9 +113,14 @@ public final class BlockPlayerPiano extends FA_StructureBlock
                     if (player.isSneaking())
                     {
                         if (!player.capabilities.isCreativeMode)
-                            world.spawnEntityInWorld(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(te.loadedSong, 1)));
+                        {
+                            final ItemStack stack = new ItemStack(ItemPianoRoll.INSTANCE, 1);
+                            stack.setItemDamage(te.loadedSong);
 
-                        te.loadedSong = null;
+                            world.spawnEntityInWorld(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), stack));
+                        }
+
+                        te.loadedSong = -1;
                         te.songPos = 0.0;
                     } else
                     {
