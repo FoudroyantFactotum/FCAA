@@ -15,7 +15,7 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.midi.generation;
 
-import com.foudroyantfactotum.mod.fousarchive.utility.Log.Logger;
+import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import javax.imageio.ImageIO;
@@ -31,6 +31,10 @@ import java.util.concurrent.*;
 
 public class MidiImageGeneration
 {
+    //============================================================
+    //                          O L D
+    //============================================================
+
     private final ExecutorService pool = Executors.newSingleThreadExecutor();
     private final BlockingQueue<Line> lines = new ArrayBlockingQueue<Line>(100);
     private static final Line TERMINATE = new Line(-1, -1.0, -1.0);

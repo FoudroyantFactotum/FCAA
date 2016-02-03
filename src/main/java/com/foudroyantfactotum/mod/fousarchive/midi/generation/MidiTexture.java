@@ -15,7 +15,7 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.midi.generation;
 
-import com.foudroyantfactotum.mod.fousarchive.utility.Log.Logger;
+import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.resources.IResourceManager;

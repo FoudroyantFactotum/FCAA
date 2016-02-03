@@ -13,18 +13,21 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package com.foudroyantfactotum.mod.fousarchive.utility.Log;
+package com.foudroyantfactotum.tool.structure.registry.StateCorrecter;
 
-import com.foudroyantfactotum.mod.fousarchive.TheMod;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
+import net.minecraft.block.BlockDirectional;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumFacing;
 
-public class Logger
+import static com.foudroyantfactotum.tool.structure.coordinates.TransformLAG.localToGlobal;
+
+public class DefaultMinecraftRotation implements IStructurePatternStateCorrecter
 {
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(TheMod.MOD_ID);
-
-    public static void info(final String format, final Object... args)
+    @Override
+    public IBlockState alterBlockState(IBlockState state, EnumFacing orientation, boolean mirror)
     {
-        logger.log(Level.INFO, format, args);
+        final EnumFacing facing = state.getValue(BlockDirectional.FACING);
+
+        return state.withProperty(BlockDirectional.FACING, localToGlobal(facing, orientation, mirror));
     }
 }

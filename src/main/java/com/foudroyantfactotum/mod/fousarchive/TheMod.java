@@ -17,25 +17,20 @@ package com.foudroyantfactotum.mod.fousarchive;
 
 import com.foudroyantfactotum.mod.fousarchive.init.InitBlock;
 import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
-import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
-import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
 import com.foudroyantfactotum.mod.fousarchive.proxy.RenderProxy;
-import com.foudroyantfactotum.mod.fousarchive.utility.Log.Logger;
+import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
 import com.foudroyantfactotum.tool.structure.StructureRegistry;
 import com.foudroyantfactotum.tool.structure.coordinates.TransformLAG;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Scanner;
 
 import static net.minecraftforge.fml.common.Mod.EventHandler;
 import static net.minecraftforge.fml.common.Mod.Instance;
@@ -72,39 +67,16 @@ public class TheMod
     public static void init(FMLInitializationEvent event) throws IOException
     {
         StructureRegistry.loadRegisteredPatterns();
-        try(final InputStream stream
-                    = Minecraft.getMinecraft().getResourceManager()
-                .getResource(new ResourceLocation(MOD_ID, "midi/midiFiles"))
-                .getInputStream()
-        ) {
-            Scanner scanner = new Scanner(stream).useDelimiter("\n");
-
-            while (scanner.hasNext())
-            {
-                final ResourceLocation rl = new ResourceLocation(MOD_ID, "midi/" + scanner.next());
-
-                LiveImage.INSTANCE.registerSong(new MidiTexture(rl));
-                ItemPianoRoll.addPianoRoll(rl);
-            }
-        }
+        ItemPianoRoll.init();
 
         ItemPianoRoll.INSTANCE = new ItemPianoRoll();
         ItemPianoRoll.INSTANCE.setCreativeTab(InitBlock.ModTab.tabs.get(InitBlock.ModTab.main));
         GameRegistry.registerItem(ItemPianoRoll.INSTANCE, ItemPianoRoll.INSTANCE.getUnlocalizedName());
     }
 
-    private static void registerPianoRoll(ResourceLocation resource)
+    @EventHandler
+    public static void serverStart(FMLServerStartingEvent event)
     {
-        //Logger.info("Name: " + resource.getResourcePath());
-        LiveImage.INSTANCE.registerSong(new MidiTexture(resource));
-
-        final String name = resource.getResourcePath()
-                .substring(resource.getResourcePath().lastIndexOf('/')+1, resource.getResourcePath().length()-4);
-
-       /* final ItemPianoRoll item = new ItemPianoRoll(resource);
-        item.setUnlocalizedName(name);
-        item.setCreativeTab(InitBlock.ModTab.tabs.get(InitBlock.ModTab.main));
-
-        GameRegistry.registerItem(item, name);*/
+        event.registerServerCommand(new ItemPianoRoll.CommandPianoRollID());
     }
 }

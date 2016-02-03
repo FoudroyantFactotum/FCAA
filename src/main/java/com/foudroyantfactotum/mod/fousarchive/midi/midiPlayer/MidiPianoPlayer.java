@@ -42,7 +42,7 @@ public class MidiPianoPlayer implements Runnable
     @SideOnly(Side.CLIENT)
     public void playClient() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException
     {
-        if (te.isInvalid() || te.loadedSong == -1)
+        if (te.isInvalid() || te.loadedSong == -1 || ItemPianoRoll.getPianoRoll(te.loadedSong) == null)
             return;
 
         final InputStream midiStream;
