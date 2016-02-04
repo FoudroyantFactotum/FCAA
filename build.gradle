@@ -1,3 +1,5 @@
+import org.gradle.plugins.ide.idea.model.*
+
 buildscript {
     repositories {
         jcenter()
@@ -34,9 +36,9 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 minecraft {
-    version = config.minecraft_version + "-" + config.forge_version // grab latest forge
+    version = config.minecraft_version + "-" + config.forge_version
     runDir = "run"
-    mappings = "stable_20"
+    mappings = config.mcp_mappings
     replace '@MOD_VERSION@', version
 }
 
@@ -61,19 +63,48 @@ processResources
     }
 }
 
-dependencies {
-    repositories {
-        maven {
-            url 'http://repository.steamnsteel.info/artifactory/foudroyantfactotum-libs-stable'
-        }
-    }
-    deobfCompile(group: 'com.foudroyantfactotum', name: 'Structure', version: '1.8.9-0.1', classifier: 'universal')
-}
-
 jar {
         manifest {
         attributes 'FMLCorePlugin': 'com.foudroyantfactotum.mod.fousarchive.utility.asm.MOD_ASM',
                    'FMLCorePluginContainsFMLMod': 'false'
+    }
+}
+
+
+//all below nicked from the mcGui project
+if (config.structure_local_enabled == "true") {
+    println("Using Structure from local path - You cannot produce a build with this configuration")
+    def newModuleLocation = file(config.structure_local_path)
+    def existingModule = idea.project.modules[0]
+    def newIml = new IdeaModuleIml(existingModule.iml.xmlTransformer, newModuleLocation)
+    def newModule = new IdeaModule(existingModule.project, newIml)
+    newModule.name = "Structure"
+    newModule.contentRoot = newModuleLocation
+    newModule.sourceDirs = [ newModuleLocation ]
+
+    idea {
+        project {
+            modules += newModule
+        }
+        module {
+            iml {
+                //Not a lot of documentation how to add a module dependency without using Multi-projects.
+                withXml {
+                    def node = it.asNode()
+                    node.children()[0].appendNode('orderEntry', ["type": "module", "module-name": newModule.name])
+                }
+            }
+        }
+    }
+} else {
+    println("Using Structure from Maven")
+    dependencies {
+        repositories {
+            maven {
+                url 'http://repository.steamnsteel.info/artifactory/foudroyantfactotum-libs-stable'
+            }
+        }
+        deobfCompile(group: 'com.foudroyantfactotum', name: 'Structure', version: '1.8.9-0.1', classifier: 'universal')
     }
 }
 
@@ -90,7 +121,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 shadowJar {
     dependencies {
-        include(dependency('deobf.snapshot.21160122.com.foudroyantfactotum:Structure:1.8.9-0.1'))
+        include(dependency('deobf.snapshot.21160126.com.foudroyantfactotum:Structure:1.8.9-0.1'))
     }
     relocate 'com.foudroyantfactotum.tool.structure',
              'com.foudroyantfactotum.mod.fousarchive.shaded.com.foudroyantfactotum.tool.structure'
