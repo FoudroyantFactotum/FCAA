@@ -127,7 +127,7 @@ public class MidiTexture extends AbstractTexture
                     final int note = shortmsg.getData1() - 18;
                     final int vel = shortmsg.getData2();
 
-                    if (note < -1 || note > 84) continue;
+                    if (!(note > -1 && note < lastEvent.length)) continue;
 
                     if (vel == 0 && lastEvent[note] != -1)
                     {

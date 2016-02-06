@@ -16,11 +16,13 @@
 package com.foudroyantfactotum.mod.fousarchive.midi;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableMap;
 
 import javax.annotation.Nonnull;
 import javax.sound.midi.*;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 public class MidiDetails
 {
@@ -43,6 +45,8 @@ public class MidiDetails
     */
 
     public static final MidiDetails NO_DETAILS = new MidiDetails();
+
+    private final String[] elem;
 
     public final String title;
     public final String subtitle;
@@ -73,7 +77,7 @@ public class MidiDetails
             "/song_type:",
             "/roll_condition:",
             "/roll_authenticity:",
-            "/roll_copyright"
+            "/roll_copyright:"
     };
 
     private MidiDetails()
@@ -97,6 +101,8 @@ public class MidiDetails
         this.rollCondition      = result[11];
         this.rollAuthenticity   = result[12];
         this.rollCopyright      = result[13];
+
+        this.elem = result;
     }
 
     @Nonnull
@@ -165,6 +171,41 @@ public class MidiDetails
                 , composer, compositionDate
                 , rollCopyright
         );
+    }
+
+    public ImmutableMap<String, String> toMap()
+    {
+        final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+
+        for (int i=0; i < tags.length; ++i)
+        {
+            if (elem[i] != null)
+                builder.put(tags[i], elem[i]);
+        }
+
+        return builder.build();
+    }
+
+    public static MidiDetails fromMap(ImmutableMap<String, String> map)
+    {
+        final String[] elem = new String[tags.length];
+
+        for (Map.Entry<String, String> entry : map.entrySet())
+        {
+            for (int i=0; i < tags.length; ++i)
+            {
+                if (entry.getKey().equals(tags[i]))
+                {
+                    elem[i] = entry.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (elem[0] == null || elem[7] == null)
+            return null;
+
+        return new MidiDetails(elem);
     }
 
     @Override

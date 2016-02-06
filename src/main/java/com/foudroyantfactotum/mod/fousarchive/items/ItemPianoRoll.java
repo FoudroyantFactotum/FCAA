@@ -16,10 +16,13 @@
 package com.foudroyantfactotum.mod.fousarchive.items;
 
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
+import com.foudroyantfactotum.mod.fousarchive.midi.JsonMidiDetails;
+import com.foudroyantfactotum.mod.fousarchive.midi.LiveMidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.midi.MidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
 import com.foudroyantfactotum.mod.fousarchive.utility.FousArchiveException;
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -30,49 +33,46 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.zip.GZIPInputStream;
 
 public class ItemPianoRoll extends FA_Item
 {
     public static ItemPianoRoll INSTANCE = null;
 
     public static final String prefixLocation = "midi";
-    public static final ResourceLocation masterListFile = new ResourceLocation(TheMod.MOD_ID, prefixLocation + "/master");
+    public static final ResourceLocation masterListFile = new ResourceLocation(TheMod.MOD_ID, prefixLocation + "/master.json.gz");
     private static final List<ResourceLocation> allSongs = new ArrayList<>();
-    private static final List<MidiDetails> songDetails = new ArrayList<>();
 
     public static void init()
     {
-        try(final InputStream stream = Minecraft.getMinecraft().getResourceManager()
+        try(final InputStream mciStream = Minecraft.getMinecraft().getResourceManager()
                 .getResource(masterListFile)
                 .getInputStream())
         {
-            final Scanner scanner = new Scanner(stream).useDelimiter("\n");
-            while (scanner.hasNext())
+            try(final GZIPInputStream gziStream = new GZIPInputStream(mciStream))
             {
-                loadSongsFromSubdirectory(prefixLocation + '/' + scanner.next());
+                final JsonMidiDetails jmd = TheMod.JSON.fromJson(new InputStreamReader(gziStream), JsonMidiDetails.class);
+
+                for (final Map.Entry<ResourceLocation, ImmutableMap<String, String>> entry : jmd.midiDetails.entrySet())
+                {
+                    LiveImage.INSTANCE.registerSong(new MidiTexture(entry.getKey()));
+                    ItemPianoRoll.addPianoRoll(entry.getKey());
+                    LiveMidiDetails.INSTANCE.addSongDetails(entry.getKey(), MidiDetails.fromMap(entry.getValue()));
+                }
             }
         } catch (IOException e)
         {
             throw new FousArchiveException("Missing master Midi file list");
         }
-
-        allSongs.stream().map((rl) -> {
-            try (final InputStream stream = Minecraft.getMinecraft().getResourceManager()
-                    .getResource(rl)
-                    .getInputStream())
-            {
-                return MidiDetails.getMidiDetails(stream);
-            } catch (IOException e)
-            {
-                throw new FousArchiveException(e);
-            }
-        }).forEach(songDetails::add);
     }
 
     private static void loadSongsFromSubdirectory(String dir)
@@ -142,13 +142,14 @@ public class ItemPianoRoll extends FA_Item
 
         if (dam > -1 && dam < allSongs.size())
         {
-            final MidiDetails song = songDetails.get(dam);
+            final MidiDetails song = LiveMidiDetails.INSTANCE.getDetailsOnSong(allSongs.get(dam));
+
             if (song == MidiDetails.NO_DETAILS)
             {
                 tooltip.add(getPianoRoll(dam).toString());
             } else {
                 tooltip.add(song.getSimpleDetails());
-                if (advanced)
+                if (advanced || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))
                 {
                     for (final String detailLine : song.getLongDetails().split("\n"))
                         tooltip.add(detailLine);
@@ -166,7 +167,7 @@ public class ItemPianoRoll extends FA_Item
 
         if (dam > -1 && dam < allSongs.size())
         {
-            final MidiDetails song = songDetails.get(dam);
+            final MidiDetails song = LiveMidiDetails.INSTANCE.getDetailsOnSong(allSongs.get(dam));
 
             if (song == MidiDetails.NO_DETAILS)
             {
@@ -197,10 +198,11 @@ public class ItemPianoRoll extends FA_Item
         public void processCommand(ICommandSender sender, String[] args) throws CommandException
         {
             final String partialName = getAsSingleString(args);
+            final ResourceLocation[] songList = LiveMidiDetails.INSTANCE.songDetails();
 
-            for (int i = 0; i < songDetails.size(); ++i)
+            for (int i = 0; i < songList.length; ++i)
             {
-                final MidiDetails song = songDetails.get(i);
+                final MidiDetails song = LiveMidiDetails.INSTANCE.getDetailsOnSong(songList[i]);
 
                 if (song.title != null && song.title.startsWith(partialName))
                     sender.addChatMessage(new ChatComponentText("("+i+")"+song.getSimpleDetails()));
