@@ -15,9 +15,13 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano;
 
+import com.foudroyantfactotum.mod.fousarchive.TheMod;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
+import com.foudroyantfactotum.mod.fousarchive.utility.FousArchiveException;
+import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
+import com.mojang.realmsclient.util.Pair;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -27,9 +31,14 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Scanner;
 
 import static com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.BlockPlayerPiano.propPiano;
 import static com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.PianoState.*;
@@ -46,8 +55,6 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         for (int v : bk)
             blackKeyNo.set(v, true);
     }
-
-    // TODO: 19/01/16 fix mirror render
 
     @Override
     public void renderTileEntityAt(TEPlayerPiano te, double x, double y, double z, float partialTicks, int destroyStage)
@@ -115,23 +122,12 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
             if (tex != null)
             {
                 //Piano Roll Music
-                final double displayAmount = 500 / 8048.0;
-                final double shift = te.songPos;
-
                 GlStateManager.bindTexture(tex.getGlTextureId());
 
                 wr.setTranslation(x - 0.02, y + 0.8, z - 0.8);
                 wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
                 {
-                    wr.pos(1.33031 + 0.08, 0.88632, 1.25589).tex(0.5 * displayAmount + shift, 1).endVertex();
-                    wr.pos(0.7103 - 0.08, 0.88632, 1.25589).tex(0.5 * displayAmount + shift, 0).endVertex();
-                    wr.pos(0.7103 - 0.08, 0.66802, 1.350171).tex(shift, 0).endVertex();
-                    wr.pos(1.33031 + 0.08, 0.66802, 1.350171).tex(shift, 1).endVertex();
-
-                    wr.pos(1.33031 + 0.08, 0.66802, 1.350171).tex(shift, 1).endVertex();
-                    wr.pos(0.7103 - 0.08, 0.66802, 1.350171).tex(shift, 0).endVertex();
-                    wr.pos(0.7103 - 0.08, 0.46830, 1.25589).tex(-0.5 * displayAmount + shift, 0).endVertex();
-                    wr.pos(1.33031 + 0.08, 0.46830, 1.25589).tex(-0.5 * displayAmount + shift, 1).endVertex();
+                    addRender(wr, te.songPos, objQUAD[orientation.getHorizontalIndex()]);
                 }
                 tess.draw();
             }
@@ -139,5 +135,199 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         wr.setTranslation(0.0D, 0.0D, 0.0D);
 
         RenderHelper.enableStandardItemLighting();
+
+        if (++count > 50)
+        {
+            count = 0;
+
+            loadSheetModel();
+        }
+
+    }
+
+    private int count = 0;
+
+    private static class Quad
+    {
+        public final float[] a;
+        public final float[] b;
+        public final float[] c;
+        public final float[] d;
+
+        public Quad(float[] a, float[] b, float[] c, float[] d)
+        {
+            this.a = a;
+            this.b = b;
+            this.c = c;
+            this.d = d;
+        }
+
+        @Override
+        public String toString()
+        {
+            return "Quad{" +
+                    "a=" + Arrays.toString(a) +
+                    ", b=" + Arrays.toString(b) +
+                    ", c=" + Arrays.toString(c) +
+                    ", d=" + Arrays.toString(d) +
+                    '}';
+        }
+    }
+
+    private static final ResourceLocation sheetLocation = new ResourceLocation(TheMod.MOD_ID, "models/block/PlayerPiano/PlayerPiano-Sheet.ply");
+    private static Quad[][] objQUAD;
+
+    static {
+        loadSheetModel();
+    }
+
+    private static void loadSheetModel()
+    {
+        final Pair<float[][], int[][]> pointsAndFaces = getQuadPointData();
+        final float[][] offset = {
+                {1.01f, -0.8f, 0.78f}, //south
+                {0.0f, -0.8f, 1.0f}, //west
+                {0.0f, -0.8f, 1.82f}, //north
+                {0.0f, 0.0f, 0.0f}  //east
+        };
+
+        objQUAD = new Quad[4][pointsAndFaces.second().length];
+
+        for (int i = 0; i < 4; ++i)
+        {
+            final float[][] points = transAndRot(pointsAndFaces.first(), offset[i], EnumFacing.getHorizontal(i));
+
+            for (int ii = 0; ii < objQUAD[i].length; ++ii)
+            {
+                final int[] faces = pointsAndFaces.second()[ii];
+
+                objQUAD[i][ii] =  new Quad(points[faces[0]], points[faces[1]], points[faces[2]], points[faces[3]]);
+            }
+
+            if (EnumFacing.getHorizontal(i) ==EnumFacing.WEST)
+                Logger.info("quad " + Arrays.toString(objQUAD[i]));
+        }
+    }
+
+    private static float[][] transAndRot(float[][] oldPoints, float[] offset, EnumFacing f)
+    {
+        final float[][] points = new float[oldPoints.length][];
+
+        for (int i = 0; i < oldPoints.length; ++i)
+        {
+            points[i] = Arrays.copyOf(oldPoints[i], 5);
+
+            points[i][0] = f.getFrontOffsetZ() * points[i][0] + f.getFrontOffsetX() * points[i][2] + offset[0];
+            points[i][1] += offset[1];
+            points[i][2] = f.getFrontOffsetZ() * points[i][2] + f.getFrontOffsetX() * points[i][0] + offset[2];
+        }
+
+        return points;
+    }
+
+    private static Pair<float[][], int[][]> getQuadPointData()
+    {
+        try (final InputStream stream = Minecraft.getMinecraft().getResourceManager().getResource(sheetLocation).getInputStream())
+        {
+            final Scanner scanner = new Scanner(stream).useDelimiter("\n");
+
+            float[][] points = {};
+            int elementFace = -1;
+            boolean readingHeader = true;
+
+            while (scanner.hasNext())
+            {
+                if (readingHeader)
+                {
+                    final String line = scanner.next();
+
+                    if (line.startsWith("element face"))
+                    {
+                        elementFace = Integer.parseInt(line.substring("element face".length()+1));
+                        points = new float[(elementFace+1)*2][];
+                    } else if (line.startsWith("end_header"))
+                    {
+                        if (elementFace == -1)
+                            throw new FousArchiveException("missing elementFace in ply");
+
+                        readingHeader = false;
+                    }
+                } else
+                {
+                    final int[][] faceIndices = new int[elementFace][];
+
+                    //read all Verities
+                    for (int i = 0; i < points.length; ++i)
+                    {
+                        final String[] line = scanner.next().split(" ");
+                        final float[] vertex = new float[5];
+
+                        for (int ii = 0; ii < vertex.length; ++ii)
+                            vertex[ii] = Float.parseFloat(line[ii]);
+
+                        points[i] = vertex;
+                    }
+
+                    //read all face indices
+                    for (int i = 0; i < elementFace; ++i)
+                    {
+                        final String[] line = scanner.next().split(" ");
+                        final int n = Integer.parseInt(line[0]);
+
+                        if (n != 4)
+                            throw new FousArchiveException("ply contains face with more then 4 verities");
+
+                        final int a = Integer.parseInt(line[1]);
+                        final int b = Integer.parseInt(line[2]);
+                        final int c = Integer.parseInt(line[3]);
+                        final int d = Integer.parseInt(line[4]);
+
+                        faceIndices[i] = new int[]{a, b, c, d};
+                    }
+
+                    return Pair.of(points, faceIndices);
+                }
+            }
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        throw new FousArchiveException("Unexpected End Of Function");
+    }
+
+    private static void addRender(WorldRenderer wr, double shift, Quad[] quads)
+    {
+        final double displayAmount = 500 / 8048.0;
+
+        /*final double xa = 1.33031 + 0.08;
+        final double xb = 0.7103 - 0.08;
+
+        final double ya = 0.88632;
+        final double yb = 0.66802;
+        final double yc = 0.46830;
+
+        final double za = 1.25589;
+        final double zb = 1.350171;
+
+        wr.pos(xa, ya, za).tex(0.5 * displayAmount + shift, 1).endVertex();
+        wr.pos(xb, ya, za).tex(0.5 * displayAmount + shift, 0).endVertex();
+        wr.pos(xb, yb, zb).tex(shift, 0).endVertex();
+        wr.pos(xa, yb, zb).tex(shift, 1).endVertex();
+
+        wr.pos(xa, yb, zb).tex(shift, 1).endVertex();
+        wr.pos(xb, yb, zb).tex(shift, 0).endVertex();
+        wr.pos(xb, yc, za).tex(-0.5 * displayAmount + shift, 0).endVertex();
+        wr.pos(xa, yc, za).tex(-0.5 * displayAmount + shift, 1).endVertex();*/
+
+        for (final Quad q : quads)
+        {
+            float[] v;
+
+            v = q.a; wr.pos(v[0], v[1], v[2]).tex(v[4] * displayAmount + shift, v[3]).endVertex();
+            v = q.b; wr.pos(v[0], v[1], v[2]).tex(v[4] * displayAmount + shift, v[3]).endVertex();
+            v = q.c; wr.pos(v[0], v[1], v[2]).tex(v[4] * displayAmount + shift, v[3]).endVertex();
+            v = q.d; wr.pos(v[0], v[1], v[2]).tex(v[4] * displayAmount + shift, v[3]).endVertex();
+        }
     }
 }
