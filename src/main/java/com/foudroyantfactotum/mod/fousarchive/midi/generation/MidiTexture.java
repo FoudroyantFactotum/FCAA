@@ -15,6 +15,7 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.midi.generation;
 
+import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -148,6 +149,41 @@ public class MidiTexture extends AbstractTexture
         }
 
         return img;
+    }
+
+    public static class EmptyPage extends MidiTexture
+    {
+        public EmptyPage()
+        {
+            super(ItemPianoRoll.NONE);
+        }
+
+        @Override
+        public void loadTexture(IResourceManager resourceManager) throws IOException
+        {
+            final int xSize = 10;
+            final int ySize = 10;
+            byte[] res = new byte[xSize * ySize * 3];
+
+            this.deleteGlTexture();
+
+            GlStateManager.bindTexture(this.getGlTextureId());
+
+            final ByteBuffer bb = (ByteBuffer) BufferUtils
+                    .createByteBuffer(res.length)
+                    .put(res)
+                    .flip();
+
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, 0);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MIN_LOD, 0.0f);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LOD, 0.0f);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, 0.0f);
+
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGB, xSize, ySize, 0,
+                    GL11.GL_RGB, GL11.GL_BYTE, bb
+            );
+        }
     }
 
     public static void main(String[] args) throws IOException, InvalidMidiDataException

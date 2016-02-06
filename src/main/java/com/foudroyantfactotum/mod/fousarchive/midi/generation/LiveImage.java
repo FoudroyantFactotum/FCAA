@@ -15,6 +15,7 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.midi.generation;
 
+import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import gnu.trove.map.hash.TObjectLongHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
@@ -47,6 +48,9 @@ public enum LiveImage
     public synchronized MidiTexture getSong(ResourceLocation rl)
     {
         final MidiTexture texture = map.get(rl);
+
+        if (texture == null)
+            return getSong(ItemPianoRoll.NONE);
 
         if (!texture.hasTexureID())
         {

@@ -18,7 +18,10 @@ package com.foudroyantfactotum.mod.fousarchive;
 import com.foudroyantfactotum.mod.fousarchive.init.InitBlock;
 import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.midi.JsonMidiDetails;
+import com.foudroyantfactotum.mod.fousarchive.midi.LiveMidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.midi.MidiDetails;
+import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
+import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
 import com.foudroyantfactotum.mod.fousarchive.proxy.RenderProxy;
 import com.foudroyantfactotum.mod.fousarchive.utility.FousArchiveException;
 import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
@@ -38,6 +41,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -77,7 +81,6 @@ public class TheMod
     public static void init(FMLInitializationEvent event) throws IOException
     {
         StructureRegistry.loadRegisteredPatterns();
-        ItemPianoRoll.init();
 
         ItemPianoRoll.INSTANCE = new ItemPianoRoll();
         ItemPianoRoll.INSTANCE.setCreativeTab(InitBlock.ModTab.tabs.get(InitBlock.ModTab.main));
@@ -103,6 +106,13 @@ public class TheMod
                         {
                             final Reader r = new InputStreamReader(stream);
                             final JsonMidiDetails jmd = JSON.fromJson(r, JsonMidiDetails.class);
+
+                            for (final Map.Entry<ResourceLocation, ImmutableMap<String, String>> entry : jmd.midiDetails.entrySet())
+                            {
+                                LiveImage.INSTANCE.registerSong(new MidiTexture(entry.getKey()));
+                                ItemPianoRoll.addPianoRoll(entry.getKey());
+                                LiveMidiDetails.INSTANCE.addSongDetails(entry.getKey(), MidiDetails.fromMap(entry.getValue()));
+                            }
 
                         } catch (IOException e)
                         {

@@ -16,7 +16,6 @@
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano;
 
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
-import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
 import net.minecraft.block.BlockDirectional;
@@ -28,7 +27,6 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 import java.util.BitSet;
@@ -110,37 +108,32 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
 
         tess.draw();
 
-        if (te.loadedSong != -1)
+        if (te.loadedSong != null)
         {
-            final ResourceLocation pianoRoll = ItemPianoRoll.getPianoRoll(te.loadedSong);
+            final MidiTexture tex = LiveImage.INSTANCE.getSong(te.loadedSong);
 
-            if (pianoRoll != null)
+            if (tex != null)
             {
-                final MidiTexture tex = LiveImage.INSTANCE.getSong(pianoRoll);
+                //Piano Roll Music
+                final double displayAmount = 500 / 8048.0;
+                final double shift = te.songPos;
 
-                if (tex != null)
+                GlStateManager.bindTexture(tex.getGlTextureId());
+
+                wr.setTranslation(x - 0.02, y + 0.8, z - 0.8);
+                wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
                 {
-                    //Piano Roll Music
-                    final double displayAmount = 500 / 8048.0;
-                    final double shift = te.songPos;
+                    wr.pos(1.33031 + 0.08, 0.88632, 1.25589).tex(0.5 * displayAmount + shift, 1).endVertex();
+                    wr.pos(0.7103 - 0.08, 0.88632, 1.25589).tex(0.5 * displayAmount + shift, 0).endVertex();
+                    wr.pos(0.7103 - 0.08, 0.66802, 1.350171).tex(shift, 0).endVertex();
+                    wr.pos(1.33031 + 0.08, 0.66802, 1.350171).tex(shift, 1).endVertex();
 
-                    GlStateManager.bindTexture(tex.getGlTextureId());
-
-                    wr.setTranslation(x - 0.02, y + 0.8, z - 0.8);
-                    wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-                    {
-                        wr.pos(1.33031 + 0.08, 0.88632, 1.25589).tex(0.5 * displayAmount + shift, 1).endVertex();
-                        wr.pos(0.7103 - 0.08, 0.88632, 1.25589).tex(0.5 * displayAmount + shift, 0).endVertex();
-                        wr.pos(0.7103 - 0.08, 0.66802, 1.350171).tex(shift, 0).endVertex();
-                        wr.pos(1.33031 + 0.08, 0.66802, 1.350171).tex(shift, 1).endVertex();
-
-                        wr.pos(1.33031 + 0.08, 0.66802, 1.350171).tex(shift, 1).endVertex();
-                        wr.pos(0.7103 - 0.08, 0.66802, 1.350171).tex(shift, 0).endVertex();
-                        wr.pos(0.7103 - 0.08, 0.46830, 1.25589).tex(-0.5 * displayAmount + shift, 0).endVertex();
-                        wr.pos(1.33031 + 0.08, 0.46830, 1.25589).tex(-0.5 * displayAmount + shift, 1).endVertex();
-                    }
-                    tess.draw();
+                    wr.pos(1.33031 + 0.08, 0.66802, 1.350171).tex(shift, 1).endVertex();
+                    wr.pos(0.7103 - 0.08, 0.66802, 1.350171).tex(shift, 0).endVertex();
+                    wr.pos(0.7103 - 0.08, 0.46830, 1.25589).tex(-0.5 * displayAmount + shift, 0).endVertex();
+                    wr.pos(1.33031 + 0.08, 0.46830, 1.25589).tex(-0.5 * displayAmount + shift, 1).endVertex();
                 }
+                tess.draw();
             }
         }
         wr.setTranslation(0.0D, 0.0D, 0.0D);

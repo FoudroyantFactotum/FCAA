@@ -27,14 +27,19 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
+import java.io.IOException;
 
 import static net.minecraft.block.BlockDirectional.FACING;
 
@@ -97,14 +102,28 @@ public final class BlockPlayerPiano extends FA_StructureBlock
             final TEPlayerPiano te = (TEPlayerPiano) ute;
             final ItemStack uStackItem = player.inventory.getCurrentItem();
 
-            if (te.loadedSong == -1)
+            if (te.loadedSong == null)
             {
                 if (uStackItem != null && uStackItem.getItem() instanceof ItemPianoRoll)
                 {
                     if (!player.capabilities.isCreativeMode)
                         player.inventory.removeStackFromSlot(player.inventory.currentItem);
 
-                    te.loadedSong = uStackItem.getItemDamage();
+                    final NBTTagCompound nbt = uStackItem.getTagCompound();
+
+                    if (nbt != null && nbt.hasKey(ItemPianoRoll.ROLL))
+                    {
+                        final ResourceLocation rl = new ResourceLocation(nbt.getString(ItemPianoRoll.ROLL));
+
+                        try{
+                            Minecraft.getMinecraft().getResourceManager().getResource(rl);
+                            te.loadedSong = rl;
+                        } catch (IOException e) {
+                            te.loadedSong = ItemPianoRoll.NONE;
+                        }
+                    } else {
+                        te.loadedSong = ItemPianoRoll.NONE;
+                    }
                 }
             } else
             {
@@ -112,15 +131,21 @@ public final class BlockPlayerPiano extends FA_StructureBlock
                 {
                     if (player.isSneaking())
                     {
-                        if (!player.capabilities.isCreativeMode)
+                        if (!player.capabilities.isCreativeMode && !world.isRemote)
                         {
                             final ItemStack stack = new ItemStack(ItemPianoRoll.INSTANCE, 1);
-                            stack.setItemDamage(te.loadedSong);
+                            if (te.loadedSong != null && te.loadedSong != ItemPianoRoll.NONE)
+                            {
+                                final NBTTagCompound nbt = new NBTTagCompound();
+
+                                nbt.setString(ItemPianoRoll.ROLL, te.loadedSong.toString());
+                                stack.setTagCompound(nbt);
+                            }
 
                             world.spawnEntityInWorld(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), stack));
                         }
 
-                        te.loadedSong = -1;
+                        te.loadedSong = null;
                         te.songPos = 0.0;
                     } else
                     {

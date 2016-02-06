@@ -15,12 +15,12 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano;
 
-import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer.MidiPianoPlayer;
 import com.foudroyantfactotum.tool.structure.registry.StructureDefinition;
 import com.foudroyantfactotum.tool.structure.tileentity.StructureTemplate;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -46,7 +46,7 @@ public class TEPlayerPiano extends StructureTemplate
     public volatile boolean isSongRunning = false;
     public volatile boolean hasSongTerminated = true;
 
-    public int loadedSong = -1;
+    public ResourceLocation loadedSong = null;
 
     public TEPlayerPiano()
     {
@@ -63,7 +63,7 @@ public class TEPlayerPiano extends StructureTemplate
     {
         super.writeToNBT(nbt);
 
-        nbt.setInteger(ITEM_LOADED_SONG, loadedSong);
+        nbt.setString(ITEM_LOADED_SONG, loadedSong == null ? "" : loadedSong.toString());
         nbt.setDouble(SONG_POSITION, songPos);
         nbt.setBoolean(IS_SONG_PLAYING, isSongPlaying);
         nbt.setBoolean(IS_SONG_RUNNING, isSongRunning);
@@ -75,7 +75,8 @@ public class TEPlayerPiano extends StructureTemplate
     {
         super.readFromNBT(nbt);
 
-        loadedSong = nbt.getInteger(ITEM_LOADED_SONG);
+        final String resName = nbt.getString(ITEM_LOADED_SONG);
+        loadedSong = resName == null || resName.isEmpty() ? null : new ResourceLocation(resName);
         songPos = nbt.getDouble(SONG_POSITION);
         isSongPlaying = nbt.getBoolean(IS_SONG_PLAYING);
         isSongRunning = nbt.getBoolean(IS_SONG_RUNNING);
@@ -112,6 +113,6 @@ public class TEPlayerPiano extends StructureTemplate
     @Override
     public String toString()
     {
-        return "te.state: " + isSongPlaying + " : " + isSongRunning + " : " + hasSongTerminated + " : " + songPos + " : " + ItemPianoRoll.getPianoRoll(loadedSong);
+        return "te.state: " + isSongPlaying + " : " + isSongRunning + " : " + hasSongTerminated + " : " + songPos + " : " + loadedSong;
     }
 }

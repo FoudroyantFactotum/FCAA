@@ -16,83 +16,35 @@
 package com.foudroyantfactotum.mod.fousarchive.items;
 
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
-import com.foudroyantfactotum.mod.fousarchive.midi.JsonMidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.midi.LiveMidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.midi.MidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
-import com.foudroyantfactotum.mod.fousarchive.utility.FousArchiveException;
-import com.google.common.collect.ImmutableMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.zip.GZIPInputStream;
 
 public class ItemPianoRoll extends FA_Item
 {
     public static ItemPianoRoll INSTANCE = null;
 
-    public static final String prefixLocation = "midi";
-    public static final ResourceLocation masterListFile = new ResourceLocation(TheMod.MOD_ID, prefixLocation + "/master.json.gz");
+    public static final ResourceLocation NONE = new ResourceLocation(TheMod.MOD_ID, "midi/NONE");
+    public static final String ROLL = "pianoRoll";
+
     private static final List<ResourceLocation> allSongs = new ArrayList<>();
-
-    public static void init()
-    {
-        try(final InputStream mciStream = Minecraft.getMinecraft().getResourceManager()
-                .getResource(masterListFile)
-                .getInputStream())
-        {
-            try(final GZIPInputStream gziStream = new GZIPInputStream(mciStream))
-            {
-                final JsonMidiDetails jmd = TheMod.JSON.fromJson(new InputStreamReader(gziStream), JsonMidiDetails.class);
-
-                for (final Map.Entry<ResourceLocation, ImmutableMap<String, String>> entry : jmd.midiDetails.entrySet())
-                {
-                    LiveImage.INSTANCE.registerSong(new MidiTexture(entry.getKey()));
-                    ItemPianoRoll.addPianoRoll(entry.getKey());
-                    LiveMidiDetails.INSTANCE.addSongDetails(entry.getKey(), MidiDetails.fromMap(entry.getValue()));
-                }
-            }
-        } catch (IOException e)
-        {
-            throw new FousArchiveException("Missing master Midi file list");
-        }
-    }
-
-    private static void loadSongsFromSubdirectory(String dir)
-    {
-        try(final Scanner scanner = new Scanner(Minecraft.getMinecraft().getResourceManager()
-                .getResource(new ResourceLocation(TheMod.MOD_ID,dir + "/master"))
-                .getInputStream()).useDelimiter("\n"))
-        {
-            while (scanner.hasNext())
-            {
-                final ResourceLocation rl = new ResourceLocation(TheMod.MOD_ID, dir + "/" + scanner.next());
-
-                LiveImage.INSTANCE.registerSong(new MidiTexture(rl));
-                ItemPianoRoll.addPianoRoll(rl);
-            }
-        } catch (IOException e)
-        {
-            throw new FousArchiveException("Missing master list for " + dir, e);
-        }
-    }
 
     public static void addPianoRoll(ResourceLocation rl)
     {
@@ -112,18 +64,14 @@ public class ItemPianoRoll extends FA_Item
         setUnlocalizedName("pianoRoll");
         setMaxStackSize(1);
         setNoRepair();
+        LiveMidiDetails.INSTANCE.addSongDetails(NONE, MidiDetails.NO_DETAILS);
+        LiveImage.INSTANCE.registerSong(new MidiTexture.EmptyPage());
     }
 
     @Override
-    public boolean showDurabilityBar(ItemStack stack)
+    public boolean isDamageable()
     {
         return false;
-    }
-
-    @Override
-    public int getMaxDamage()
-    {
-        return allSongs.size();
     }
 
     @Override
@@ -138,46 +86,42 @@ public class ItemPianoRoll extends FA_Item
     {
         tooltip.clear();
 
-        final int dam = stack.getItemDamage();
-
-        if (dam > -1 && dam < allSongs.size())
+        if (stack.getTagCompound() == null)
         {
-            final MidiDetails song = LiveMidiDetails.INSTANCE.getDetailsOnSong(allSongs.get(dam));
+            tooltip.add(MidiDetails.NO_DETAILS.getSimpleDetails());
+            return;
+        }
 
-            if (song == MidiDetails.NO_DETAILS)
+        final ResourceLocation song = getTagResourceOrElse(stack.getTagCompound(), ROLL, NONE);
+        final MidiDetails detail = LiveMidiDetails.INSTANCE.getDetailsOnSong(song);
+
+        tooltip.add(detail.getSimpleDetails());
+
+        if (detail != MidiDetails.NO_DETAILS)
+        {
+            if (advanced || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))
             {
-                tooltip.add(getPianoRoll(dam).toString());
-            } else {
-                tooltip.add(song.getSimpleDetails());
-                if (advanced || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))
-                {
-                    for (final String detailLine : song.getLongDetails().split("\n"))
-                        tooltip.add(detailLine);
-                }
+                for (final String detailLine : detail.getLongDetails().split("\n"))
+                    tooltip.add(detailLine);
             }
-        } else {
-            tooltip.add("INVALID");
         }
     }
 
-    @Override
-    public String getHighlightTip(ItemStack item, String displayName)
+    private static ResourceLocation getTagResourceOrElse(NBTTagCompound nbt, String tag, ResourceLocation orElse)
     {
-        final int dam = item.getItemDamage();
+        return nbt.hasKey(tag) ? new ResourceLocation(nbt.getString(tag)) : orElse;
+    }
 
-        if (dam > -1 && dam < allSongs.size())
-        {
-            final MidiDetails song = LiveMidiDetails.INSTANCE.getDetailsOnSong(allSongs.get(dam));
+    @Override
+    public String getHighlightTip(ItemStack stack, String displayName)
+    {
+        if (stack.getTagCompound() == null)
+            return MidiDetails.NO_DETAILS.getSimpleDetails();
 
-            if (song == MidiDetails.NO_DETAILS)
-            {
-                return getPianoRoll(dam).toString();
-            } else {
-                return song.getSimpleDetails();
-            }
-        } else {
-            return "INVALID + " + displayName;
-        }
+        final ResourceLocation song = getTagResourceOrElse(stack.getTagCompound(), ROLL, NONE);
+        final MidiDetails detail = LiveMidiDetails.INSTANCE.getDetailsOnSong(song);
+
+        return detail.getSimpleDetails();
     }
 
     public static class CommandPianoRollID extends CommandBase
@@ -199,13 +143,31 @@ public class ItemPianoRoll extends FA_Item
         {
             final String partialName = getAsSingleString(args);
             final ResourceLocation[] songList = LiveMidiDetails.INSTANCE.songDetails();
+            ResourceLocation rl = null;
+            int count = 0;
 
             for (int i = 0; i < songList.length; ++i)
             {
                 final MidiDetails song = LiveMidiDetails.INSTANCE.getDetailsOnSong(songList[i]);
 
-                if (song.title != null && song.title.startsWith(partialName))
-                    sender.addChatMessage(new ChatComponentText("("+i+")"+song.getSimpleDetails()));
+                if (song.title != null && song.title.toLowerCase().startsWith(partialName.toLowerCase()))
+                {
+                    rl = songList[i];
+                    ++count;
+                    sender.addChatMessage(new ChatComponentText(song.getSimpleDetails()));
+                }
+            }
+
+            if (count == 1 && rl != null)
+            {
+                final BlockPos sp = sender.getPosition();
+                final ItemStack stack = new ItemStack(ItemPianoRoll.INSTANCE, 1);
+                final NBTTagCompound nbt = new NBTTagCompound();
+
+                nbt.setString(ItemPianoRoll.ROLL, rl.toString());
+                stack.setTagCompound(nbt);
+
+                sender.getEntityWorld().spawnEntityInWorld(new EntityItem(sender.getEntityWorld(), sp.getX(), sp.getY(), sp.getZ(), stack));
             }
         }
 
@@ -216,13 +178,13 @@ public class ItemPianoRoll extends FA_Item
 
             final StringBuilder builder = new StringBuilder(str.length);
 
-            for (int i=0; i < str.length-1; ++i)
+            for (int i = 0; i < str.length - 1; ++i)
             {
                 builder.append(str[i]);
                 builder.append(' ');
             }
 
-            builder.append(str[str.length-1]);
+            builder.append(str[str.length - 1]);
 
             return builder.toString();
         }
