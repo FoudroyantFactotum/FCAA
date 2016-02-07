@@ -20,7 +20,6 @@ import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
 import com.foudroyantfactotum.mod.fousarchive.utility.FousArchiveException;
-import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
 import com.mojang.realmsclient.util.Pair;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.state.IBlockState;
@@ -32,6 +31,7 @@ import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Vec3i;
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
@@ -106,7 +106,6 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
                 brd.getBlockModelRenderer().renderModel(te.getWorld(), modelKeyBlack, stateKeyWhite, te.getPos(), wr);
                 rx += keySize * orientation.getFrontOffsetZ();
                 rz -= keySize * orientation.getFrontOffsetX();
-
             } else
             {
                 brd.getBlockModelRenderer().renderModel(te.getWorld(), modelKeyWhite, stateKeyWhite, te.getPos(), wr);
@@ -135,17 +134,7 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         wr.setTranslation(0.0D, 0.0D, 0.0D);
 
         RenderHelper.enableStandardItemLighting();
-
-        if (++count > 50)
-        {
-            count = 0;
-
-            loadSheetModel();
-        }
-
     }
-
-    private int count = 0;
 
     private static class Quad
     {
@@ -186,9 +175,9 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         final Pair<float[][], int[][]> pointsAndFaces = getQuadPointData();
         final float[][] offset = {
                 {1.01f, -0.8f, 0.78f}, //south
-                {0.0f, -0.8f, 1.0f}, //west
+                {1.05f, -0.8f, -0.2f}, //west
                 {0.0f, -0.8f, 1.82f}, //north
-                {0.0f, 0.0f, 0.0f}  //east
+                {0.0f, -0.8f, 2.8f}  //east
         };
 
         objQUAD = new Quad[4][pointsAndFaces.second().length];
@@ -203,23 +192,21 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
 
                 objQUAD[i][ii] =  new Quad(points[faces[0]], points[faces[1]], points[faces[2]], points[faces[3]]);
             }
-
-            if (EnumFacing.getHorizontal(i) ==EnumFacing.WEST)
-                Logger.info("quad " + Arrays.toString(objQUAD[i]));
         }
     }
 
     private static float[][] transAndRot(float[][] oldPoints, float[] offset, EnumFacing f)
     {
         final float[][] points = new float[oldPoints.length][];
+        final Vec3i d = f.getDirectionVec();
 
         for (int i = 0; i < oldPoints.length; ++i)
         {
             points[i] = Arrays.copyOf(oldPoints[i], 5);
 
-            points[i][0] = f.getFrontOffsetZ() * points[i][0] + f.getFrontOffsetX() * points[i][2] + offset[0];
+            points[i][0] = d.getZ() * oldPoints[i][0] + d.getX() * oldPoints[i][2] + offset[0];
             points[i][1] += offset[1];
-            points[i][2] = f.getFrontOffsetZ() * points[i][2] + f.getFrontOffsetX() * points[i][0] + offset[2];
+            points[i][2] = d.getZ() * oldPoints[i][2] + d.getX() * oldPoints[i][0] + offset[2];
         }
 
         return points;
@@ -296,38 +283,20 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         throw new FousArchiveException("Unexpected End Of Function");
     }
 
+    private final static double displayAmount = 500 / 8048.0;
+    private final static double pd = 500 / 8048.0 * -0.5;
+    private final static double nd = 500 / 8048.0 * 0.5;
+
     private static void addRender(WorldRenderer wr, double shift, Quad[] quads)
     {
-        final double displayAmount = 500 / 8048.0;
-
-        /*final double xa = 1.33031 + 0.08;
-        final double xb = 0.7103 - 0.08;
-
-        final double ya = 0.88632;
-        final double yb = 0.66802;
-        final double yc = 0.46830;
-
-        final double za = 1.25589;
-        final double zb = 1.350171;
-
-        wr.pos(xa, ya, za).tex(0.5 * displayAmount + shift, 1).endVertex();
-        wr.pos(xb, ya, za).tex(0.5 * displayAmount + shift, 0).endVertex();
-        wr.pos(xb, yb, zb).tex(shift, 0).endVertex();
-        wr.pos(xa, yb, zb).tex(shift, 1).endVertex();
-
-        wr.pos(xa, yb, zb).tex(shift, 1).endVertex();
-        wr.pos(xb, yb, zb).tex(shift, 0).endVertex();
-        wr.pos(xb, yc, za).tex(-0.5 * displayAmount + shift, 0).endVertex();
-        wr.pos(xa, yc, za).tex(-0.5 * displayAmount + shift, 1).endVertex();*/
-
         for (final Quad q : quads)
         {
             float[] v;
 
-            v = q.a; wr.pos(v[0], v[1], v[2]).tex(v[4] * displayAmount + shift, v[3]).endVertex();
-            v = q.b; wr.pos(v[0], v[1], v[2]).tex(v[4] * displayAmount + shift, v[3]).endVertex();
-            v = q.c; wr.pos(v[0], v[1], v[2]).tex(v[4] * displayAmount + shift, v[3]).endVertex();
-            v = q.d; wr.pos(v[0], v[1], v[2]).tex(v[4] * displayAmount + shift, v[3]).endVertex();
+            v = q.a; wr.pos(v[0], v[1], v[2]).tex(v[4] * displayAmount + shift + pd, v[3]).endVertex();
+            v = q.b; wr.pos(v[0], v[1], v[2]).tex(v[4] * displayAmount + shift + pd, v[3]).endVertex();
+            v = q.c; wr.pos(v[0], v[1], v[2]).tex(v[4] * displayAmount + shift - nd, v[3]).endVertex();
+            v = q.d; wr.pos(v[0], v[1], v[2]).tex(v[4] * displayAmount + shift - nd, v[3]).endVertex();
         }
     }
 }
