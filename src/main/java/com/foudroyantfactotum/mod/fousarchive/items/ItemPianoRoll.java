@@ -150,7 +150,7 @@ public class ItemPianoRoll extends FA_Item
             {
                 final MidiDetails song = LiveMidiDetails.INSTANCE.getDetailsOnSong(songList[i]);
 
-                if (song.title != null && song.title.toLowerCase().startsWith(partialName.toLowerCase()))
+                if (song.title != null && song.title.toLowerCase().contains(partialName.toLowerCase()))
                 {
                     rl = songList[i];
                     ++count;

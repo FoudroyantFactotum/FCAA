@@ -134,6 +134,7 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         wr.setTranslation(0.0D, 0.0D, 0.0D);
 
         RenderHelper.enableStandardItemLighting();
+        loadSheetModel();
     }
 
     private static class Quad
@@ -176,7 +177,7 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         final float[][] offset = {
                 {1.01f, -0.8f, 0.78f}, //south
                 {1.05f, -0.8f, -0.2f}, //west
-                {0.0f, -0.8f, 1.82f}, //north
+                {0.02f, -0.8f, 1.82f}, //north
                 {0.0f, -0.8f, 2.8f}  //east
         };
 
@@ -204,9 +205,13 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         {
             points[i] = Arrays.copyOf(oldPoints[i], 5);
 
+            //t & r x,y,z
             points[i][0] = d.getZ() * oldPoints[i][0] + d.getX() * oldPoints[i][2] + offset[0];
             points[i][1] += offset[1];
             points[i][2] = d.getZ() * oldPoints[i][2] + d.getX() * oldPoints[i][0] + offset[2];
+
+            //f uv
+            points[i][3] = f.getAxis() == EnumFacing.Axis.X ? -points[i][3] : points[i][3];
         }
 
         return points;
@@ -218,8 +223,8 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         {
             final Scanner scanner = new Scanner(stream).useDelimiter("\n");
 
-            float[][] points = {};
             int elementFace = -1;
+            int elementVertex = -1;
             boolean readingHeader = true;
 
             while (scanner.hasNext())
@@ -228,23 +233,33 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
                 {
                     final String line = scanner.next();
 
-                    if (line.startsWith("element face"))
+                    if (line.startsWith("element"))
                     {
-                        elementFace = Integer.parseInt(line.substring("element face".length()+1));
-                        points = new float[(elementFace+1)*2][];
+                        final String[] words = line.split(" ");
+
+                        if (words[1].equals("vertex"))
+                        {
+                            elementVertex = Integer.parseInt(words[2]);
+                        } else if (words[1].equals("face"))
+                        {
+                            elementFace = Integer.parseInt(words[2]);
+                        }
                     } else if (line.startsWith("end_header"))
                     {
                         if (elementFace == -1)
-                            throw new FousArchiveException("missing elementFace in ply");
+                            throw new FousArchiveException("missing 'element face' in ply");
+                        if (elementVertex == -1)
+                            throw new FousArchiveException("missing 'element vertex' in ply");
 
                         readingHeader = false;
                     }
                 } else
                 {
                     final int[][] faceIndices = new int[elementFace][];
+                    final float[][] points = new float[elementVertex][];
 
                     //read all Verities
-                    for (int i = 0; i < points.length; ++i)
+                    for (int i = 0; i < elementVertex; ++i)
                     {
                         final String[] line = scanner.next().split(" ");
                         final float[] vertex = new float[5];
@@ -283,9 +298,8 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         throw new FousArchiveException("Unexpected End Of Function");
     }
 
-    private final static double displayAmount = 500 / 8048.0;
-    private final static double pd = 500 / 8048.0 * -0.5;
-    private final static double nd = 500 / 8048.0 * 0.5;
+    private final static double d = 500 / 8048.0;
+    private final static double hd = d * 0.5;
 
     private static void addRender(WorldRenderer wr, double shift, Quad[] quads)
     {
@@ -293,10 +307,10 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         {
             float[] v;
 
-            v = q.a; wr.pos(v[0], v[1], v[2]).tex(v[4] * displayAmount + shift + pd, v[3]).endVertex();
-            v = q.b; wr.pos(v[0], v[1], v[2]).tex(v[4] * displayAmount + shift + pd, v[3]).endVertex();
-            v = q.c; wr.pos(v[0], v[1], v[2]).tex(v[4] * displayAmount + shift - nd, v[3]).endVertex();
-            v = q.d; wr.pos(v[0], v[1], v[2]).tex(v[4] * displayAmount + shift - nd, v[3]).endVertex();
+            v = q.a; wr.pos(v[0], v[1], v[2]).tex(v[4] * d + shift - hd, v[3]).endVertex();
+            v = q.b; wr.pos(v[0], v[1], v[2]).tex(v[4] * d + shift - hd, v[3]).endVertex();
+            v = q.c; wr.pos(v[0], v[1], v[2]).tex(v[4] * d + shift - hd, v[3]).endVertex();
+            v = q.d; wr.pos(v[0], v[1], v[2]).tex(v[4] * d + shift - hd, v[3]).endVertex();
         }
     }
 }
