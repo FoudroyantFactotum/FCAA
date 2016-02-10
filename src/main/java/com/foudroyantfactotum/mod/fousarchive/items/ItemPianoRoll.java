@@ -32,10 +32,14 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class ItemPianoRoll extends FA_Item
 {
@@ -129,46 +133,126 @@ public class ItemPianoRoll extends FA_Item
         @Override
         public String getCommandName()
         {
-            return "listPianoRollID";
+            return "listPianoRolls";
         }
 
         @Override
         public String getCommandUsage(ICommandSender sender)
         {
-            return "/listPianoRollID [full or partial name]";
+            return "/listPianoRolls [t\"Song Title\"] [c\"Song Author\"] [d\"Song Year\"] [m\"Manufacturer\"]";
         }
 
         @Override
         public void processCommand(ICommandSender sender, String[] args) throws CommandException
         {
-            final String partialName = getAsSingleString(args);
-            final ResourceLocation[] songList = LiveMidiDetails.INSTANCE.songDetails();
-            ResourceLocation rl = null;
-            int count = 0;
-
-            for (int i = 0; i < songList.length; ++i)
+            try
             {
-                final MidiDetails song = LiveMidiDetails.INSTANCE.getDetailsOnSong(songList[i]);
+                final List<Pair<SearchMatch, String>> pt = parse(getAsSingleString(args));
+                if (pt.size() > 10)
+                    throw new CommandException("Too many matches");
 
-                if (song.title != null && song.title.toLowerCase().contains(partialName.toLowerCase()))
+                final List<Predicate<MidiDetails>> func = new ArrayList<>(pt.size());
+                final List<SearchMatch> outfString = new LinkedList<>();
+
+                for (Pair<SearchMatch, String> p : pt)
                 {
-                    rl = songList[i];
-                    ++count;
-                    sender.addChatMessage(new ChatComponentText(song.getSimpleDetails()));
+                    func.add(p.getLeft().checkDetails(p.getRight()));
+                    outfString.add(p.getLeft());
+                }
+
+                final ResourceLocation[] songList = LiveMidiDetails.INSTANCE.songDetails();
+                final List<Pair<ResourceLocation, MidiDetails>> validList = new LinkedList<>();
+
+                sender.addChatMessage(new ChatComponentText("==========Searching=========="));
+
+                    song:
+                    for (int i = 0; i < songList.length; ++i)
+                    {
+                        final MidiDetails song = LiveMidiDetails.INSTANCE.getDetailsOnSong(songList[i]);
+
+                        for (Predicate<MidiDetails> p : func)
+                            if (!p.test(song))
+                                continue song;
+
+                        validList.add(Pair.of(songList[i], song));
+                    }
+                int i = 0;
+
+                for (Pair<ResourceLocation, MidiDetails> m : validList)
+                    sender.addChatMessage(new ChatComponentText((++i) + ". " + toStringer(m.getRight(), outfString)));
+
+                sender.addChatMessage(new ChatComponentText("=========End  Search========="));
+
+                if (validList.size() == 1)
+                {
+                    final BlockPos sp = sender.getPosition();
+                    final ItemStack stack = new ItemStack(ItemPianoRoll.INSTANCE, 1);
+                    final NBTTagCompound nbt = new NBTTagCompound();
+
+                    nbt.setString(ItemPianoRoll.ROLL, validList.get(0).getLeft().toString());
+                    stack.setTagCompound(nbt);
+
+                    sender.getEntityWorld().spawnEntityInWorld(new EntityItem(sender.getEntityWorld(), sp.getX(), sp.getY(), sp.getZ(), stack));
+                }
+            } catch (Exception e)
+            {
+                if (e instanceof CommandException)
+                    throw e;
+            }
+        }
+
+        private static String toStringer(MidiDetails m, List<SearchMatch> v)
+        {
+            final StringBuilder sb = new StringBuilder(v.size()*2-1);
+            int i = 0;
+
+            for (SearchMatch f : v)
+            {
+                if (i++ > 0)
+                    sb.append(" : ");
+
+                sb.append(f.getValue(m));
+            }
+
+            return sb.toString();
+        }
+
+        private List<Pair<SearchMatch, String>> parse(String s) throws CommandException
+        {
+            final List<Pair<SearchMatch, String>> list = new LinkedList<>();
+
+            while (!s.isEmpty() && s.length() >= 1)
+            {
+                final SearchMatch sm = SearchMatch.getOnChar(s.charAt(0));
+
+                if (sm == null)
+                    throw new CommandException("Expected SearchMatch value found '" + s.charAt(0) + '\'');
+
+                if (s.length() <= 1)
+                {
+                    list.add(Pair.of(sm, ""));
+                    s = "";
+                    continue;
+                }
+
+                if (s.charAt(1) == '\"')
+                {
+                    s = s.substring(2);
+
+                    final int ifq = s.indexOf('\"');
+                    final String s1 = s.substring(0, ifq);
+
+                    s = s.substring(ifq + 1).trim();
+
+                    list.add(Pair.of(sm, s1));
+                } else
+                {
+                    list.add(Pair.of(sm, ""));
+                    s = s.substring(1).trim();
                 }
             }
 
-            if (count == 1 && rl != null)
-            {
-                final BlockPos sp = sender.getPosition();
-                final ItemStack stack = new ItemStack(ItemPianoRoll.INSTANCE, 1);
-                final NBTTagCompound nbt = new NBTTagCompound();
-
-                nbt.setString(ItemPianoRoll.ROLL, rl.toString());
-                stack.setTagCompound(nbt);
-
-                sender.getEntityWorld().spawnEntityInWorld(new EntityItem(sender.getEntityWorld(), sp.getX(), sp.getY(), sp.getZ(), stack));
-            }
+            return list;
         }
 
         private String getAsSingleString(String[] str)
@@ -187,6 +271,52 @@ public class ItemPianoRoll extends FA_Item
             builder.append(str[str.length - 1]);
 
             return builder.toString();
+        }
+
+        private enum SearchMatch
+        {
+            Title('t', MidiDetails::getTitle),
+            Composer('c', MidiDetails::getComposer),
+            Date('d', MidiDetails::getCompositionDate),
+            Manufacturer('m', MidiDetails::getRollManufacturer);
+
+            private char c;
+            private Function<MidiDetails, String> func;
+
+            SearchMatch(char c, Function<MidiDetails, String> func)
+            {
+                this.c = c;
+                this.func = func;
+            }
+
+            public char getCommandChar()
+            {
+                return c;
+            }
+
+            public String getValue(MidiDetails m)
+            {
+                return func.apply(m);
+            }
+
+            public Predicate<MidiDetails> checkDetails(String s)
+            {
+                return (a) ->
+                {
+                    final String r = func.apply(a);
+
+                    return r != null && r.toLowerCase().contains(s.replaceAll("\"", "").toLowerCase());
+                };
+            }
+
+            public static SearchMatch getOnChar(char c)
+            {
+                for (SearchMatch s : SearchMatch.values())
+                    if (s.c == c)
+                        return s;
+
+                return null;
+            }
         }
     }
 }

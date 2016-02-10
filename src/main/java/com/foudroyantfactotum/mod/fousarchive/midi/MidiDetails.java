@@ -48,20 +48,20 @@ public class MidiDetails
 
     private final String[] elem;
 
-    public final String title;
-    public final String subtitle;
-    public final String rollManufacturer;
-    public final String rollBrand;
-    public final String rollNumber;
-    public final String rollClass;
-    public final String performer;
-    public final String composer;
-    public final String compositionDate;
-    public final String rollTempo;
-    public final String songType;
-    public final String rollCondition;
-    public final String rollAuthenticity;
-    public final String rollCopyright;
+    private final String title;
+    private final String subtitle;
+    private final String rollManufacturer;
+    private final String rollBrand;
+    private final String rollNumber;
+    private final String rollClass;
+    private final String performer;
+    private final String composer;
+    private final String compositionDate;
+    private final String rollTempo;
+    private final String songType;
+    private final String rollCondition;
+    private final String rollAuthenticity;
+    private final String rollCopyright;
 
     private static final String[] tags = {
             "/title:",
@@ -206,6 +206,76 @@ public class MidiDetails
             return null;
 
         return new MidiDetails(elem);
+    }
+
+    public String getTitle()
+    {
+        return title;
+    }
+
+    public String getSubtitle()
+    {
+        return subtitle;
+    }
+
+    public String getRollManufacturer()
+    {
+        return rollManufacturer;
+    }
+
+    public String getRollBrand()
+    {
+        return rollBrand;
+    }
+
+    public String getRollNumber()
+    {
+        return rollNumber;
+    }
+
+    public String getRollClass()
+    {
+        return rollClass;
+    }
+
+    public String getPerformer()
+    {
+        return performer;
+    }
+
+    public String getComposer()
+    {
+        return composer;
+    }
+
+    public String getCompositionDate()
+    {
+        return compositionDate;
+    }
+
+    public String getRollTempo()
+    {
+        return rollTempo;
+    }
+
+    public String getSongType()
+    {
+        return songType;
+    }
+
+    public String getRollCondition()
+    {
+        return rollCondition;
+    }
+
+    public String getRollAuthenticity()
+    {
+        return rollAuthenticity;
+    }
+
+    public String getRollCopyright()
+    {
+        return rollCopyright;
     }
 
     @Override

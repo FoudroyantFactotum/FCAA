@@ -237,13 +237,8 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
                     {
                         final String[] words = line.split(" ");
 
-                        if (words[1].equals("vertex"))
-                        {
-                            elementVertex = Integer.parseInt(words[2]);
-                        } else if (words[1].equals("face"))
-                        {
-                            elementFace = Integer.parseInt(words[2]);
-                        }
+                        if (words[1].equals("vertex"))    elementVertex = Integer.parseInt(words[2]);
+                        else if (words[1].equals("face")) elementFace   = Integer.parseInt(words[2]);
                     } else if (line.startsWith("end_header"))
                     {
                         if (elementFace == -1)
