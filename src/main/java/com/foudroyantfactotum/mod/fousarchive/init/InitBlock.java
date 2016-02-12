@@ -120,13 +120,7 @@ public class InitBlock
 
                         TheMod.render.registerBlockAsItemModel(block);
                     }
-                } catch (ClassNotFoundException e)//todo better errors
-                {
-                    e.printStackTrace();
-                } catch (InstantiationException e)
-                {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e)
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e)//todo better errors
                 {
                     e.printStackTrace();
                 }
@@ -191,7 +185,7 @@ public class InitBlock
         }
     }
 
-    private static Field getInstanceField(Class<?> clazz)
+    public static Field getInstanceField(Class<?> clazz)
     {
         for (Field f : clazz.getFields())
         {

@@ -17,6 +17,7 @@ package com.foudroyantfactotum.mod.fousarchive.midi;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
+import gnu.trove.map.hash.TObjectByteHashMap;
 
 import javax.annotation.Nonnull;
 import javax.sound.midi.*;
@@ -79,6 +80,21 @@ public class MidiDetails
             "/roll_authenticity:",
             "/roll_copyright:"
     };
+
+    private static final TObjectByteHashMap<String> ctt = new TObjectByteHashMap<>(tags.length);
+    private static final String[] cTags = cleanTags();
+    private static String[] cleanTags()
+    {
+        final String[] t = new String[tags.length];
+
+        for (int i = 0; i < t.length; ++i)
+        {
+            t[i] = tags[i].substring(1,tags[i].length()-1);
+            ctt.put(t[i], (byte)i);
+        }
+
+        return t;
+    }
 
     private MidiDetails()
     {
@@ -177,10 +193,10 @@ public class MidiDetails
     {
         final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
 
-        for (int i=0; i < tags.length; ++i)
+        for (int i=0; i < cTags.length; ++i)
         {
             if (elem[i] != null)
-                builder.put(tags[i], elem[i]);
+                builder.put(cTags[i], elem[i]);
         }
 
         return builder.build();
@@ -191,16 +207,8 @@ public class MidiDetails
         final String[] elem = new String[tags.length];
 
         for (Map.Entry<String, String> entry : map.entrySet())
-        {
-            for (int i=0; i < tags.length; ++i)
-            {
-                if (entry.getKey().equals(tags[i]))
-                {
-                    elem[i] = entry.getValue();
-                    break;
-                }
-            }
-        }
+            if (ctt.containsKey(entry.getKey()))
+                elem[ctt.get(entry.getKey())] = entry.getValue();
 
         if (elem[0] == null || elem[7] == null)
             return null;

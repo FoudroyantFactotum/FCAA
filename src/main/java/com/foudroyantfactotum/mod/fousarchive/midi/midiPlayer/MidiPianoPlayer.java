@@ -273,12 +273,12 @@ public class MidiPianoPlayer implements Runnable
                         case ShortMessage.PITCH_BEND: Logger.info("PITCH_BEND");break;
                     }*/
 
-                    if (sm.getData1() - 21 > -1 && sm.getData1() - 21 < te.keyOffset.length)
+                    if (sm.getData1() - 18 > -1 && sm.getData1() - 18 < te.keyOffset.length)
                     {
-                        te.keyIsDown[sm.getData1() - 21] = sm.getData2() != 0;
+                        te.keyIsDown[sm.getData1() - 18] = sm.getData2() != 0;
 
                         if (sm.getData2() != 0)
-                            te.keyOffset[sm.getData1() - 21] = -0.03f;
+                            te.keyOffset[sm.getData1() - 18] = -0.03f;
                     }
                 }
 

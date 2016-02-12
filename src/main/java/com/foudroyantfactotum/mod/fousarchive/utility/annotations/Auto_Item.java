@@ -13,22 +13,20 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package com.foudroyantfactotum.mod.fousarchive.utility;
+package com.foudroyantfactotum.mod.fousarchive.utility.annotations;
 
-import com.foudroyantfactotum.mod.fousarchive.TheMod;
-import com.foudroyantfactotum.tool.structure.net.StructurePacket;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
+import com.foudroyantfactotum.mod.fousarchive.init.InitBlock;
 
-public class ModNetwork
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface Auto_Item
 {
-    public static SimpleNetworkWrapper network;
+    String name();
 
-    public static void init()
-    {
-        network = NetworkRegistry.INSTANCE.newSimpleChannel(TheMod.MOD_ID);
-
-        network.registerMessage(StructurePacket.Handler.class, StructurePacket.class, 1, Side.CLIENT);
-    }
+    String tab() default InitBlock.ModTab.main;
 }

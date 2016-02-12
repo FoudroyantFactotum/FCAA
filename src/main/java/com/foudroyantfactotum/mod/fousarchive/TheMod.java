@@ -16,7 +16,9 @@
 package com.foudroyantfactotum.mod.fousarchive;
 
 import com.foudroyantfactotum.mod.fousarchive.init.InitBlock;
+import com.foudroyantfactotum.mod.fousarchive.init.InitItem;
 import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
+import com.foudroyantfactotum.mod.fousarchive.items.RandomChestPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.midi.JsonMidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.midi.LiveMidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.midi.MidiDetails;
@@ -24,26 +26,25 @@ import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
 import com.foudroyantfactotum.mod.fousarchive.proxy.RenderProxy;
 import com.foudroyantfactotum.mod.fousarchive.utility.FousArchiveException;
-import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
 import com.foudroyantfactotum.tool.structure.StructureRegistry;
 import com.foudroyantfactotum.tool.structure.coordinates.TransformLAG;
+import com.foudroyantfactotum.tool.structure.net.ModNetwork;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.OBJLoader;
+import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
-import java.io.*;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import static net.minecraftforge.fml.common.Mod.EventHandler;
 import static net.minecraftforge.fml.common.Mod.Instance;
@@ -71,10 +72,12 @@ public class TheMod
     @EventHandler
     public static void preInit(FMLPreInitializationEvent event) throws IOException
     {
-        Logger.info("==========preInit==========");
         OBJLoader.instance.addDomain(MOD_ID);
+        StructureRegistry.setMOD_ID(TheMod.MOD_ID);
+        ModNetwork.init();
         TransformLAG.initStatic();
         InitBlock.init();
+        InitItem.init();
     }
 
     @EventHandler
@@ -82,10 +85,17 @@ public class TheMod
     {
         StructureRegistry.loadRegisteredPatterns();
 
-        ItemPianoRoll.INSTANCE = new ItemPianoRoll();
-        ItemPianoRoll.INSTANCE.setCreativeTab(InitBlock.ModTab.tabs.get(InitBlock.ModTab.main));
-        GameRegistry.registerItem(ItemPianoRoll.INSTANCE, ItemPianoRoll.INSTANCE.getUnlocalizedName());
-        FMLInterModComms.sendMessage(TheMod.MOD_ID, "register.piano.roll.list", new ResourceLocation(TheMod.MOD_ID, "midi/master.json.gz").toString());
+
+        final RandomChestPianoRoll rcpp = new RandomChestPianoRoll();
+
+        ChestGenHooks.getInfo(ChestGenHooks.MINESHAFT_CORRIDOR).addItem(rcpp);
+        ChestGenHooks.getInfo(ChestGenHooks.DUNGEON_CHEST).addItem(rcpp);
+        ChestGenHooks.getInfo(ChestGenHooks.NETHER_FORTRESS).addItem(rcpp);
+        ChestGenHooks.getInfo(ChestGenHooks.PYRAMID_DESERT_CHEST).addItem(rcpp);
+        ChestGenHooks.getInfo(ChestGenHooks.PYRAMID_JUNGLE_CHEST).addItem(rcpp);
+        ChestGenHooks.getInfo(ChestGenHooks.STRONGHOLD_LIBRARY).addItem(rcpp);
+        ChestGenHooks.getInfo(ChestGenHooks.VILLAGE_BLACKSMITH).addItem(rcpp);
+        ChestGenHooks.getInfo(ChestGenHooks.STRONGHOLD_CORRIDOR).addItem(rcpp);
     }
 
     @EventHandler
@@ -93,7 +103,7 @@ public class TheMod
     {
         for (final FMLInterModComms.IMCMessage msg : event.getMessages())
         {
-            if (msg.key.equals("register.piano.roll.list"))
+            if (msg.key.equals("register.piano.roll.list.json"))
             {
                 try
                 {
@@ -113,7 +123,6 @@ public class TheMod
                                 ItemPianoRoll.addPianoRoll(entry.getKey());
                                 LiveMidiDetails.INSTANCE.addSongDetails(entry.getKey(), MidiDetails.fromMap(entry.getValue()));
                             }
-
                         } catch (IOException e)
                         {
                             throw new FousArchiveException("Failed to open master list ", e);
@@ -125,7 +134,7 @@ public class TheMod
                     }
                 } catch (FousArchiveException e)
                 {
-                    throw new FousArchiveException("IMCMsg register.piano.roll.list " + msg.getSender(), e);
+                    throw new FousArchiveException("IMCMsg register.piano.roll.list.json " + msg.getSender(), e);
                 }
             }
         }
@@ -141,88 +150,5 @@ public class TheMod
     public static void serverStart(FMLServerStartingEvent event)
     {
         event.registerServerCommand(new ItemPianoRoll.CommandPianoRollID());
-    }
-
-    private static final String midaddr = "src/main/resources/assets/" + TheMod.MOD_ID;
-    private static final String assetDir = "/midi/";
-
-    public static void main(String[] args)
-    {
-        final List<File> list = new LinkedList<>();
-        final File dir = new File(midaddr + assetDir);
-
-        Logger.info(dir.getAbsolutePath());
-
-        for (File sfile : dir.listFiles())
-        {
-            recFile(sfile, list);
-        }
-
-        final ImmutableMap.Builder<ResourceLocation, ImmutableMap<String, String>> builder = ImmutableMap.builder();
-
-        for (File f : list)
-        {
-            final String addr = f.getPath();
-            final String rladdr = TheMod.MOD_ID + ':' + addr.substring(addr.indexOf(midaddr) + midaddr.length()+1);
-            final ImmutableMap<String, String> details = midiDetailsToMap(f);
-
-            if (details != null)
-            {
-                builder.put(new ResourceLocation(rladdr), details);
-            } else {
-                Logger.info("Missing details on " + f);
-            }
-        }
-
-        try (final OutputStream fstream = new FileOutputStream(dir + "/master.json.gz"))
-        {
-            try (final GZIPOutputStream gzstream = new GZIPOutputStream(fstream))
-            {
-                final OutputStreamWriter osw = new OutputStreamWriter(gzstream);
-
-                osw.write(JSON.toJson(builder.build()));
-                osw.flush();
-            }
-        } catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    private static ImmutableMap<String, String> midiDetailsToMap(File f)
-    {
-        try (final InputStream stream = new FileInputStream(f))
-        {
-            final MidiDetails md = MidiDetails.getMidiDetails(stream);
-
-            if (md != MidiDetails.NO_DETAILS)
-            {
-                return md.toMap();
-            }
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    private static void recFile(File file, List<File> list)
-    {
-        if (file.isDirectory())
-        {
-            for (final File sfile : file.listFiles())
-            {
-                recFile(sfile, list);
-            }
-        } else {
-            if (file.getName().toLowerCase().endsWith(".mid"))
-            {
-                list.add(file);
-            }
-        }
     }
 }

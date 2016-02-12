@@ -20,6 +20,8 @@ import com.foudroyantfactotum.mod.fousarchive.midi.LiveMidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.midi.MidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
+import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Instance;
+import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Item;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -41,9 +43,11 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@Auto_Item(name = "pianoRoll")
 public class ItemPianoRoll extends FA_Item
 {
-    public static ItemPianoRoll INSTANCE = null;
+    @Auto_Instance
+    public static final ItemPianoRoll INSTANCE = null;
 
     public static final ResourceLocation NONE = new ResourceLocation(TheMod.MOD_ID, "midi/NONE");
     public static final String ROLL = "pianoRoll";
@@ -63,9 +67,13 @@ public class ItemPianoRoll extends FA_Item
         return null;
     }
 
+    public static int getPianoRollCount()
+    {
+        return allSongs.size();
+    }
+
     public ItemPianoRoll()
     {
-        setUnlocalizedName("pianoRoll");
         setMaxStackSize(1);
         setNoRepair();
         LiveMidiDetails.INSTANCE.addSongDetails(NONE, MidiDetails.NO_DETAILS);

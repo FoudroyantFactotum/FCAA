@@ -39,6 +39,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 
 import static net.minecraft.block.BlockDirectional.FACING;
@@ -115,13 +117,16 @@ public final class BlockPlayerPiano extends FA_StructureBlock
                     {
                         final ResourceLocation rl = new ResourceLocation(nbt.getString(ItemPianoRoll.ROLL));
 
-                        try{
+                        try
+                        {
                             Minecraft.getMinecraft().getResourceManager().getResource(rl);
                             te.loadedSong = rl;
-                        } catch (IOException e) {
+                        } catch (IOException e)
+                        {
                             te.loadedSong = ItemPianoRoll.NONE;
                         }
-                    } else {
+                    } else
+                    {
                         te.loadedSong = ItemPianoRoll.NONE;
                     }
                 }
@@ -133,16 +138,7 @@ public final class BlockPlayerPiano extends FA_StructureBlock
                     {
                         if (!player.capabilities.isCreativeMode && !world.isRemote)
                         {
-                            final ItemStack stack = new ItemStack(ItemPianoRoll.INSTANCE, 1);
-                            if (te.loadedSong != null && te.loadedSong != ItemPianoRoll.NONE)
-                            {
-                                final NBTTagCompound nbt = new NBTTagCompound();
-
-                                nbt.setString(ItemPianoRoll.ROLL, te.loadedSong.toString());
-                                stack.setTagCompound(nbt);
-                            }
-
-                            world.spawnEntityInWorld(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), stack));
+                            spawnItemRollOnGround(world, pos, te.loadedSong);
                         }
 
                         te.loadedSong = null;
@@ -164,6 +160,39 @@ public final class BlockPlayerPiano extends FA_StructureBlock
         }
 
         return super.onStructureBlockActivated(world, pos, player, callPos, side, local, sx, sy, sz);
+    }
+
+    @Override
+    public void breakStructure(World world, BlockPos origin, EnumFacing orientation, boolean mirror, boolean isCreative, boolean isSneaking)
+    {
+        if (!world.isRemote)
+        {
+            final TileEntity ute = world.getTileEntity(origin);
+
+            if (ute instanceof TEPlayerPiano)
+            {
+                final TEPlayerPiano te = (TEPlayerPiano) ute;
+                spawnItemRollOnGround(world, origin, te.loadedSong);
+            }
+        }
+
+        super.breakStructure(world, origin, orientation, mirror, isCreative, isSneaking);
+    }
+
+    private static void spawnItemRollOnGround(@Nonnull World world, @Nonnull BlockPos pos, @Nullable ResourceLocation rl)
+    {
+        final ItemStack stack = new ItemStack(ItemPianoRoll.INSTANCE, 1);
+
+        if (rl != null && rl != ItemPianoRoll.NONE)
+        {
+            final NBTTagCompound nbt = new NBTTagCompound();
+
+            nbt.setString(ItemPianoRoll.ROLL, rl.toString());
+            stack.setTagCompound(nbt);
+
+            world.spawnEntityInWorld(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), stack));
+        }
+
     }
 
     @Override

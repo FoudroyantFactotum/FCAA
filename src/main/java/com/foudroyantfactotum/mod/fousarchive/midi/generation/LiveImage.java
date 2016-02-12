@@ -24,13 +24,13 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 public enum LiveImage
 {
     INSTANCE;
 
-    private ConcurrentHashMap<ResourceLocation, MidiTexture> map = new ConcurrentHashMap<>();
+    private HashMap<ResourceLocation, MidiTexture> map = new HashMap<>();
     private TObjectLongHashMap<MidiTexture> activeItems = new TObjectLongHashMap<>();
 
     private long pass = 0;
