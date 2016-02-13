@@ -13,23 +13,33 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package com.foudroyantfactotum.mod.fousarchive.proxy;
+package com.foudroyantfactotum.mod.fousarchive.utility.ply;
 
-import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
-import net.minecraft.block.Block;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntity;
+import java.util.Arrays;
 
-public class RenderProxy
+public class Quad
 {
-    public void preInit() { }
+    public final float[] a;
+    public final float[] b;
+    public final float[] c;
+    public final float[] d;
 
-    public void init() { }
+    public Quad(float[] a, float[] b, float[] c, float[] d)
+    {
+        this.a = a;
+        this.b = b;
+        this.c = c;
+        this.d = d;
+    }
 
-    public <E extends TileEntity> void registerTESR(Class<E> te, FA_TESR<E> tesr) { }
-
-    public void registerBlockAsItemModel(Block block) { }
-
-    public void registerMetaItemModel(Item item, int meta, ModelResourceLocation ml) { }
+    @Override
+    public String toString()
+    {
+        return "Quad{" +
+                "a=" + Arrays.toString(a) +
+                ", b=" + Arrays.toString(b) +
+                ", c=" + Arrays.toString(c) +
+                ", d=" + Arrays.toString(d) +
+                '}';
+    }
 }

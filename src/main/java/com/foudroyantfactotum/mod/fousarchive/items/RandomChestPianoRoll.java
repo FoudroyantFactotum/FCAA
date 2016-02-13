@@ -35,7 +35,7 @@ public class RandomChestPianoRoll extends WeightedRandomChestContent
         final ItemStack stack = new ItemStack(ItemPianoRoll.INSTANCE, 1);
         final NBTTagCompound nbt = new NBTTagCompound();
 
-        nbt.setString(ItemPianoRoll.ROLL, ItemPianoRoll.getPianoRoll((int) (ItemPianoRoll.getPianoRollCount()*random.nextDouble())).toString());
+        ItemPianoRoll.setPianoRollNBT(nbt, ItemPianoRoll.getPianoRoll((int) (ItemPianoRoll.getPianoRollCount()*random.nextDouble())).toString());
         stack.setTagCompound(nbt);
 
         return new ItemStack[]{stack};

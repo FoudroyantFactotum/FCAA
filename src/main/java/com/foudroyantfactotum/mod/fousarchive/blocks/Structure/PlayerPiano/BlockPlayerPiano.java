@@ -138,7 +138,7 @@ public final class BlockPlayerPiano extends FA_StructureBlock
                     {
                         if (!player.capabilities.isCreativeMode && !world.isRemote)
                         {
-                            spawnItemRollOnGround(world, pos, te.loadedSong);
+                            spawnItemPianoRollOnGround(world, pos, te.loadedSong);
                         }
 
                         te.loadedSong = null;
@@ -172,27 +172,26 @@ public final class BlockPlayerPiano extends FA_StructureBlock
             if (ute instanceof TEPlayerPiano)
             {
                 final TEPlayerPiano te = (TEPlayerPiano) ute;
-                spawnItemRollOnGround(world, origin, te.loadedSong);
+                spawnItemPianoRollOnGround(world, origin, te.loadedSong);
             }
         }
 
         super.breakStructure(world, origin, orientation, mirror, isCreative, isSneaking);
     }
 
-    private static void spawnItemRollOnGround(@Nonnull World world, @Nonnull BlockPos pos, @Nullable ResourceLocation rl)
+    private static void spawnItemPianoRollOnGround(@Nonnull World world, @Nonnull BlockPos pos, @Nullable ResourceLocation rl)
     {
-        final ItemStack stack = new ItemStack(ItemPianoRoll.INSTANCE, 1);
-
         if (rl != null && rl != ItemPianoRoll.NONE)
         {
+            final String name = rl.toString();
+            final ItemStack stack = new ItemStack(ItemPianoRoll.INSTANCE, 1, name.hashCode() % ItemPianoRoll.iconNo);
             final NBTTagCompound nbt = new NBTTagCompound();
 
-            nbt.setString(ItemPianoRoll.ROLL, rl.toString());
+            ItemPianoRoll.setPianoRollNBT(nbt, name);
             stack.setTagCompound(nbt);
 
             world.spawnEntityInWorld(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), stack));
         }
-
     }
 
     @Override

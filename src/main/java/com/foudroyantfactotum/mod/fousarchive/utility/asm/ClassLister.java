@@ -24,6 +24,10 @@ public class ClassLister implements IClassTransformer
     {
         if (s.startsWith("com.foudroyantfactotum.mod.fousarchive"))
             System.out.println(s);
+        else if (s.startsWith("net.minecraft.client.renderer.ItemModelMesher"))
+        {
+
+        }
 
         return bytes;
     }

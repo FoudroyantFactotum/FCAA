@@ -49,7 +49,7 @@ public class MidiTexture extends AbstractTexture
     public void loadTexture(IResourceManager resourceManager) throws IOException
     {
         final int xSize = GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE);
-        final int ySize = 88;
+        final int ySize = 85;
         byte[] res = null;
 
         try (final InputStream io = resourceManager.getResource(rl).getInputStream())
@@ -72,7 +72,7 @@ public class MidiTexture extends AbstractTexture
                     .flip();
 
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, 0);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NONE);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MIN_LOD, 0.0f);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LOD, 0.0f);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, 0.0f);

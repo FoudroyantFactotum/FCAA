@@ -39,4 +39,9 @@ public class ClientRenderProxy extends RenderProxy
                 new ModelResourceLocation(resourceName, "inventory")
         );
     }
+
+    public void registerMetaItemModel(Item item, int meta, ModelResourceLocation ml)
+    {
+        ModelLoader.setCustomModelResourceLocation(item, meta, ml);
+    }
 }

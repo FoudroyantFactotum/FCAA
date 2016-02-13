@@ -306,4 +306,13 @@ public class MidiDetails
                 .add("rollCopyright", rollCopyright)
                 .toString();
     }
+
+    public static MidiDetails simpleMD(@Nonnull String name, @Nonnull String composer)
+    {
+        final String[] str = new String[tags.length];
+        str[0] = name;
+        str[7] = composer;
+
+        return new MidiDetails(str);
+    }
 }

@@ -1,10 +1,15 @@
 package com.foudroyantfactotum.mod.fousarchive.init;
 
+import com.foudroyantfactotum.mod.fousarchive.TheMod;
 import com.foudroyantfactotum.mod.fousarchive.items.FA_Item;
+import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.utility.Clazz;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Item;
 import com.google.common.reflect.ClassPath;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.lang.reflect.Field;
@@ -14,15 +19,38 @@ import static com.foudroyantfactotum.mod.fousarchive.init.InitBlock.getInstanceF
 
 public class InitItem
 {
-    public static void init()
+    public static void preInit()
     {
         registerTaggedItems();
         registerItems();
     }
 
-    private static void registerItems()
+    public static void init()
+    {
+        registerSpecialPianoRollIcons();
+    }
+
+    private static void registerSpecialPianoRollIcons()
     {
 
+        ModelBakery.registerItemVariants(ItemPianoRoll.INSTANCE,
+                new ResourceLocation(TheMod.MOD_ID, "pianoRoll0"),
+                new ResourceLocation(TheMod.MOD_ID, "pianoRoll1"),
+                new ResourceLocation(TheMod.MOD_ID, "pianoRoll2")
+        );
+
+        for (int i = 0; i < ItemPianoRoll.iconNo; ++i)
+        {
+            final ResourceLocation rl = new ResourceLocation(TheMod.MOD_ID, "pianoRoll"+i);
+
+            TheMod.render.registerMetaItemModel(ItemPianoRoll.INSTANCE, i,
+                            new ModelResourceLocation(rl, "inventory")
+                    );
+        }
+    }
+
+    private static void registerItems()
+    {
     }
 
     private static void registerTaggedItems()

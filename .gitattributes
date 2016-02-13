@@ -1,0 +1,2 @@
+#PlayerPiano-Sheet.ply requires newline as line terminator
+*.ply text eol=lf

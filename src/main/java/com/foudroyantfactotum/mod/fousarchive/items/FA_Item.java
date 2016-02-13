@@ -11,7 +11,7 @@ public class FA_Item extends Item
     {
         final String unloc = super.getUnlocalizedName();
 
-        return "item." + TheMod.MOD_ID + ":" + unloc.substring(unloc.indexOf('.') + 1);
+        return TheMod.MOD_ID + ":" + unloc.substring(unloc.indexOf('.') + 1);
     }
 
     @Override

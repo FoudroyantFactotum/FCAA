@@ -65,7 +65,7 @@ public class ItemPianoBuilder extends BuildFormTool
     {
         final String unloc = super.getUnlocalizedName();
 
-        return "item." + TheMod.MOD_ID + ":" + unloc.substring(unloc.indexOf('.') + 1);
+        return TheMod.MOD_ID + ":" + unloc.substring(unloc.indexOf('.') + 1);
     }
 
     @Override

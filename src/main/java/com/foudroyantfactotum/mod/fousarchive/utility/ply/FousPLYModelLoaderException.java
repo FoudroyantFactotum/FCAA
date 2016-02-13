@@ -13,23 +13,19 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package com.foudroyantfactotum.mod.fousarchive.proxy;
+package com.foudroyantfactotum.mod.fousarchive.utility.ply;
 
-import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
-import net.minecraft.block.Block;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntity;
+import com.foudroyantfactotum.mod.fousarchive.utility.FousArchiveException;
 
-public class RenderProxy
+public class FousPLYModelLoaderException extends FousArchiveException
 {
-    public void preInit() { }
+    public FousPLYModelLoaderException() {}
 
-    public void init() { }
+    public FousPLYModelLoaderException(String s) { super(s); }
 
-    public <E extends TileEntity> void registerTESR(Class<E> te, FA_TESR<E> tesr) { }
+    public FousPLYModelLoaderException(String s, Throwable throwable) { super(s, throwable); }
 
-    public void registerBlockAsItemModel(Block block) { }
+    public FousPLYModelLoaderException(Throwable throwable) { super(throwable); }
 
-    public void registerMetaItemModel(Item item, int meta, ModelResourceLocation ml) { }
+    public FousPLYModelLoaderException(String s, Throwable throwable, boolean b, boolean b1) { super(s, throwable, b, b1); }
 }

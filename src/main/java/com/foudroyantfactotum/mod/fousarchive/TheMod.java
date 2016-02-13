@@ -15,25 +15,19 @@
  */
 package com.foudroyantfactotum.mod.fousarchive;
 
+import com.foudroyantfactotum.mod.fousarchive.init.IMCEvents;
 import com.foudroyantfactotum.mod.fousarchive.init.InitBlock;
 import com.foudroyantfactotum.mod.fousarchive.init.InitItem;
 import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.items.RandomChestPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.midi.JsonMidiDetails;
-import com.foudroyantfactotum.mod.fousarchive.midi.LiveMidiDetails;
-import com.foudroyantfactotum.mod.fousarchive.midi.MidiDetails;
-import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
-import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
 import com.foudroyantfactotum.mod.fousarchive.proxy.RenderProxy;
-import com.foudroyantfactotum.mod.fousarchive.utility.FousArchiveException;
+import com.foudroyantfactotum.mod.fousarchive.textures.Generator;
 import com.foudroyantfactotum.tool.structure.StructureRegistry;
 import com.foudroyantfactotum.tool.structure.coordinates.TransformLAG;
 import com.foudroyantfactotum.tool.structure.net.ModNetwork;
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.fml.common.Mod;
@@ -41,10 +35,6 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.Map;
-import java.util.zip.GZIPInputStream;
 
 import static net.minecraftforge.fml.common.Mod.EventHandler;
 import static net.minecraftforge.fml.common.Mod.Instance;
@@ -64,7 +54,7 @@ public class TheMod
             serverSide = "com.foudroyantfactotum.mod.fousarchive.proxy.RenderProxy")
     public static RenderProxy render;
 
-    public static final Gson JSON = new GsonBuilder()
+    public static final Gson json = new GsonBuilder()
             .registerTypeAdapter(JsonMidiDetails.class, JsonMidiDetails.Json.JSD)
             .setPrettyPrinting()
             .create();
@@ -74,9 +64,11 @@ public class TheMod
     {
         OBJLoader.instance.addDomain(MOD_ID);
         StructureRegistry.setMOD_ID(TheMod.MOD_ID);
+
         ModNetwork.init();
         TransformLAG.initStatic();
         InitBlock.init();
+        InitItem.preInit();
         InitItem.init();
     }
 
@@ -84,7 +76,7 @@ public class TheMod
     public static void init(FMLInitializationEvent event) throws IOException
     {
         StructureRegistry.loadRegisteredPatterns();
-
+        Generator.init();
 
         final RandomChestPianoRoll rcpp = new RandomChestPianoRoll();
 
@@ -101,43 +93,7 @@ public class TheMod
     @EventHandler
     public static void imcEvent(FMLInterModComms.IMCEvent event)
     {
-        for (final FMLInterModComms.IMCMessage msg : event.getMessages())
-        {
-            if (msg.key.equals("register.piano.roll.list.json"))
-            {
-                try
-                {
-                    if (msg.isStringMessage())
-                    {
-                        final ResourceLocation rl = new ResourceLocation(msg.getStringValue());
-
-                        try (final GZIPInputStream stream = new GZIPInputStream(Minecraft.getMinecraft().getResourceManager()
-                                .getResource(rl).getInputStream()))
-                        {
-                            final Reader r = new InputStreamReader(stream);
-                            final JsonMidiDetails jmd = JSON.fromJson(r, JsonMidiDetails.class);
-
-                            for (final Map.Entry<ResourceLocation, ImmutableMap<String, String>> entry : jmd.midiDetails.entrySet())
-                            {
-                                LiveImage.INSTANCE.registerSong(new MidiTexture(entry.getKey()));
-                                ItemPianoRoll.addPianoRoll(entry.getKey());
-                                LiveMidiDetails.INSTANCE.addSongDetails(entry.getKey(), MidiDetails.fromMap(entry.getValue()));
-                            }
-                        } catch (IOException e)
-                        {
-                            throw new FousArchiveException("Failed to open master list ", e);
-                        }
-
-                    } else
-                    {
-                        throw new FousArchiveException("Received " + msg.getMessageType() + " : expected String");
-                    }
-                } catch (FousArchiveException e)
-                {
-                    throw new FousArchiveException("IMCMsg register.piano.roll.list.json " + msg.getSender(), e);
-                }
-            }
-        }
+        IMCEvents.eventProcess(event.getMessages());
     }
 
     @EventHandler

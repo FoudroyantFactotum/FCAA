@@ -19,9 +19,9 @@ import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import gnu.trove.map.hash.TObjectLongHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -68,9 +68,9 @@ public enum LiveImage
     }
 
     @SubscribeEvent
-    public void removeOldTextures(RenderWorldLastEvent event)
+    public void removeOldTextures(TickEvent event)
     {
-        if (pass < System.currentTimeMillis())
+        if (event.type == TickEvent.Type.CLIENT && event.phase == TickEvent.Phase.START && pass < System.currentTimeMillis())
         {
             synchronized (this)
             {

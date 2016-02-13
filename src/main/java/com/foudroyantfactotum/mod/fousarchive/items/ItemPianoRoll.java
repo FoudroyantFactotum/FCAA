@@ -51,6 +51,11 @@ public class ItemPianoRoll extends FA_Item
 
     public static final ResourceLocation NONE = new ResourceLocation(TheMod.MOD_ID, "midi/NONE");
     public static final String ROLL = "pianoRoll";
+    public static final String COLOUR = "rollColour";
+
+    public static final int colourOffset = 0x111111;
+    public static final int colourRange = 0xDDDDDD;
+    public static final int iconNo = 3;
 
     private static final List<ResourceLocation> allSongs = new ArrayList<>();
 
@@ -75,15 +80,41 @@ public class ItemPianoRoll extends FA_Item
     public ItemPianoRoll()
     {
         setMaxStackSize(1);
-        setNoRepair();
+        setHasSubtypes(true);
+        setMaxDamage(0);
         LiveMidiDetails.INSTANCE.addSongDetails(NONE, MidiDetails.NO_DETAILS);
         LiveImage.INSTANCE.registerSong(new MidiTexture.EmptyPage());
     }
 
     @Override
-    public boolean isDamageable()
+    public int getColorFromItemStack(ItemStack stack, int renderPass)
     {
-        return false;
+        if (renderPass == 1)
+        {
+            final NBTTagCompound nbt = stack.getTagCompound();
+
+            if (nbt != null && nbt.hasKey(COLOUR))
+                return nbt.getInteger(COLOUR);
+        }
+
+        return 0xFFFFFF;
+    }
+
+    @Override
+    public int getMetadata(int damage)
+    {
+        if (damage > -1 && damage < iconNo)
+        {
+            return damage;
+        }
+
+        return 0;
+    }
+
+    @Override
+    public String getUnlocalizedName(ItemStack stack)
+    {
+        return getUnlocalizedName();
     }
 
     @Override
@@ -134,6 +165,12 @@ public class ItemPianoRoll extends FA_Item
         final MidiDetails detail = LiveMidiDetails.INSTANCE.getDetailsOnSong(song);
 
         return detail.getSimpleDetails();
+    }
+
+    public static void setPianoRollNBT(NBTTagCompound nbt, String name)
+    {
+        nbt.setString(ROLL, name);
+        nbt.setInteger(COLOUR, (name.hashCode() % colourRange) + colourOffset);
     }
 
     public static class CommandPianoRollID extends CommandBase
@@ -194,10 +231,10 @@ public class ItemPianoRoll extends FA_Item
                 if (validList.size() == 1)
                 {
                     final BlockPos sp = sender.getPosition();
-                    final ItemStack stack = new ItemStack(ItemPianoRoll.INSTANCE, 1);
+                    final ItemStack stack = new ItemStack(ItemPianoRoll.INSTANCE, 1, validList.get(0).getLeft().toString().hashCode() % iconNo);
                     final NBTTagCompound nbt = new NBTTagCompound();
 
-                    nbt.setString(ItemPianoRoll.ROLL, validList.get(0).getLeft().toString());
+                    setPianoRollNBT(nbt, validList.get(0).getLeft().toString());
                     stack.setTagCompound(nbt);
 
                     sender.getEntityWorld().spawnEntityInWorld(new EntityItem(sender.getEntityWorld(), sp.getX(), sp.getY(), sp.getZ(), stack));
