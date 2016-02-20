@@ -17,6 +17,7 @@ package com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer;
 
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.TEPlayerPiano;
 import com.foudroyantfactotum.mod.fousarchive.midi.MidiMultiplexSynth;
+import com.foudroyantfactotum.mod.fousarchive.utility.Settings;
 import com.sun.media.sound.RealTimeSequencerProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
@@ -109,9 +110,9 @@ public class MidiPianoPlayer implements Runnable
 
                         if (distance > 35)
                         {
-                            audioLevel = (int) (Math.abs(1 - Math.min((distance-35)/800, 1.0)) * 127);
+                            audioLevel = (int) (Math.abs(1 - Math.min((distance-35)/800, 1.0)) * Settings.PianoPlayer.b7_max_vol);
                         } else {
-                            audioLevel = 127;
+                            audioLevel = Settings.PianoPlayer.b7_max_vol;
                         }
 
                     } else {

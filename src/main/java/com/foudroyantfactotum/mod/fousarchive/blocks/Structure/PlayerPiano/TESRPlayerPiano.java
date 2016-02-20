@@ -19,6 +19,7 @@ import com.foudroyantfactotum.mod.fousarchive.TheMod;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
+import com.foudroyantfactotum.mod.fousarchive.utility.Settings;
 import com.foudroyantfactotum.mod.fousarchive.utility.ply.ModelLoader;
 import com.foudroyantfactotum.mod.fousarchive.utility.ply.Quad;
 import net.minecraft.block.BlockDirectional;
@@ -45,8 +46,8 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
 
     private static Quad[][] objQUAD;
 
-    private final static double d = 500 / 8048.0; // sheet display size ratio
-    private final static double hd = d * 0.5; // half sheet display size ratio
+    private static final double d = (double) Settings.PianoPlayer.uy_max_sheet_shown / (double) Settings.PianoPlayer.uy_max_texture_cap; // sheet display size ratio
+    private static final double hd = d * 0.5;
 
     static {
         ModelLoader.registerLoad(

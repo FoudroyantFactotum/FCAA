@@ -170,7 +170,7 @@ public class MidiDetails
 
     public String getSimpleDetails()
     {
-        return String.format("\"%s\" by %s", title, composer);
+        return String.format("\u201C%s\u201D by %s", title, composer);
     }
 
     public String getLongDetails()

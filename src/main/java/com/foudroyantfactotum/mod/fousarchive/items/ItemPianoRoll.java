@@ -184,7 +184,7 @@ public class ItemPianoRoll extends FA_Item
         @Override
         public String getCommandUsage(ICommandSender sender)
         {
-            return "/listPianoRolls [t\"Song Title\"] [c\"Song Author\"] [d\"Song Year\"] [m\"Manufacturer\"]";
+            return "/listPianoRolls [t\"Song Title\"] [c\"Song Composer\"] [d\"Song Year\"] [m\"Manufacturer\"]";
         }
 
         @Override

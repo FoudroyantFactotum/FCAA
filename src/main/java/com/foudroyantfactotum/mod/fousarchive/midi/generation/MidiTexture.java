@@ -16,7 +16,9 @@
 package com.foudroyantfactotum.mod.fousarchive.midi.generation;
 
 import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
+import com.foudroyantfactotum.mod.fousarchive.utility.Settings;
 import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.resources.IResourceManager;
@@ -48,7 +50,7 @@ public class MidiTexture extends AbstractTexture
     @Override
     public void loadTexture(IResourceManager resourceManager) throws IOException
     {
-        final int xSize = GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE);
+        final int xSize = getSmallTextureSize();
         final int ySize = 85;
         byte[] res = null;
 
@@ -72,7 +74,8 @@ public class MidiTexture extends AbstractTexture
                     .flip();
 
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, 0);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NONE);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MIN_LOD, 0.0f);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LOD, 0.0f);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, 0.0f);
@@ -83,7 +86,16 @@ public class MidiTexture extends AbstractTexture
         }
     }
 
-    public boolean hasTexureID()
+    //todo improve texture roll rendering for rolls of different speeds
+    private static int getSmallTextureSize()
+    {
+        if (Minecraft.getGLMaximumTextureSize() < Settings.PianoPlayer.uy_max_texture_cap)
+            return Minecraft.getGLMaximumTextureSize();
+        else
+            return Settings.PianoPlayer.uy_max_texture_cap;
+    }
+
+    public boolean hasTextureID()
     {
         return glTextureId != -1;
     }
@@ -125,12 +137,16 @@ public class MidiTexture extends AbstractTexture
                 if (midimsg instanceof ShortMessage)
                 {
                     final ShortMessage shortmsg = (ShortMessage) midimsg;
+                    final int shortmsg_cmd = shortmsg.getCommand();
+
+                    if (!(shortmsg_cmd == ShortMessage.NOTE_OFF || shortmsg_cmd == ShortMessage.NOTE_ON)) continue;
+
                     final int note = shortmsg.getData1() - 18;
                     final int vel = shortmsg.getData2();
 
                     if (!(note > -1 && note < lastEvent.length)) continue;
 
-                    if (vel == 0 && lastEvent[note] != -1)
+                    if ((vel == 0 || shortmsg_cmd == ShortMessage.NOTE_OFF) && lastEvent[note] != -1)
                     {
                         final int line = note * xSize;
                         final int lineStart = (int) (line + (lastEvent[note] * xSize / (double) sequence.getTickLength())) * pixelComponents;

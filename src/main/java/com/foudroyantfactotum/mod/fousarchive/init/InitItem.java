@@ -19,20 +19,16 @@ import static com.foudroyantfactotum.mod.fousarchive.init.InitBlock.getInstanceF
 
 public class InitItem
 {
-    public static void preInit()
+    public static void init()
     {
         registerTaggedItems();
         registerItems();
-    }
 
-    public static void init()
-    {
         registerSpecialPianoRollIcons();
     }
 
     private static void registerSpecialPianoRollIcons()
     {
-
         ModelBakery.registerItemVariants(ItemPianoRoll.INSTANCE,
                 new ResourceLocation(TheMod.MOD_ID, "pianoRoll0"),
                 new ResourceLocation(TheMod.MOD_ID, "pianoRoll1"),

@@ -35,7 +35,7 @@ import java.util.Scanner;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class ModelLoader
+public final class ModelLoader
 {
     private static ProgressManager.ProgressBar loadingBar = null;
     private static final List<ModelReference> modelList = new ArrayList<>();
@@ -44,7 +44,7 @@ public class ModelLoader
         MinecraftForge.EVENT_BUS.register(new ModelLoader());
     }
 
-    protected ModelLoader() {/*noop*/}
+    private ModelLoader() {/*noop*/}
 
     public static void registerLoad(@Nonnull ResourceLocation rl, @Nullable Supplier<float[][]> s, @Nonnull Consumer<Quad[][]> q)
     {

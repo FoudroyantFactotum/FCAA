@@ -23,6 +23,7 @@ import com.foudroyantfactotum.mod.fousarchive.items.RandomChestPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.midi.JsonMidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.proxy.RenderProxy;
 import com.foudroyantfactotum.mod.fousarchive.textures.Generator;
+import com.foudroyantfactotum.mod.fousarchive.utility.Settings;
 import com.foudroyantfactotum.tool.structure.StructureRegistry;
 import com.foudroyantfactotum.tool.structure.coordinates.TransformLAG;
 import com.foudroyantfactotum.tool.structure.net.ModNetwork;
@@ -65,10 +66,11 @@ public class TheMod
         OBJLoader.instance.addDomain(MOD_ID);
         StructureRegistry.setMOD_ID(TheMod.MOD_ID);
 
+        Settings.setConfigurationFile(event.getSuggestedConfigurationFile());
+
         ModNetwork.init();
         TransformLAG.initStatic();
         InitBlock.init();
-        InitItem.preInit();
         InitItem.init();
     }
 

@@ -16,6 +16,7 @@
 package com.foudroyantfactotum.mod.fousarchive.midi.generation;
 
 import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
+import com.foudroyantfactotum.mod.fousarchive.utility.Settings;
 import gnu.trove.map.hash.TObjectLongHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
@@ -52,7 +53,7 @@ public enum LiveImage
         if (texture == null)
             return getSong(ItemPianoRoll.NONE);
 
-        if (!texture.hasTexureID())
+        if (!texture.hasTextureID())
         {
             try
             {
@@ -74,12 +75,12 @@ public enum LiveImage
         {
             synchronized (this)
             {
-                pass = System.currentTimeMillis() + 5000;
+                pass = System.currentTimeMillis() + Settings.PianoPlayer.ums_texture_poll_time;
 
-                activeItems.retainEntries((a, b) -> {
-                    if (System.currentTimeMillis() > b + 5000)
+                activeItems.retainEntries((tex, timeStamp) -> {
+                    if (System.currentTimeMillis() > timeStamp + Settings.PianoPlayer.ums_texture_unload_time)
                     {
-                        a.deleteGlTexture();
+                        tex.deleteGlTexture();
                         return false;
                     }
 
