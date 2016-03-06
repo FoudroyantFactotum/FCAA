@@ -15,10 +15,12 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.utility.annotations;
 
-import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
+import com.foudroyantfactotum.mod.fousarchive.TESR.FA_TESR;
 import com.foudroyantfactotum.mod.fousarchive.init.InitBlock;
 import com.foudroyantfactotum.tool.structure.item.StructureBlockItem;
 import com.foudroyantfactotum.tool.structure.tileentity.StructureTE;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -37,5 +39,6 @@ public @interface Auto_Structure
 
     Class<? extends StructureBlockItem> item() default StructureBlockItem.class;
 
+    @SideOnly(Side.CLIENT)
     Class<? extends FA_TESR> TESR() default FA_TESR.class;
 }

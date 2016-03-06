@@ -15,21 +15,24 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.proxy;
 
-import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
+import com.foudroyantfactotum.mod.fousarchive.TESR.FA_TESR;
+import com.foudroyantfactotum.mod.fousarchive.TheMod;
+import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Structure;
+import com.foudroyantfactotum.tool.structure.net.StructureNetwork;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
-public class ClientRenderProxy extends RenderProxy
-{
-    public <E extends TileEntity> void registerTESR(Class<E> te, FA_TESR<E> tesr)
-    {
-        ClientRegistry.bindTileEntitySpecialRenderer(te, tesr);
-    }
+import java.io.IOException;
+import java.io.InputStream;
 
+public class ClientRenderProxy implements IModRenderProxy
+{
     public void registerBlockAsItemModel(Block block) {
         final String resourceName = block.getUnlocalizedName().substring(5); //removes tile. off of the resource name
 
@@ -43,5 +46,31 @@ public class ClientRenderProxy extends RenderProxy
     public void registerMetaItemModel(Item item, int meta, ModelResourceLocation ml)
     {
         ModelLoader.setCustomModelResourceLocation(item, meta, ml);
+    }
+
+    @Override
+    public <T extends ResourceLocation> void registerItemVariants(Item item, T... names)
+    {
+        ModelLoader.registerItemVariants(item, names);
+    }
+
+    @Override
+    public void preInit()
+    {
+        OBJLoader.instance.addDomain(TheMod.MOD_ID);
+        StructureNetwork.init();
+    }
+
+    @Override
+    public void registerTESR(Auto_Structure annot) throws IllegalAccessException, InstantiationException
+    {
+        if (annot.TESR() != FA_TESR.class)
+            ClientRegistry.bindTileEntitySpecialRenderer(annot.tileEntity(), annot.TESR().newInstance());
+    }
+
+    @Override
+    public InputStream getInputStream(ResourceLocation rl) throws IOException
+    {
+        return Minecraft.getMinecraft().getResourceManager().getResource(rl).getInputStream();
     }
 }

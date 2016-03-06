@@ -2,7 +2,7 @@
 tile.fousarchive:playerPiano.name=Player Piano
 
 #items
-fousarchive:pianoFormTool.name=Piano Tuning Lever
+fousarchive:tuningFork.name=Piano Tuning Fork
 
 # Creative Tabs
 itemGroup.fousarchive=Fou's Archive

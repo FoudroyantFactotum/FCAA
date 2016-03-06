@@ -18,8 +18,8 @@ package com.foudroyantfactotum.mod.fousarchive.init;
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
 import com.foudroyantfactotum.mod.fousarchive.blocks.FA_Block;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_ShapeBlock;
-import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
 import com.foudroyantfactotum.mod.fousarchive.utility.Clazz;
+import com.foudroyantfactotum.mod.fousarchive.utility.FousArchiveException;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Block;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Instance;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Ore;
@@ -118,11 +118,11 @@ public class InitBlock
                         if (clazz.isAnnotationPresent(Auto_Ore.class))
                             OreDictionary.registerOre(annot.name(), block);
 
-                        TheMod.render.registerBlockAsItemModel(block);
+                        TheMod.proxy.registerBlockAsItemModel(block);
                     }
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e)//todo better errors
                 {
-                    e.printStackTrace();
+                    throw new FousArchiveException("Error on " + i.getName(), e);
                 }
             }
         } catch (NoSuchFieldException e)
@@ -163,10 +163,8 @@ public class InitBlock
                         if (!ModTab.none.equals(annot.tab()))//todo better error handling
                             block.setCreativeTab(ModTab.tabs.get(annot.tab()));
 
-                        if (annot.TESR() != FA_TESR.class)
-                            TheMod.render.registerTESR(annot.tileEntity(), annot.TESR().newInstance());
-
-                        TheMod.render.registerBlockAsItemModel(block);
+                        TheMod.proxy.registerTESR(annot);
+                        TheMod.proxy.registerBlockAsItemModel(block);
                     }
                 } catch (ClassNotFoundException e)//todo better errors
                 {

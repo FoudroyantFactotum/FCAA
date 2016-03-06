@@ -25,9 +25,10 @@ import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
 import com.foudroyantfactotum.mod.fousarchive.utility.FousArchiveException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.event.FMLInterModComms.IMCMessage;
+import net.minecraftforge.fml.relauncher.Side;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -98,15 +99,16 @@ public final class IMCEvents
         {
             final ResourceLocation rl = new ResourceLocation(msg.getStringValue());
 
-            try (final GZIPInputStream stream = new GZIPInputStream(Minecraft.getMinecraft().getResourceManager()
-                    .getResource(rl).getInputStream()))
+            try (final GZIPInputStream stream = new GZIPInputStream(TheMod.proxy.getInputStream(rl)))
             {
                 final Reader r = new InputStreamReader(stream);
                 final JsonMidiDetails jmd = TheMod.json.fromJson(r, JsonMidiDetails.class);
 
                 for (final Map.Entry<ResourceLocation, ImmutableMap<String, String>> entry : jmd.midiDetails.entrySet())
                 {
-                    LiveImage.INSTANCE.registerSong(new MidiTexture(entry.getKey()));
+                    if (FMLCommonHandler.instance().getSide() == Side.CLIENT)
+                        LiveImage.INSTANCE.registerSong(new MidiTexture(entry.getKey()));
+
                     ItemPianoRoll.addPianoRoll(entry.getKey());
                     LiveMidiDetails.INSTANCE.addSongDetails(entry.getKey(), MidiDetails.fromMap(entry.getValue()));
                 }

@@ -18,8 +18,6 @@ package com.foudroyantfactotum.mod.fousarchive.items;
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
 import com.foudroyantfactotum.mod.fousarchive.midi.LiveMidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.midi.MidiDetails;
-import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
-import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Instance;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Item;
 import net.minecraft.command.CommandBase;
@@ -55,7 +53,7 @@ public class ItemPianoRoll extends FA_Item
 
     public static final int colourOffset = 0x111111;
     public static final int colourRange = 0xDDDDDD;
-    public static final int iconNo = 3;
+    public static final int iconNo = 9;
 
     private static final List<ResourceLocation> allSongs = new ArrayList<>();
 
@@ -83,7 +81,6 @@ public class ItemPianoRoll extends FA_Item
         setHasSubtypes(true);
         setMaxDamage(0);
         LiveMidiDetails.INSTANCE.addSongDetails(NONE, MidiDetails.NO_DETAILS);
-        LiveImage.INSTANCE.registerSong(new MidiTexture.EmptyPage());
     }
 
     @Override
@@ -231,7 +228,7 @@ public class ItemPianoRoll extends FA_Item
                 if (validList.size() == 1)
                 {
                     final BlockPos sp = sender.getPosition();
-                    final ItemStack stack = new ItemStack(ItemPianoRoll.INSTANCE, 1, validList.get(0).getLeft().toString().hashCode() % iconNo);
+                    final ItemStack stack = new ItemStack(ItemPianoRoll.INSTANCE, 1, Math.abs(validList.get(0).getLeft().toString().hashCode()) % iconNo);
                     final NBTTagCompound nbt = new NBTTagCompound();
 
                     setPianoRollNBT(nbt, validList.get(0).getLeft().toString());

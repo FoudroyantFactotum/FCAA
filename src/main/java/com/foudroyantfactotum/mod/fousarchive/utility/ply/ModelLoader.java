@@ -37,7 +37,6 @@ import java.util.function.Supplier;
 
 public final class ModelLoader
 {
-    private static ProgressManager.ProgressBar loadingBar = null;
     private static final List<ModelReference> modelList = new ArrayList<>();
 
     static {
@@ -54,7 +53,7 @@ public final class ModelLoader
     @SubscribeEvent
     public void onResourceManagerReload(ModelBakeEvent e)
     {
-        loadingBar = ProgressManager.push("PLY Model Loader", modelList.size());
+        final ProgressManager.ProgressBar loadingBar = ProgressManager.push("PLY Model Loader", modelList.size());
 
         for (final ModelReference mr : modelList)
         {
@@ -81,7 +80,6 @@ public final class ModelLoader
         }
 
         ProgressManager.pop(loadingBar);
-        loadingBar = null;
     }
 
     private static float[][] transAndRot(float[][] oldPoints, float[] offset, EnumFacing f)

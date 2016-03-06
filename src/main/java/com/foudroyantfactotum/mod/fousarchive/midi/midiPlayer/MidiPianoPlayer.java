@@ -15,11 +15,13 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer;
 
+import com.foudroyantfactotum.mod.fousarchive.TheMod;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.TEPlayerPiano;
 import com.foudroyantfactotum.mod.fousarchive.midi.MidiMultiplexSynth;
 import com.foudroyantfactotum.mod.fousarchive.utility.Settings;
 import com.sun.media.sound.RealTimeSequencerProvider;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SoundCategory;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -94,7 +96,7 @@ public class MidiPianoPlayer implements Runnable
                         if (!te.keyIsDown[i])
                         {
                             if (te.keyOffset[i] < 0)
-                                te.keyOffset[i] += 0.0005;
+                                te.keyOffset[i] += Settings.PianoPlayer.d_key_restore_time;
                             else
                                 te.keyOffset[i] = 0;
                         }
@@ -119,11 +121,11 @@ public class MidiPianoPlayer implements Runnable
                         audioLevel = 0;
                     }
 
-                    receiver.changeVolumeLevel(audioLevel);
+                    receiver.changeVolumeLevel((int) (audioLevel * Minecraft.getMinecraft().gameSettings.getSoundLevel(SoundCategory.RECORDS)));
 
                     te.songPos = (double) sequencer.getTickPosition() / sequencer.getTickLength();
 
-                    Thread.sleep(2);
+                    Thread.sleep(4);
                 }
             } catch (NullPointerException | ClassCastException e)
             {
@@ -153,7 +155,7 @@ public class MidiPianoPlayer implements Runnable
 
         synchronized (MidiSystem.class)
         {
-            midiStream = Minecraft.getMinecraft().getResourceManager().getResource(te.loadedSong).getInputStream();
+            midiStream = TheMod.proxy.getInputStream(te.loadedSong);
             sequencer = (Sequencer) new RealTimeSequencerProvider().getDevice(null);
         }
 
@@ -167,7 +169,7 @@ public class MidiPianoPlayer implements Runnable
             {
                 while (sequencer.isRunning() && !te.isInvalid())
                 {
-                    if (!te.isSongRunning && allKeysInRightPosition(te.keyOffset))
+                    if (!te.isSongRunning)
                     {
                         te.hasSongTerminated = true;
                         sequencer.stop();

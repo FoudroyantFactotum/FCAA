@@ -2,16 +2,16 @@
 {
   "modid": "fousarchive",
   "name": "Fou's Archive",
-  "description": "//TODO",
+  "description": "Bringing the past to the present.",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
+  "url": "http://www.foudroyantfactotum.com/fousarchive",
   "updateUrl": "",
   "authorList": [
     "Foudroyant Factotum"
   ],
   "credits": "",
-  "logoFile": "\Logo.png",
+  "logoFile": "Logo.png",
   "screenshots": [
   ],
   "parent":"",

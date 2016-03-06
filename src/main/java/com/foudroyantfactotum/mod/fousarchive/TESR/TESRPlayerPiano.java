@@ -13,10 +13,10 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano;
+package com.foudroyantfactotum.mod.fousarchive.TESR;
 
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
-import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
+import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.TEPlayerPiano;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
 import com.foudroyantfactotum.mod.fousarchive.utility.Settings;
@@ -73,10 +73,10 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
     private static float[][] getSheetTransform()
     {
         return new float[][] {
-                {1.01f, -0.8f, 0.78f}, //south
-                {1.05f, -0.8f, -0.2f}, //west
-                {0.02f, -0.8f, 1.82f}, //north
-                {0.0f, -0.8f, 2.8f}  //east
+                {1.01f, -0.8f, 0.795f}, //south
+                {1.025f, -0.8f, -0.2f}, //west
+                {0.02f, -0.8f, 1.805f}, //north
+                {0.015f, -0.8f, 2.8f}  //east
         };
     }
 

@@ -20,7 +20,8 @@ import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.Block
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Instance;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Item;
 import com.foudroyantfactotum.tool.structure.block.StructureBlock;
-import com.foudroyantfactotum.tool.structure.item.BuildFormTool;
+import com.foudroyantfactotum.tool.structure.item.StructureItemForm;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
@@ -28,21 +29,13 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@Auto_Item(name = "pianoFormTool")
-public class ItemPianoBuilder extends BuildFormTool
+@Auto_Item(name = "tuningFork")
+public class ItemTuningFork extends StructureItemForm
 {
     @Auto_Instance
-    public static final ItemPianoBuilder INSTANCE = null;
+    public static final ItemTuningFork INSTANCE = null;
 
-    private static final List<StructureBlock> validSearchBlocks = new ArrayList<>(1);
-
-    public ItemPianoBuilder()
-    {
-        validSearchBlocks.add(BlockPlayerPiano.INSTANCE);
-    }
+    private static final ImmutableList<StructureBlock> validStructures = ImmutableList.of(BlockPlayerPiano.INSTANCE);
 
     @Override
     public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
@@ -55,7 +48,7 @@ public class ItemPianoBuilder extends BuildFormTool
         final EnumFacing[] orientation = orientationPriority[MathHelper.floor_double(player.rotationYaw * 4.0f / 360.0f + 0.5) & 3];
         final boolean[] mirror = mirrorPriority[player.isSneaking()?1:0];
 
-        doSearch(world, pos, orientation, mirror, validSearchBlocks);
+        doSearch(world, pos, orientation, mirror, validStructures);
 
         return true;
     }
@@ -68,7 +61,6 @@ public class ItemPianoBuilder extends BuildFormTool
         return TheMod.MOD_ID + ":" + unloc.substring(unloc.indexOf('.') + 1);
     }
 
-    @Override
     public String getUnlocalizedName(ItemStack stack)
     {
         return getUnlocalizedName();

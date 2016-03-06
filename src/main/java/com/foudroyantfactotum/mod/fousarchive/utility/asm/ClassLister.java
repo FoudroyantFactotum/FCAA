@@ -22,12 +22,7 @@ public class ClassLister implements IClassTransformer
     @Override
     public byte[] transform(String s, String s1, byte[] bytes)
     {
-        if (s.startsWith("com.foudroyantfactotum.mod.fousarchive"))
-            System.out.println(s);
-        else if (s.startsWith("net.minecraft.client.renderer.ItemModelMesher"))
-        {
-
-        }
+        //if (s.startsWith("com.foudroyantfactotum.mod.fousarchive")) System.out.println(s);
 
         return bytes;
     }

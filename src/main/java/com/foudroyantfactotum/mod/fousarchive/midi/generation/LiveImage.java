@@ -39,6 +39,7 @@ public enum LiveImage
     LiveImage()
     {
         MinecraftForge.EVENT_BUS.register(this);
+        registerSong(new MidiTexture.EmptyPage());
     }
 
     public synchronized void registerSong(MidiTexture location)

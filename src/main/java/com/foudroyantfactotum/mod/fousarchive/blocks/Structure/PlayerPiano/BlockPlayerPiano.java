@@ -15,6 +15,8 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano;
 
+import com.foudroyantfactotum.mod.fousarchive.TESR.TESRPlayerPiano;
+import com.foudroyantfactotum.mod.fousarchive.TheMod;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_StructureBlock;
 import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer.MidiPianoPlayer;
@@ -22,12 +24,11 @@ import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Instance;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Structure;
 import com.foudroyantfactotum.tool.structure.coordinates.BlockPosUtil;
 import com.foudroyantfactotum.tool.structure.tileentity.StructureTE;
-import com.foudroyantfactotum.tool.structure.utillity.StructureDefinitionBuilder;
+import com.foudroyantfactotum.tool.structure.utility.StructureDefinitionBuilder;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -119,7 +120,7 @@ public final class BlockPlayerPiano extends FA_StructureBlock
 
                         try
                         {
-                            Minecraft.getMinecraft().getResourceManager().getResource(rl);
+                            TheMod.proxy.getInputStream(rl);
                             te.loadedSong = rl;
                         } catch (IOException e)
                         {
@@ -157,6 +158,8 @@ public final class BlockPlayerPiano extends FA_StructureBlock
                     te.isSongPlaying = false;
                 }
             }
+
+            te.markDirty();
         }
 
         return super.onStructureBlockActivated(world, pos, player, callPos, side, local, sx, sy, sz);
@@ -184,7 +187,7 @@ public final class BlockPlayerPiano extends FA_StructureBlock
         if (rl != null && rl != ItemPianoRoll.NONE)
         {
             final String name = rl.toString();
-            final ItemStack stack = new ItemStack(ItemPianoRoll.INSTANCE, 1, name.hashCode() % ItemPianoRoll.iconNo);
+            final ItemStack stack = new ItemStack(ItemPianoRoll.INSTANCE, 1, Math.abs(name.hashCode()) % ItemPianoRoll.iconNo);
             final NBTTagCompound nbt = new NBTTagCompound();
 
             ItemPianoRoll.setPianoRollNBT(nbt, name);
@@ -224,7 +227,10 @@ public final class BlockPlayerPiano extends FA_StructureBlock
                 }
         );
 
-        builder.setCollisionBoxes(new float[]{0, 0, 0, 0, 0, 0});
+        builder.setCollisionBoxes(
+                new float[]{0.0f,0.0f,0.0f, 2.0f,2.0f, 0.46f},
+                new float[]{0.0f,0.8f,0.45f, 2.0f,0.92f, 0.90f}
+        );
 
         return builder;
     }

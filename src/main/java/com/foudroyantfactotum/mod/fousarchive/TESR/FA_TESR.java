@@ -13,23 +13,11 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package com.foudroyantfactotum.mod.fousarchive.proxy;
+package com.foudroyantfactotum.mod.fousarchive.TESR;
 
-import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_TESR;
-import net.minecraft.block.Block;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.item.Item;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 
-public class RenderProxy
+public abstract class FA_TESR<E extends TileEntity> extends TileEntitySpecialRenderer<E>
 {
-    public void preInit() { }
-
-    public void init() { }
-
-    public <E extends TileEntity> void registerTESR(Class<E> te, FA_TESR<E> tesr) { }
-
-    public void registerBlockAsItemModel(Block block) { }
-
-    public void registerMetaItemModel(Item item, int meta, ModelResourceLocation ml) { }
 }

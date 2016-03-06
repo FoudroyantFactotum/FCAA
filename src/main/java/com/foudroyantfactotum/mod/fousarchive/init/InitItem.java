@@ -3,10 +3,11 @@ package com.foudroyantfactotum.mod.fousarchive.init;
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
 import com.foudroyantfactotum.mod.fousarchive.items.FA_Item;
 import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
+import com.foudroyantfactotum.mod.fousarchive.proxy.ClientRenderProxy;
 import com.foudroyantfactotum.mod.fousarchive.utility.Clazz;
+import com.foudroyantfactotum.mod.fousarchive.utility.FousArchiveException;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Item;
 import com.google.common.reflect.ClassPath;
-import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -23,30 +24,38 @@ public class InitItem
     {
         registerTaggedItems();
         registerItems();
+    }
 
-        registerSpecialPianoRollIcons();
+    private static void registerItems()
+    {
+        if (TheMod.proxy instanceof ClientRenderProxy)
+        {
+            registerSpecialPianoRollIcons();
+        }
     }
 
     private static void registerSpecialPianoRollIcons()
     {
-        ModelBakery.registerItemVariants(ItemPianoRoll.INSTANCE,
+        TheMod.proxy.registerItemVariants(ItemPianoRoll.INSTANCE,
                 new ResourceLocation(TheMod.MOD_ID, "pianoRoll0"),
                 new ResourceLocation(TheMod.MOD_ID, "pianoRoll1"),
-                new ResourceLocation(TheMod.MOD_ID, "pianoRoll2")
+                new ResourceLocation(TheMod.MOD_ID, "pianoRoll2"),
+                new ResourceLocation(TheMod.MOD_ID, "pianoRoll3"),
+                new ResourceLocation(TheMod.MOD_ID, "pianoRoll4"),
+                new ResourceLocation(TheMod.MOD_ID, "pianoRoll5"),
+                new ResourceLocation(TheMod.MOD_ID, "pianoRoll6"),
+                new ResourceLocation(TheMod.MOD_ID, "pianoRoll7"),
+                new ResourceLocation(TheMod.MOD_ID, "pianoRoll8")
         );
 
         for (int i = 0; i < ItemPianoRoll.iconNo; ++i)
         {
             final ResourceLocation rl = new ResourceLocation(TheMod.MOD_ID, "pianoRoll"+i);
 
-            TheMod.render.registerMetaItemModel(ItemPianoRoll.INSTANCE, i,
+            TheMod.proxy.registerMetaItemModel(ItemPianoRoll.INSTANCE, i,
                             new ModelResourceLocation(rl, "inventory")
                     );
         }
-    }
-
-    private static void registerItems()
-    {
     }
 
     private static void registerTaggedItems()
@@ -73,14 +82,14 @@ public class InitItem
                         fINSTANCE.set(null, item);
 
                         item.setUnlocalizedName(annot.name());
-                        GameRegistry.registerItem(item, item.getUnlocalizedName());
+                        GameRegistry.registerItem(item, annot.name());
 
                         if (!InitBlock.ModTab.none.equals(annot.tab()))//todo better error handling
                             item.setCreativeTab(InitBlock.ModTab.tabs.get(annot.tab()));
                     }
-                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e)//todo better errors
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoClassDefFoundError e)//todo better errors
                 {
-                    e.printStackTrace();
+                    throw new FousArchiveException("Error on " + i.getName(), e);
                 }
             }
         } catch (NoSuchFieldException e)

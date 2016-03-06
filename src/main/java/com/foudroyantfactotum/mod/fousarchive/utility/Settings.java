@@ -107,6 +107,7 @@ public final class Settings
         public static int ums_texture_poll_time = 5000;
         public static int uy_max_texture_cap = 8048;
         public static int uy_max_sheet_shown = 500;
+        public static double d_key_restore_time = 0.001;
     }
 
     public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException

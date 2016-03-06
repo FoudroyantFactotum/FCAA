@@ -13,11 +13,18 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package com.foudroyantfactotum.mod.fousarchive.blocks.Structure;
+package com.foudroyantfactotum.mod.fousarchive.proxy;
 
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 
-public abstract class FA_TESR<E extends TileEntity> extends TileEntitySpecialRenderer<E>
+import java.io.IOException;
+import java.io.InputStream;
+
+public class ServerRenderProxy implements IModRenderProxy
 {
+    @Override
+    public InputStream getInputStream(ResourceLocation rl) throws IOException
+    {
+        return getClass().getClassLoader().getResourceAsStream(String.format("assets/%s/%s", rl.getResourceDomain(), rl.getResourcePath()));
+    }
 }
