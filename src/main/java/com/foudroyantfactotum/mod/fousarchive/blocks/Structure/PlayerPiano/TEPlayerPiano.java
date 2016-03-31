@@ -100,6 +100,12 @@ public class TEPlayerPiano extends StructureTE
         }
     }
 
+    @Override
+    public void markDirty()
+    {
+        super.markDirty();
+    }
+
     private void configureMusicState()
     {
         if (!hasSongTerminated)

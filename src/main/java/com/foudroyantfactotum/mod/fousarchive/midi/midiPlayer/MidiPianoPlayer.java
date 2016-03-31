@@ -55,8 +55,8 @@ public class MidiPianoPlayer implements Runnable
         {
             midiStream = Minecraft.getMinecraft().getResourceManager().getResource(te.loadedSong).getInputStream();
             sequencer = (Sequencer) new RealTimeSequencerProvider().getDevice(null);
-            receiver = MidiMultiplexSynth.INSTANCE.getNewReceiver();
         }
+        receiver = MidiMultiplexSynth.INSTANCE.getNewReceiver();
 
         sequencer.open();
         sequencer.setSequence(midiStream);
@@ -203,6 +203,7 @@ public class MidiPianoPlayer implements Runnable
         te.markDirty();
     }
 
+    @SideOnly(Side.CLIENT)
     private boolean allKeysInRightPosition(float[] keyOffset)
     {
         for (float f : keyOffset)

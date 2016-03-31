@@ -151,7 +151,6 @@ public final class BlockPlayerPiano extends FA_StructureBlock
                         te.hasSongTerminated = false;
 
                         TEPlayerPiano.midiService.execute(new MidiPianoPlayer(te, te.songPos));
-                        te.markDirty();
                     }
                 } else if (te.isSongPlaying)
                 {
