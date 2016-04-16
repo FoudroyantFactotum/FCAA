@@ -1,5 +1,7 @@
 package com.foudroyantfactotum.mod.fousarchive.midi;
 
+import com.foudroyantfactotum.mod.fousarchive.utility.Settings;
+
 import javax.sound.midi.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -57,6 +59,7 @@ public enum MidiMultiplexSynth
 
     public static class MultiplexMidiReceiver implements Receiver
     {
+        private int volume = Settings.PianoPlayer.b7_max_vol;
         private int channel;
         private int channelID;
         private Synthesizer synthesizer;
@@ -98,6 +101,11 @@ public enum MidiMultiplexSynth
         public synchronized void changeVolumeLevel(int vol)
         {
             synthesizer.getChannels()[channelID].controlChange(7, vol);
+        }
+
+        public synchronized int getVolumeLevel()
+        {
+            return volume;
         }
 
         @Override

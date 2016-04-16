@@ -20,6 +20,7 @@ import com.foudroyantfactotum.mod.fousarchive.TheMod;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_StructureBlock;
 import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer.MidiPianoPlayer;
+import com.foudroyantfactotum.mod.fousarchive.midi.state.SongPlayingState;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Instance;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Structure;
 import com.foudroyantfactotum.tool.structure.coordinates.BlockPosUtil;
@@ -133,7 +134,7 @@ public final class BlockPlayerPiano extends FA_StructureBlock
                 }
             } else
             {
-                if (te.hasSongTerminated)
+                if (te.songState == SongPlayingState.TERMINATED)
                 {
                     if (player.isSneaking())
                     {
@@ -146,15 +147,13 @@ public final class BlockPlayerPiano extends FA_StructureBlock
                         te.songPos = 0.0;
                     } else
                     {
-                        te.isSongPlaying = true;
-                        te.isSongRunning = true;
-                        te.hasSongTerminated = false;
+                        te.songState = SongPlayingState.PLAYING;
 
                         TEPlayerPiano.midiService.execute(new MidiPianoPlayer(te, te.songPos));
                     }
-                } else if (te.isSongPlaying)
+                } else if (te.songState == SongPlayingState.PLAYING)
                 {
-                    te.isSongPlaying = false;
+                    te.songState = SongPlayingState.RUNNING;
                 }
             }
 

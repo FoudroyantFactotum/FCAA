@@ -16,6 +16,7 @@
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano;
 
 import com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer.MidiPianoPlayer;
+import com.foudroyantfactotum.mod.fousarchive.midi.state.SongPlayingState;
 import com.foudroyantfactotum.tool.structure.registry.StructureDefinition;
 import com.foudroyantfactotum.tool.structure.tileentity.StructureTE;
 import net.minecraft.nbt.NBTTagCompound;
@@ -33,9 +34,7 @@ public class TEPlayerPiano extends StructureTE
     public static final ExecutorService midiService = Executors.newCachedThreadPool();
     public static final String ITEM_LOADED_SONG = "itemPianoRoll";
     public static final String SONG_POSITION = "songPos";
-    public static final String IS_SONG_PLAYING = "isSongPlaying";
-    public static final String IS_SONG_RUNNING = "isSongRunning";
-    public static final String HAS_SONG_TERMINATED = "hasSongTerminated";
+    public static final String SONG_STATE = "songState";
 
     @SideOnly(Side.CLIENT)
     public volatile float[] keyOffset;
@@ -43,9 +42,7 @@ public class TEPlayerPiano extends StructureTE
     public volatile boolean[] keyIsDown;
 
     public volatile double songPos;
-    public volatile boolean isSongPlaying = false;
-    public volatile boolean isSongRunning = false;
-    public volatile boolean hasSongTerminated = true;
+    public volatile SongPlayingState songState = SongPlayingState.TERMINATED;
 
     public ResourceLocation loadedSong = null;
 
@@ -77,9 +74,7 @@ public class TEPlayerPiano extends StructureTE
 
         nbt.setString(ITEM_LOADED_SONG, loadedSong == null ? "" : loadedSong.toString());
         nbt.setDouble(SONG_POSITION, songPos);
-        nbt.setBoolean(IS_SONG_PLAYING, isSongPlaying);
-        nbt.setBoolean(IS_SONG_RUNNING, isSongRunning);
-        nbt.setBoolean(HAS_SONG_TERMINATED, hasSongTerminated);
+        nbt.setByte(SONG_STATE, (byte) songState.ordinal());
     }
 
     @Override
@@ -90,9 +85,7 @@ public class TEPlayerPiano extends StructureTE
         final String resName = nbt.getString(ITEM_LOADED_SONG);
         loadedSong = resName == null || resName.isEmpty() ? null : new ResourceLocation(resName);
         songPos = nbt.getDouble(SONG_POSITION);
-        isSongPlaying = nbt.getBoolean(IS_SONG_PLAYING);
-        isSongRunning = nbt.getBoolean(IS_SONG_RUNNING);
-        hasSongTerminated = nbt.getBoolean(HAS_SONG_TERMINATED);
+        songState = SongPlayingState.values()[nbt.getByte(SONG_STATE)];
 
         if (worldObj != null && worldObj.isRemote)
         {
@@ -108,7 +101,7 @@ public class TEPlayerPiano extends StructureTE
 
     private void configureMusicState()
     {
-        if (!hasSongTerminated)
+        if (songState != SongPlayingState.TERMINATED)
             midiService.execute(new MidiPianoPlayer(this, songPos));
     }
 
@@ -131,6 +124,6 @@ public class TEPlayerPiano extends StructureTE
     @Override
     public String toString()
     {
-        return "te.state: " + isSongPlaying + " : " + isSongRunning + " : " + hasSongTerminated + " : " + songPos + " : " + loadedSong;
+        return "te.state: " + songState + " : " + songPos + " : " + loadedSong;
     }
 }
