@@ -19,7 +19,6 @@ import com.foudroyantfactotum.mod.fousarchive.TheMod;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.TEPlayerPiano;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
-import com.foudroyantfactotum.mod.fousarchive.utility.Settings;
 import com.foudroyantfactotum.mod.fousarchive.utility.ply.ModelLoader;
 import com.foudroyantfactotum.mod.fousarchive.utility.ply.Quad;
 import net.minecraft.block.BlockDirectional;
@@ -45,9 +44,6 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
     private static final float keySize = 0.0375f;
 
     private static Quad[][] objQUAD;
-
-    private static final double d = (double) Settings.PianoPlayer.uy_max_sheet_shown / (double) Settings.PianoPlayer.uy_max_texture_cap; // sheet display size ratio
-    private static final double hd = d * 0.5;
 
     static {
         ModelLoader.registerLoad(
@@ -150,7 +146,7 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
                 wr.setTranslation(x - 0.02, y + 0.8, z - 0.8);
                 wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
                 {
-                    addRender(wr, te.songPos, objQUAD[orientation.getHorizontalIndex()]);
+                    addRender(wr, tex, te.songPos, objQUAD[orientation.getHorizontalIndex()]);
                 }
                 tess.draw();
             }
@@ -160,8 +156,11 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         RenderHelper.enableStandardItemLighting();
     }
 
-    private static void addRender(WorldRenderer wr, double shift, Quad[] quads)
+    private static void addRender(WorldRenderer wr, MidiTexture mdt, double shift, Quad[] quads)
     {
+        double d = mdt.getDisplayRatio();
+        double hd = mdt.getDisplayAmount();
+
         for (final Quad q : quads)
         {
             float[] v;

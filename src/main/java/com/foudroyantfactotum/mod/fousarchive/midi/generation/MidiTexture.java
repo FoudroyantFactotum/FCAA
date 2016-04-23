@@ -86,7 +86,6 @@ public class MidiTexture extends AbstractTexture
         }
     }
 
-    //todo improve texture roll rendering for rolls of different speeds
     private static int getSmallTextureSize()
     {
         if (Minecraft.getGLMaximumTextureSize() < Settings.PianoPlayer.uy_max_texture_cap)
@@ -115,6 +114,16 @@ public class MidiTexture extends AbstractTexture
     public void setBlurMipmap(boolean p1, boolean p2)
     {
 
+    }
+
+    public double getDisplayRatio()
+    {
+        return Settings.PianoPlayer.uy_max_sheet_shown / (double) Settings.PianoPlayer.uy_max_texture_cap; // sheet display size ratio
+    }
+
+    public double getDisplayAmount()
+    {
+        return getDisplayRatio() * 0.5;
     }
 
     private static byte[] getMidiTrack(InputStream io, int xSize, int ySize) throws InvalidMidiDataException, IOException
