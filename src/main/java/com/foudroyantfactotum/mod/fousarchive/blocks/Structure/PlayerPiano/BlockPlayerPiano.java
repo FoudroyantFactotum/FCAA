@@ -23,6 +23,7 @@ import com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer.MidiPianoPlayer;
 import com.foudroyantfactotum.mod.fousarchive.midi.state.SongPlayingState;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Instance;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Structure;
+import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
 import com.foudroyantfactotum.tool.structure.coordinates.BlockPosUtil;
 import com.foudroyantfactotum.tool.structure.tileentity.StructureTE;
 import com.foudroyantfactotum.tool.structure.utility.StructureDefinitionBuilder;
@@ -99,6 +100,7 @@ public final class BlockPlayerPiano extends FA_StructureBlock
     @Override
     public boolean onStructureBlockActivated(World world, BlockPos pos, EntityPlayer player, BlockPos callPos, EnumFacing side, BlockPos local, float sx, float sy, float sz)
     {
+        Logger.info("Side: " + world.isRemote);
         final TileEntity ute = world.getTileEntity(pos);
 
         if (ute instanceof TEPlayerPiano)
@@ -158,6 +160,7 @@ public final class BlockPlayerPiano extends FA_StructureBlock
             }
 
             te.markDirty();
+            world.markBlockForUpdate(pos);
         }
 
         return super.onStructureBlockActivated(world, pos, player, callPos, side, local, sx, sy, sz);

@@ -69,7 +69,7 @@ public class MidiPianoPlayer implements Runnable
         {
             try
             {
-                while (sequencer.isRunning() && !te.isInvalid() && Minecraft.getMinecraft().thePlayer != null)
+                while (sequencer.isRunning() && !te.isInvalid() && Minecraft.getMinecraft().thePlayer != null && te.songState != SongPlayingState.TERMINATED)
                 {
                     if (te.songState == SongPlayingState.RUNNING && allKeysInRightPosition(te.keyOffset))
                     {
@@ -113,10 +113,13 @@ public class MidiPianoPlayer implements Runnable
 
                             if (distance > 35)
                             {
-                                audioLevel = (int) (Math.abs(1 - Math.min((distance - 35) / 800, 1.0)) * Settings.PianoPlayer.b7_max_vol);
+                                audioLevel = (int) ((
+                                        Math.abs(1 - Math.min((distance - 35) / 800, 1.0)) * Settings.PianoPlayer.b7_max_vol) *
+                                        Minecraft.getMinecraft().gameSettings.getSoundLevel(SoundCategory.RECORDS)
+                                );
                             } else
                             {
-                                audioLevel = Settings.PianoPlayer.b7_max_vol;
+                                audioLevel = (int) (Settings.PianoPlayer.b7_max_vol * Minecraft.getMinecraft().gameSettings.getSoundLevel(SoundCategory.RECORDS));
                             }
                         } else {
                             audioLevel = receiver.getVolumeLevel();
@@ -125,7 +128,7 @@ public class MidiPianoPlayer implements Runnable
                         audioLevel = 0;
                     }
 
-                    receiver.changeVolumeLevel((int) (audioLevel * Minecraft.getMinecraft().gameSettings.getSoundLevel(SoundCategory.RECORDS)));
+                    receiver.changeVolumeLevel(audioLevel);
 
                     te.songPos = (double) sequencer.getTickPosition() / sequencer.getTickLength();
 
@@ -154,6 +157,7 @@ public class MidiPianoPlayer implements Runnable
 
         final InputStream midiStream;
         final Sequencer sequencer;
+        long transitionTime = -1;
 
         synchronized (MidiSystem.class)
         {
@@ -171,16 +175,26 @@ public class MidiPianoPlayer implements Runnable
             {
                 while (sequencer.isRunning() && !te.isInvalid())
                 {
-                    if (te.songState != SongPlayingState.PLAYING)
+                    if (te.songState == SongPlayingState.RUNNING)
                     {
-                        te.songState = SongPlayingState.TERMINATED;
-                        sequencer.stop();
+                        if (transitionTime != -1)
+                        {
+                            if (transitionTime < System.currentTimeMillis())
+                            {
+                                te.songState = SongPlayingState.TERMINATED;
+                                sequencer.stop();
+                            }
+                        } else {
+                            transitionTime = System.currentTimeMillis() + (long)(0.03/Settings.PianoPlayer.d_key_restore_time*4);
+                        }
+
                         continue;
                     }
 
                     te.songPos = (double) sequencer.getTickPosition() / sequencer.getTickLength();
 
                     Thread.sleep(4);
+                    te.markDirty();
                 }
             } catch (NullPointerException | ClassCastException e)
             {

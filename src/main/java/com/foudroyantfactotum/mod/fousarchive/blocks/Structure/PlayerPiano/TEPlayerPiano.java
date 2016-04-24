@@ -17,6 +17,7 @@ package com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano;
 
 import com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer.MidiPianoPlayer;
 import com.foudroyantfactotum.mod.fousarchive.midi.state.SongPlayingState;
+import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
 import com.foudroyantfactotum.tool.structure.registry.StructureDefinition;
 import com.foudroyantfactotum.tool.structure.tileentity.StructureTE;
 import net.minecraft.nbt.NBTTagCompound;
@@ -90,6 +91,9 @@ public class TEPlayerPiano extends StructureTE
         if (worldObj != null && worldObj.isRemote)
         {
             configureMusicState();
+            Logger.info("RF_NBT side : " + worldObj.isRemote);
+        } else {
+            Logger.info("asdfasdfasdfasdf");
         }
     }
 

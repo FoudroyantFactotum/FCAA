@@ -100,6 +100,7 @@ public enum MidiMultiplexSynth
 
         public synchronized void changeVolumeLevel(int vol)
         {
+            volume = vol;
             synthesizer.getChannels()[channelID].controlChange(7, vol);
         }
 
