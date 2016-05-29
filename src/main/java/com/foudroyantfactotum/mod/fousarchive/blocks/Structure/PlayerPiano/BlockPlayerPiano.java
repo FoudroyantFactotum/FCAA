@@ -24,29 +24,31 @@ import com.foudroyantfactotum.mod.fousarchive.midi.state.SongPlayingState;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Instance;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Structure;
 import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
+import com.foudroyantfactotum.tool.structure.block.StructureShapeBlock;
 import com.foudroyantfactotum.tool.structure.coordinates.BlockPosUtil;
 import com.foudroyantfactotum.tool.structure.tileentity.StructureTE;
 import com.foudroyantfactotum.tool.structure.utility.StructureDefinitionBuilder;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-
-import static net.minecraft.block.BlockDirectional.FACING;
 
 @Auto_Structure(name = "playerPiano", tileEntity = TEPlayerPiano.class, TESR = TESRPlayerPiano.class)
 public final class BlockPlayerPiano extends FA_StructureBlock
@@ -59,18 +61,19 @@ public final class BlockPlayerPiano extends FA_StructureBlock
     public BlockPlayerPiano()
     {
         super(false);
+
         setDefaultState(
                 this.blockState
                         .getBaseState()
-                        .withProperty(FACING, EnumFacing.SOUTH)
+                        .withProperty(StructureShapeBlock.DIRECTION, EnumFacing.SOUTH)
                         .withProperty(propPiano, PianoState.piano)
         );
     }
 
     @Override
-    protected BlockState createBlockState()
+    protected BlockStateContainer createBlockState()
     {
-        return new BlockState(this, FACING, propPiano);
+        return new BlockStateContainer(this, StructureShapeBlock.DIRECTION, propPiano);
     }
 
     @Override
@@ -88,19 +91,23 @@ public final class BlockPlayerPiano extends FA_StructureBlock
     @Override
     public TileEntity createTileEntity(World world, IBlockState state)
     {
-        return new TEPlayerPiano(getPattern(), state.getValue(FACING));
+        return new TEPlayerPiano(getPattern(), state.getValue(StructureShapeBlock.DIRECTION));
     }
 
     @Override
     public void spawnBreakParticle(World world, StructureTE te, BlockPos local, float sx, float sy, float sz)
     {
-
+        world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL,
+                    local.getX() + 0.5f,
+                    local.getY() + 0.5f,
+                    local.getZ() + 0.5f, (-0.5 + Math.random()) * 0.25f, 0.05f, (-0.5 + Math.random()) * 0.2f);
     }
 
     @Override
-    public boolean onStructureBlockActivated(World world, BlockPos pos, EntityPlayer player, BlockPos callPos, EnumFacing side, BlockPos local, float sx, float sy, float sz)
+    public boolean onStructureBlockActivated(World world, BlockPos pos, EntityPlayer player, EnumHand hand, BlockPos callPos, EnumFacing side, BlockPos local, float sx, float sy, float sz)
     {
-        Logger.info("Side: " + world.isRemote);
+        if (hand != EnumHand.MAIN_HAND) return false;
+
         final TileEntity ute = world.getTileEntity(pos);
 
         if (ute instanceof TEPlayerPiano)
@@ -133,6 +140,9 @@ public final class BlockPlayerPiano extends FA_StructureBlock
                     {
                         te.loadedSong = ItemPianoRoll.NONE;
                     }
+                    Logger.info("has set piano roll");
+                } else {
+                    Logger.info("no piano roll in hand");
                 }
             } else
             {
@@ -147,23 +157,31 @@ public final class BlockPlayerPiano extends FA_StructureBlock
 
                         te.loadedSong = null;
                         te.songPos = 0.0;
+                        Logger.info("has removed piano roll");
                     } else
                     {
                         te.songState = SongPlayingState.PLAYING;
+                        Logger.info("has song and now playing");
+                        Logger.info("This side is running midiplayer " + FMLCommonHandler.instance().getEffectiveSide() + " : " + FMLCommonHandler.instance().getSide() + " : " + world.isRemote);
 
-                        TEPlayerPiano.midiService.execute(new MidiPianoPlayer(te, te.songPos));
+                        final MidiPianoPlayer mpp = new MidiPianoPlayer(te, te.songPos);
+                        (world.isRemote ? TEPlayerPiano.existingPlayers_client : TEPlayerPiano.existingPlayers_server).put(pos, mpp);
+                        TEPlayerPiano.midiService.execute(mpp);
                     }
                 } else if (te.songState == SongPlayingState.PLAYING)
                 {
                     te.songState = SongPlayingState.RUNNING;
+
+                    Logger.info("has song and playing -> RUNNING -> TERMINATED");
                 }
             }
 
             te.markDirty();
-            world.markBlockForUpdate(pos);
+            world.markAndNotifyBlock(pos, world.getChunkFromBlockCoords(pos), world.getBlockState(pos), world.getBlockState(pos), 0x2);
+            world.notifyNeighborsOfStateChange(pos, this);
         }
 
-        return super.onStructureBlockActivated(world, pos, player, callPos, side, local, sx, sy, sz);
+        return super.onStructureBlockActivated(world, pos, player, hand, callPos, side, local, sx, sy, sz);
     }
 
     @Override

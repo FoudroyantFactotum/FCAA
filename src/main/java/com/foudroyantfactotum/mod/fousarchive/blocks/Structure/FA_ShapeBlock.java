@@ -14,9 +14,10 @@ public class FA_ShapeBlock extends StructureShapeBlock
     @Auto_Instance
     public static final FA_ShapeBlock INSTANCE = null;
 
-    public FA_ShapeBlock()
+    @Override
+    public boolean canMirror()
     {
-        super(false);
+        return false;
     }
 
     @Override

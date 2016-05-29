@@ -20,10 +20,11 @@ import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.TEPla
 import com.foudroyantfactotum.mod.fousarchive.midi.MidiMultiplexSynth;
 import com.foudroyantfactotum.mod.fousarchive.midi.state.SongPlayingState;
 import com.foudroyantfactotum.mod.fousarchive.utility.Settings;
+import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
 import com.sun.media.sound.RealTimeSequencerProvider;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SoundCategory;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -35,6 +36,7 @@ public class MidiPianoPlayer implements Runnable
 {
     private final TEPlayerPiano te;
     private final double startPos;
+    private boolean deathState = false;
 
     public MidiPianoPlayer(TEPlayerPiano te, double startPos)
     {
@@ -144,13 +146,14 @@ public class MidiPianoPlayer implements Runnable
         sequencer.stop();
         receiver.close();
 
-        if (te.songPos == 1.0)
+        Logger.info("seqPos: " + sequencer.getTickPosition() + " : " + sequencer.getTickLength() + " : " + te.songPos);
+        if (sequencer.getTickPosition() == sequencer.getTickLength())
         {
             te.songPos = 0.0;
         }
     }
 
-    private void playServer() throws IOException, MidiUnavailableException, InvalidMidiDataException, InterruptedException
+    private void playServer() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException
     {
         if (te.isInvalid() || te.loadedSong == null)
             return;
@@ -206,11 +209,10 @@ public class MidiPianoPlayer implements Runnable
         te.songState = SongPlayingState.TERMINATED;
         sequencer.stop();
 
-        if (te.songPos == 1.0)
+        if (sequencer.getTickPosition() == sequencer.getTickLength())
         {
             te.songPos = 0.0;
         }
-        te.markDirty();
     }
 
     @SideOnly(Side.CLIENT)
@@ -237,6 +239,14 @@ public class MidiPianoPlayer implements Runnable
             te.songState = SongPlayingState.TERMINATED;
             e.printStackTrace();
         }
+
+        te.markDirty();
+        deathState = true;
+    }
+
+    public boolean isPlayerDead()
+    {
+        return deathState;
     }
 
     private class EventSieve implements Receiver

@@ -57,7 +57,7 @@ public class InitBlock
                 @Override
                 public Item getTabIconItem()
                 {
-                    return Items.apple;
+                    return Items.GOLDEN_APPLE;
                 }
             });
 

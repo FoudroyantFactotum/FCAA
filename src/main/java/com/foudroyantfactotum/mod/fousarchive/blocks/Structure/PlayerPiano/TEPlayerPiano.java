@@ -23,16 +23,21 @@ import com.foudroyantfactotum.tool.structure.tileentity.StructureTE;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class TEPlayerPiano extends StructureTE
 {
     public static final ExecutorService midiService = Executors.newCachedThreadPool();
+    public static final Map<BlockPos, MidiPianoPlayer> existingPlayers_client = new HashMap<>();
+    public static final Map<BlockPos, MidiPianoPlayer> existingPlayers_server = new HashMap<>();
     public static final String ITEM_LOADED_SONG = "itemPianoRoll";
     public static final String SONG_POSITION = "songPos";
     public static final String SONG_STATE = "songState";
@@ -69,19 +74,23 @@ public class TEPlayerPiano extends StructureTE
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound nbt)
+    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
     {
         super.writeToNBT(nbt);
 
         nbt.setString(ITEM_LOADED_SONG, loadedSong == null ? "" : loadedSong.toString());
         nbt.setDouble(SONG_POSITION, songPos);
         nbt.setByte(SONG_STATE, (byte) songState.ordinal());
+
+        return nbt;
     }
 
     @Override
     public void readFromNBT(NBTTagCompound nbt)
     {
         super.readFromNBT(nbt);
+
+        if (!nbt.hasKey(ITEM_LOADED_SONG)) return;
 
         final String resName = nbt.getString(ITEM_LOADED_SONG);
         loadedSong = resName == null || resName.isEmpty() ? null : new ResourceLocation(resName);
@@ -91,9 +100,6 @@ public class TEPlayerPiano extends StructureTE
         if (worldObj != null && worldObj.isRemote)
         {
             configureMusicState();
-            Logger.info("RF_NBT side : " + worldObj.isRemote);
-        } else {
-            Logger.info("asdfasdfasdfasdf");
         }
     }
 
@@ -106,7 +112,24 @@ public class TEPlayerPiano extends StructureTE
     private void configureMusicState()
     {
         if (songState != SongPlayingState.TERMINATED)
-            midiService.execute(new MidiPianoPlayer(this, songPos));
+        {
+            final Map<BlockPos, MidiPianoPlayer> existingPlayers = worldObj.isRemote ? existingPlayers_client : existingPlayers_server;
+            final MidiPianoPlayer possiblePlayer = existingPlayers.get(this.getPos());
+            Logger.info("existing Players: " + existingPlayers);
+
+            if (possiblePlayer == null || possiblePlayer.isPlayerDead())
+            {
+                if (possiblePlayer != null)
+                    existingPlayers.remove(getPos());
+
+                MidiPianoPlayer player = new MidiPianoPlayer(this, songPos);
+
+                Logger.info("creating new PlayerPiano at " + getPos());
+                Logger.info("This side is running midiplayer " + FMLCommonHandler.instance().getEffectiveSide() + " : " + FMLCommonHandler.instance().getSide() + " : " + getWorld().isRemote);
+                existingPlayers.put(getPos(), player);
+                midiService.execute(player);
+            }
+        }
     }
 
     @Override
@@ -121,7 +144,7 @@ public class TEPlayerPiano extends StructureTE
     {
         if (worldObj != null && !worldObj.isRemote)
         {
-            configureMusicState();
+            //configureMusicState();
         }
     }
 

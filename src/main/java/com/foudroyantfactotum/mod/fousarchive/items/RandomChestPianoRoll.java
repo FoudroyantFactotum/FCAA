@@ -15,14 +15,7 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.items;
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.WeightedRandomChestContent;
-
-import java.util.Random;
-
-public class RandomChestPianoRoll extends WeightedRandomChestContent
+/*public class RandomChestPianoRoll extends WeightedRandomChestContent
 {
     public RandomChestPianoRoll()
     {
@@ -40,4 +33,4 @@ public class RandomChestPianoRoll extends WeightedRandomChestContent
 
         return new ItemStack[]{stack};
     }
-}
+}*/

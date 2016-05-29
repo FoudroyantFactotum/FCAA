@@ -27,9 +27,10 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.tuple.Pair;
@@ -83,18 +84,9 @@ public class ItemPianoRoll extends FA_Item
         LiveMidiDetails.INSTANCE.addSongDetails(NONE, MidiDetails.NO_DETAILS);
     }
 
-    @Override
-    public int getColorFromItemStack(ItemStack stack, int renderPass)
+    public static int getColourOffset()
     {
-        if (renderPass == 1)
-        {
-            final NBTTagCompound nbt = stack.getTagCompound();
-
-            if (nbt != null && nbt.hasKey(COLOUR))
-                return nbt.getInteger(COLOUR);
-        }
-
-        return 0xFFFFFF;
+        return colourOffset;
     }
 
     @Override
@@ -185,7 +177,7 @@ public class ItemPianoRoll extends FA_Item
         }
 
         @Override
-        public void processCommand(ICommandSender sender, String[] args) throws CommandException
+        public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
         {
             try
             {
@@ -205,7 +197,7 @@ public class ItemPianoRoll extends FA_Item
                 final ResourceLocation[] songList = LiveMidiDetails.INSTANCE.songDetails();
                 final List<Pair<ResourceLocation, MidiDetails>> validList = new LinkedList<>();
 
-                sender.addChatMessage(new ChatComponentText("==========Searching=========="));
+                sender.addChatMessage(new TextComponentString("==========Searching=========="));
 
                     song:
                     for (int i = 0; i < songList.length; ++i)
@@ -221,9 +213,9 @@ public class ItemPianoRoll extends FA_Item
                 int i = 0;
 
                 for (Pair<ResourceLocation, MidiDetails> m : validList)
-                    sender.addChatMessage(new ChatComponentText((++i) + ". " + toStringer(m.getRight(), outfString)));
+                    sender.addChatMessage(new TextComponentString((++i) + ". " + toStringer(m.getRight(), outfString)));
 
-                sender.addChatMessage(new ChatComponentText("=========End  Search========="));
+                sender.addChatMessage(new TextComponentString("=========End  Search========="));
 
                 if (validList.size() == 1)
                 {

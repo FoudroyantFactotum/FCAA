@@ -19,8 +19,8 @@ import com.foudroyantfactotum.mod.fousarchive.init.IMCEvents;
 import com.foudroyantfactotum.mod.fousarchive.init.InitBlock;
 import com.foudroyantfactotum.mod.fousarchive.init.InitItem;
 import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
-import com.foudroyantfactotum.mod.fousarchive.items.RandomChestPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.midi.JsonMidiDetails;
+import com.foudroyantfactotum.mod.fousarchive.midi.MidiMultiplexSynth;
 import com.foudroyantfactotum.mod.fousarchive.proxy.IModRenderProxy;
 import com.foudroyantfactotum.mod.fousarchive.textures.Generator;
 import com.foudroyantfactotum.mod.fousarchive.utility.Settings;
@@ -28,11 +28,15 @@ import com.foudroyantfactotum.tool.structure.StructureRegistry;
 import com.foudroyantfactotum.tool.structure.coordinates.TransformLAG;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.minecraftforge.common.ChestGenHooks;
+import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.relauncher.Side;
 
+import javax.sound.midi.MidiUnavailableException;
 import java.io.IOException;
 
 import static net.minecraftforge.fml.common.Mod.EventHandler;
@@ -71,6 +75,15 @@ public class TheMod
         InitItem.init();
 
         proxy.preInit();
+
+        try
+        {
+            //init one Synth to fix audio crackle on start
+            MidiMultiplexSynth.INSTANCE.getNewReceiver().close();
+        } catch (MidiUnavailableException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @EventHandler
@@ -78,8 +91,21 @@ public class TheMod
     {
         StructureRegistry.loadRegisteredPatterns();
         Generator.init();
+        if (event.getSide() == Side.CLIENT)
+        {
+            Minecraft.getMinecraft().getItemColors().registerItemColorHandler((stack, tintIndex) -> {
+                 if (tintIndex == 1)
+                 {
+                     final NBTTagCompound nbt = stack.getTagCompound();
 
-        final RandomChestPianoRoll rcpp = new RandomChestPianoRoll();
+                     if (nbt != null && nbt.hasKey(ItemPianoRoll.COLOUR))
+                         return nbt.getInteger(ItemPianoRoll.COLOUR);
+                 }
+                return 0xFFFFFF;
+            }, ItemPianoRoll.INSTANCE);
+        }
+
+        /*final RandomChestPianoRoll rcpp = new RandomChestPianoRoll();
 
         ChestGenHooks.getInfo(ChestGenHooks.MINESHAFT_CORRIDOR).addItem(rcpp);
         ChestGenHooks.getInfo(ChestGenHooks.DUNGEON_CHEST).addItem(rcpp);
@@ -88,7 +114,14 @@ public class TheMod
         ChestGenHooks.getInfo(ChestGenHooks.PYRAMID_JUNGLE_CHEST).addItem(rcpp);
         ChestGenHooks.getInfo(ChestGenHooks.STRONGHOLD_LIBRARY).addItem(rcpp);
         ChestGenHooks.getInfo(ChestGenHooks.VILLAGE_BLACKSMITH).addItem(rcpp);
-        ChestGenHooks.getInfo(ChestGenHooks.STRONGHOLD_CORRIDOR).addItem(rcpp);
+        ChestGenHooks.getInfo(ChestGenHooks.STRONGHOLD_CORRIDOR).addItem(rcpp);*/
+
+        //load internal music files
+        FMLInterModComms.sendMessage(
+                TheMod.MOD_ID,
+                IMCEvents.IMCEventHandler.REGISTER_JSON_SONG_LIST.key(),
+                new ResourceLocation(TheMod.MOD_ID, "midi/master.json.gz").toString()
+        );
 
         proxy.init();
     }

@@ -16,21 +16,22 @@
 package com.foudroyantfactotum.mod.fousarchive.TESR;
 
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
+import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.BlockPlayerPiano;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.TEPlayerPiano;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
 import com.foudroyantfactotum.mod.fousarchive.utility.ply.ModelLoader;
 import com.foudroyantfactotum.mod.fousarchive.utility.ply.Quad;
-import net.minecraft.block.BlockDirectional;
+import com.foudroyantfactotum.tool.structure.block.StructureShapeBlock;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.model.IBakedModel;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import org.lwjgl.opengl.GL11;
 
 import java.util.BitSet;
@@ -81,10 +82,14 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
     {
         final BlockRendererDispatcher brd = Minecraft.getMinecraft().getBlockRendererDispatcher();
         final Tessellator tess = Tessellator.getInstance();
-        final WorldRenderer wr = tess.getWorldRenderer();
+        final VertexBuffer wr = tess.getBuffer();
 
         final BlockPos pos = te.getPos();
-        final IBlockState statePiano = getWorld().getBlockState(pos).withProperty(propPiano, piano_body);
+        final IBlockState state = getWorld().getBlockState(pos);
+
+        if (state.getBlock() != BlockPlayerPiano.INSTANCE) return;
+
+        final IBlockState statePiano = state.withProperty(propPiano, piano_body);
         final IBlockState stateKeyWhite = statePiano.withProperty(propPiano, key_white);
         final IBlockState stateKeyBlack = statePiano.withProperty(propPiano, key_black);
 
@@ -92,9 +97,9 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         final IBakedModel modelKeyWhite = brd.getBlockModelShapes().getModelForState(stateKeyWhite);
         final IBakedModel modelKeyBlack = brd.getBlockModelShapes().getModelForState(stateKeyBlack);
 
-        final EnumFacing orientation = statePiano.getValue(BlockDirectional.FACING);
+        final EnumFacing orientation = statePiano.getValue(StructureShapeBlock.DIRECTION);
 
-        bindTexture(TextureMap.locationBlocksTexture);
+        bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
         RenderHelper.disableStandardItemLighting();
         GlStateManager.blendFunc(770, 771);
@@ -111,7 +116,7 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         wr.color(255, 255, 255, 255);
         wr.setTranslation(rx,ry,rz);
 
-        brd.getBlockModelRenderer().renderModel(te.getWorld(), modelPianoBody, statePiano, te.getPos(), wr);
+        brd.getBlockModelRenderer().renderModel(te.getWorld(), modelPianoBody, statePiano, te.getPos(), wr, false);
 
         //render keys
         for (int key = 0; key < 85; ++key)
@@ -123,12 +128,12 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
 
             if (blackKeyNo.get(key))
             {
-                brd.getBlockModelRenderer().renderModel(te.getWorld(), modelKeyBlack, stateKeyWhite, te.getPos(), wr);
+                brd.getBlockModelRenderer().renderModel(te.getWorld(), modelKeyBlack, stateKeyWhite, te.getPos(), wr, false);
                 rx += keySize * orientation.getFrontOffsetZ();
                 rz -= keySize * orientation.getFrontOffsetX();
             } else
             {
-                brd.getBlockModelRenderer().renderModel(te.getWorld(), modelKeyWhite, stateKeyWhite, te.getPos(), wr);
+                brd.getBlockModelRenderer().renderModel(te.getWorld(), modelKeyWhite, stateKeyWhite, te.getPos(), wr, false);
             }
         }
 
@@ -156,7 +161,7 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         RenderHelper.enableStandardItemLighting();
     }
 
-    private static void addRender(WorldRenderer wr, MidiTexture mdt, double shift, Quad[] quads)
+    private static void addRender(VertexBuffer wr, MidiTexture mdt, double shift, Quad[] quads)
     {
         double d = mdt.getDisplayRatio();
         double hd = mdt.getDisplayAmount();

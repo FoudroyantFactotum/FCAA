@@ -20,17 +20,19 @@ import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.Block
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Instance;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Item;
 import com.foudroyantfactotum.tool.structure.block.StructureBlock;
-import com.foudroyantfactotum.tool.structure.item.StructureItemForm;
+import com.foudroyantfactotum.tool.structure.item.StructureFormTool;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 @Auto_Item(name = "tuningFork")
-public class ItemTuningFork extends StructureItemForm
+public class ItemTuningFork extends StructureFormTool
 {
     @Auto_Instance
     public static final ItemTuningFork INSTANCE = null;
@@ -38,11 +40,11 @@ public class ItemTuningFork extends StructureItemForm
     private static final ImmutableList<StructureBlock> validStructures = ImmutableList.of(BlockPlayerPiano.INSTANCE);
 
     @Override
-    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
+    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
         if (world.isRemote || player == null)
         {
-            return true;
+            return EnumActionResult.SUCCESS;
         }
 
         final EnumFacing[] orientation = orientationPriority[MathHelper.floor_double(player.rotationYaw * 4.0f / 360.0f + 0.5) & 3];
@@ -50,7 +52,7 @@ public class ItemTuningFork extends StructureItemForm
 
         doSearch(world, pos, orientation, mirror, validStructures);
 
-        return true;
+        return EnumActionResult.SUCCESS;
     }
 
     @Override

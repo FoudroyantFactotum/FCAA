@@ -21,7 +21,7 @@ import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Structure
 import com.foudroyantfactotum.tool.structure.net.StructureNetwork;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoader;
@@ -57,7 +57,7 @@ public class ClientRenderProxy implements IModRenderProxy
     @Override
     public void preInit()
     {
-        OBJLoader.instance.addDomain(TheMod.MOD_ID);
+        OBJLoader.INSTANCE.addDomain(TheMod.MOD_ID);
         StructureNetwork.init();
     }
 
@@ -65,7 +65,7 @@ public class ClientRenderProxy implements IModRenderProxy
     public void registerTESR(Auto_Structure annot) throws IllegalAccessException, InstantiationException
     {
         if (annot.TESR() != FA_TESR.class)
-            ClientRegistry.bindTileEntitySpecialRenderer(annot.tileEntity(), annot.TESR().newInstance());
+            ClientRegistry.bindTileEntitySpecialRenderer((Class) annot.tileEntity(), (FA_TESR) annot.TESR().newInstance());
     }
 
     @Override

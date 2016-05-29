@@ -1,7 +1,9 @@
 package com.foudroyantfactotum.mod.fousarchive.midi;
 
 import com.foudroyantfactotum.mod.fousarchive.utility.Settings;
+import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
 
+import javax.annotation.Nonnull;
 import javax.sound.midi.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -16,6 +18,7 @@ public enum MidiMultiplexSynth
     private final List<Synthesizer> synths = new LinkedList<>();
     private final List<MultiplexMidiReceiver> receivers = new ArrayList<>();
 
+    @Nonnull
     public synchronized MultiplexMidiReceiver getNewReceiver() throws MidiUnavailableException
     {
         final int synthID = receivers.size()/channelsPerSynth;
@@ -31,11 +34,16 @@ public enum MidiMultiplexSynth
         final MultiplexMidiReceiver mmr = new MultiplexMidiReceiver(receivers.size(), synths.get(receivers.size()/channelsPerSynth));
         receivers.add(mmr);
 
+        Logger.info("Got new Multiplex " + mmr.channel);
+
         return mmr;
     }
 
-    private synchronized void removeAllocatedChannel(int channel)
+    private synchronized void removeAllocatedChannel(final @Nonnull MultiplexMidiReceiver receiver)
     {
+        final int channel = receiver.channel;
+        Logger.info("Removed Multiplex " + channel);
+
         receivers.remove(channel);
         synths.get(channel/channelsPerSynth).getChannels()[channel%channelsPerSynth].resetAllControllers();
 
@@ -44,7 +52,6 @@ public enum MidiMultiplexSynth
             final MultiplexMidiReceiver mmr = receivers.get(cid);
 
             mmr.config(mmr.channel-1, synths.get((mmr.channel-1)/channelsPerSynth));
-
         }
 
         //remove extra synths if threshold passes
@@ -71,9 +78,12 @@ public enum MidiMultiplexSynth
 
         synchronized void config(int channel, Synthesizer synthesizer)
         {
+            final int oldCha = this.channel;
             this.channel = channel;
             this.channelID = channel%channelsPerSynth;
             this.synthesizer = synthesizer;
+
+            Logger.info("Configured as " + channel + " : " + channelID +" : oldChan " + oldCha + " : " + synthesizer);
         }
 
         @Override
@@ -112,7 +122,7 @@ public enum MidiMultiplexSynth
         @Override
         public void close()
         {
-            MidiMultiplexSynth.INSTANCE.removeAllocatedChannel(channel);
+            MidiMultiplexSynth.INSTANCE.removeAllocatedChannel(this);
         }
     }
 }

@@ -8,7 +8,7 @@ import com.foudroyantfactotum.mod.fousarchive.utility.Clazz;
 import com.foudroyantfactotum.mod.fousarchive.utility.FousArchiveException;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Item;
 import com.google.common.reflect.ClassPath;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -56,6 +56,7 @@ public class InitItem
                             new ModelResourceLocation(rl, "inventory")
                     );
         }
+
     }
 
     private static void registerTaggedItems()
