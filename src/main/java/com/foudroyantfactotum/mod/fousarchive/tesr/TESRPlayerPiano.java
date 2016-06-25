@@ -13,10 +13,10 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package com.foudroyantfactotum.mod.fousarchive.TESR;
+package com.foudroyantfactotum.mod.fousarchive.tesr;
 
+import com.foudroyantfactotum.mod.fousarchive.library.ModBlocks;
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
-import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.BlockPlayerPiano;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.TEPlayerPiano;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
@@ -87,7 +87,7 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         final BlockPos pos = te.getPos();
         final IBlockState state = getWorld().getBlockState(pos);
 
-        if (state.getBlock() != BlockPlayerPiano.INSTANCE) return;
+        if (state.getBlock() != ModBlocks.playerPiano) return;
 
         final IBlockState statePiano = state.withProperty(propPiano, piano_body);
         final IBlockState stateKeyWhite = statePiano.withProperty(propPiano, key_white);

@@ -15,14 +15,15 @@
  */
 package com.foudroyantfactotum.mod.fousarchive;
 
+import com.foudroyantfactotum.mod.fousarchive.library.ModItems;
 import com.foudroyantfactotum.mod.fousarchive.init.IMCEvents;
 import com.foudroyantfactotum.mod.fousarchive.init.InitBlock;
+import com.foudroyantfactotum.mod.fousarchive.init.InitCommand;
 import com.foudroyantfactotum.mod.fousarchive.init.InitItem;
 import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.midi.JsonMidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.midi.MidiMultiplexSynth;
 import com.foudroyantfactotum.mod.fousarchive.proxy.IModRenderProxy;
-import com.foudroyantfactotum.mod.fousarchive.textures.Generator;
 import com.foudroyantfactotum.mod.fousarchive.utility.Settings;
 import com.foudroyantfactotum.tool.structure.StructureRegistry;
 import com.foudroyantfactotum.tool.structure.coordinates.TransformLAG;
@@ -90,7 +91,7 @@ public class TheMod
     public static void init(FMLInitializationEvent event) throws IOException
     {
         StructureRegistry.loadRegisteredPatterns();
-        Generator.init();
+
         if (event.getSide() == Side.CLIENT)
         {
             Minecraft.getMinecraft().getItemColors().registerItemColorHandler((stack, tintIndex) -> {
@@ -102,7 +103,7 @@ public class TheMod
                          return nbt.getInteger(ItemPianoRoll.COLOUR);
                  }
                 return 0xFFFFFF;
-            }, ItemPianoRoll.INSTANCE);
+            }, ModItems.pianoRoll);
         }
 
         /*final RandomChestPianoRoll rcpp = new RandomChestPianoRoll();
@@ -141,11 +142,6 @@ public class TheMod
     @EventHandler
     public static void serverStart(FMLServerStartingEvent event)
     {
-        event.registerServerCommand(new ItemPianoRoll.CommandPianoRollID());
-
-        if (_DEBUG_MODE)
-        {
-            event.registerServerCommand(new StructureRegistry.CommandReloadStructures());
-        }
+        InitCommand.init(event);
     }
 }

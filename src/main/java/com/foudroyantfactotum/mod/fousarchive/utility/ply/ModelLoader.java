@@ -51,7 +51,7 @@ public final class ModelLoader
     }
 
     @SubscribeEvent
-    public void onResourceManagerReload(ModelBakeEvent e)
+    public void onResourceManagerReload(final @Nonnull ModelBakeEvent e)
     {
         final ProgressManager.ProgressBar loadingBar = ProgressManager.push("PLY Model Loader", modelList.size());
 

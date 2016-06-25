@@ -15,14 +15,12 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano;
 
-import com.foudroyantfactotum.mod.fousarchive.TESR.TESRPlayerPiano;
+import com.foudroyantfactotum.mod.fousarchive.library.ModItems;
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_StructureBlock;
 import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer.MidiPianoPlayer;
 import com.foudroyantfactotum.mod.fousarchive.midi.state.SongPlayingState;
-import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Instance;
-import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Structure;
 import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
 import com.foudroyantfactotum.tool.structure.coordinates.BlockPosUtil;
 import com.foudroyantfactotum.tool.structure.tileentity.StructureTE;
@@ -50,12 +48,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 
-@Auto_Structure(name = "playerPiano", tileEntity = TEPlayerPiano.class, TESR = TESRPlayerPiano.class)
 public final class BlockPlayerPiano extends FA_StructureBlock
 {
-    @Auto_Instance
-    public static final BlockPlayerPiano INSTANCE = null;
-
     public static final PropertyEnum<PianoState> propPiano = PropertyEnum.create("ps", PianoState.class);
 
     public BlockPlayerPiano()
@@ -140,9 +134,9 @@ public final class BlockPlayerPiano extends FA_StructureBlock
                     {
                         te.loadedSong = ItemPianoRoll.NONE;
                     }
-                    Logger.info("has set piano roll");
+                    Logger.info("has set playerPiano roll");
                 } else {
-                    Logger.info("no piano roll in hand");
+                    Logger.info("no playerPiano roll in hand");
                 }
             } else
             {
@@ -157,7 +151,7 @@ public final class BlockPlayerPiano extends FA_StructureBlock
 
                         te.loadedSong = null;
                         te.songPos = 0.0;
-                        Logger.info("has removed piano roll");
+                        Logger.info("has removed playerPiano roll");
                     } else
                     {
                         te.songState = SongPlayingState.PLAYING;
@@ -206,7 +200,7 @@ public final class BlockPlayerPiano extends FA_StructureBlock
         if (rl != null && rl != ItemPianoRoll.NONE)
         {
             final String name = rl.toString();
-            final ItemStack stack = new ItemStack(ItemPianoRoll.INSTANCE, 1, Math.abs(name.hashCode()) % ItemPianoRoll.iconNo);
+            final ItemStack stack = new ItemStack(ModItems.pianoRoll, 1, Math.abs(name.hashCode()) % ItemPianoRoll.iconNo);
             final NBTTagCompound nbt = new NBTTagCompound();
 
             ItemPianoRoll.setPianoRollNBT(nbt, name);

@@ -15,29 +15,18 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.init;
 
+import com.foudroyantfactotum.mod.fousarchive.library.ModBlocks;
+import com.foudroyantfactotum.mod.fousarchive.library.ModItems;
+import com.foudroyantfactotum.mod.fousarchive.library.ModNames;
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
-import com.foudroyantfactotum.mod.fousarchive.blocks.FA_Block;
-import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_ShapeBlock;
-import com.foudroyantfactotum.mod.fousarchive.utility.Clazz;
-import com.foudroyantfactotum.mod.fousarchive.utility.FousArchiveException;
-import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Block;
-import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Instance;
-import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Ore;
-import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Structure;
+import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_ShapeTE;
+import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.TEPlayerPiano;
 import com.foudroyantfactotum.tool.structure.StructureRegistry;
-import com.foudroyantfactotum.tool.structure.block.StructureBlock;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.reflect.ClassPath;
-import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.OreDictionary;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 
 public class InitBlock
 {
@@ -67,140 +56,27 @@ public class InitBlock
 
     public static void init()
     {
-        registerTaggedBlocks();
         registerBlocks();
-        registerTaggedStructures();
         registerStructures();
     }
 
     private static void registerBlocks()
     {
+        GameRegistry.register(ModBlocks.structureShape);
+        GameRegistry.registerWithItem(ModBlocks.playerPiano);
 
+        GameRegistry.registerTileEntity(TEPlayerPiano.class, ModNames.Blocks.playerPiano);
+        GameRegistry.registerTileEntity(FA_ShapeTE.class, ModNames.Blocks.structureShape);
+
+        final CreativeTabs tab = ModTab.tabs.get(ModTab.main);
+
+        ModBlocks.playerPiano.setCreativeTab(tab);
+        ModItems.tuningFork.setCreativeTab(tab);
     }
 
     private static void registerStructures()
     {
-
+        StructureRegistry.registerStructureForLoad(ModBlocks.playerPiano, ModBlocks.structureShape);
+        TheMod.proxy.registerBlockAsItemModel(ModBlocks.playerPiano);
     }
-
-    private static void registerTaggedBlocks()
-    {
-        try
-        {
-            final Field mField = Field.class.getDeclaredField("modifiers");
-            mField.setAccessible(true);
-
-            for (final ClassPath.ClassInfo i : Clazz.getClassListFrom(FA_Block.class.getPackage()))
-            {
-                try
-                {
-                    final Class<?> clazz = Class.forName(i.getName());
-                    final Auto_Block annot = clazz.getAnnotation(Auto_Block.class);
-
-                    if (annot != null)
-                    {
-                        final Field fINSTANCE = getInstanceField(clazz);
-                        final Block block = (Block) clazz.newInstance();
-
-                        fINSTANCE.setAccessible(true);
-                        mField.setInt(fINSTANCE, fINSTANCE.getModifiers() & ~Modifier.FINAL);
-                        fINSTANCE.set(null, block);
-
-                        block.setUnlocalizedName(annot.name());
-                        GameRegistry.registerBlock(block, annot.item(), annot.name());//consider null items?
-
-                        if (!ModTab.none.equals(annot.tab()))//todo better error handling
-                            block.setCreativeTab(ModTab.tabs.get(annot.tab()));
-
-                        if (annot.tileEntity() != TileEntity.class) //TileEntity class use as default null
-                            GameRegistry.registerTileEntity(annot.tileEntity(), "tile." + annot.name());
-
-                        if (clazz.isAnnotationPresent(Auto_Ore.class))
-                            OreDictionary.registerOre(annot.name(), block);
-
-                        TheMod.proxy.registerBlockAsItemModel(block);
-                    }
-                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e)//todo better errors
-                {
-                    throw new FousArchiveException("Error on " + i.getName(), e);
-                }
-            }
-        } catch (NoSuchFieldException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    private static void registerTaggedStructures()
-    {
-        try
-        {
-            final Field mField = Field.class.getDeclaredField("modifiers");
-            mField.setAccessible(true);
-
-            for (final ClassPath.ClassInfo i : Clazz.getClassListFrom(FA_ShapeBlock.class.getPackage()))
-            {
-                try
-                {
-                    final Class<?> clazz = Class.forName(i.getName());
-                    final Auto_Structure annot = clazz.getAnnotation(Auto_Structure.class);
-
-                    if (annot != null)
-                    {
-                        final Field fINSTANCE = getInstanceField(clazz);
-                        final StructureBlock block = (StructureBlock) clazz.newInstance();
-
-                        fINSTANCE.setAccessible(true);
-                        mField.setInt(fINSTANCE, fINSTANCE.getModifiers() & ~Modifier.FINAL);
-                        fINSTANCE.set(null, block);
-
-                        block.setUnlocalizedName(annot.name());
-                        GameRegistry.registerBlock(block, annot.item(), annot.name());//consider null items?
-                        GameRegistry.registerTileEntity(annot.tileEntity(), "tile." + annot.name());
-
-                        StructureRegistry.registerStructureForLoad(block, FA_ShapeBlock.INSTANCE);
-
-                        if (!ModTab.none.equals(annot.tab()))//todo better error handling
-                            block.setCreativeTab(ModTab.tabs.get(annot.tab()));
-
-                        TheMod.proxy.registerTESR(annot);
-                        TheMod.proxy.registerBlockAsItemModel(block);
-                    }
-                } catch (ClassNotFoundException e)//todo better errors
-                {
-                    e.printStackTrace();
-                } catch (InstantiationException e)
-                {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        } catch (NoSuchFieldException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    public static Field getInstanceField(Class<?> clazz)
-    {
-        for (Field f : clazz.getFields())
-        {
-            final Auto_Instance aINSTANCE = f.getAnnotation(Auto_Instance.class);
-
-            if (aINSTANCE != null) //found Annotation
-            {
-                final int mod = f.getModifiers();
-
-                if (Modifier.isFinal(mod) && Modifier.isPublic(mod) && Modifier.isStatic(mod))
-                {
-                    return f;
-                }
-            }
-        }
-
-        return null; //todo fix
-    }
-
 }

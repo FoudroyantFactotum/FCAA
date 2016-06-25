@@ -1,19 +1,13 @@
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure;
 
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
-import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Block;
-import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Instance;
 import com.foudroyantfactotum.tool.structure.block.StructureShapeBlock;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
-@Auto_Block(name="fa_shape", tileEntity = FA_ShapeTE.class)
 public class FA_ShapeBlock extends StructureShapeBlock
 {
-    @Auto_Instance
-    public static final FA_ShapeBlock INSTANCE = null;
-
     @Override
     public boolean canMirror()
     {

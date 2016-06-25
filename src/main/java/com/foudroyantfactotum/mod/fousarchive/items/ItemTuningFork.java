@@ -15,10 +15,8 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.items;
 
+import com.foudroyantfactotum.mod.fousarchive.library.ModBlocks;
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
-import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.BlockPlayerPiano;
-import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Instance;
-import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Item;
 import com.foudroyantfactotum.tool.structure.block.StructureBlock;
 import com.foudroyantfactotum.tool.structure.item.StructureFormTool;
 import com.google.common.collect.ImmutableList;
@@ -31,13 +29,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
-@Auto_Item(name = "tuningFork")
 public class ItemTuningFork extends StructureFormTool
 {
-    @Auto_Instance
-    public static final ItemTuningFork INSTANCE = null;
-
-    private static final ImmutableList<StructureBlock> validStructures = ImmutableList.of(BlockPlayerPiano.INSTANCE);
+    private static final ImmutableList<StructureBlock> validStructures = ImmutableList.of(ModBlocks.playerPiano);
 
     @Override
     public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)

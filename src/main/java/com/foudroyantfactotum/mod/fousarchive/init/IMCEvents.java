@@ -42,7 +42,7 @@ public final class IMCEvents
 {
     public enum IMCEventHandler
     {
-        REGISTER_JSON_SONG_LIST("register.piano.roll.list.json", IMCEvents::addExternalSongList);
+        REGISTER_JSON_SONG_LIST("register.playerPiano.roll.list.json", IMCEvents::addExternalSongList);
 
         private final Consumer<IMCMessage> m;
         private final String s;

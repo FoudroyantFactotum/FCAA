@@ -15,9 +15,9 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.proxy;
 
-import com.foudroyantfactotum.mod.fousarchive.TESR.FA_TESR;
+import com.foudroyantfactotum.mod.fousarchive.tesr.TESRPlayerPiano;
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
-import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Structure;
+import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.TEPlayerPiano;
 import com.foudroyantfactotum.tool.structure.net.StructureNetwork;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -63,10 +63,9 @@ public class ClientRenderProxy implements IModRenderProxy
     }
 
     @Override
-    public void registerTESR(Auto_Structure annot) throws IllegalAccessException, InstantiationException
+    public void init()
     {
-        if (annot.TESR() != FA_TESR.class)
-            ClientRegistry.bindTileEntitySpecialRenderer((Class) annot.tileEntity(), (FA_TESR) annot.TESR().newInstance());
+        ClientRegistry.bindTileEntitySpecialRenderer(TEPlayerPiano.class, new TESRPlayerPiano());
     }
 
     @Override

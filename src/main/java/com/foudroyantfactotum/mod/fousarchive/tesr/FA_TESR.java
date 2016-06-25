@@ -13,26 +13,11 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
-package com.foudroyantfactotum.mod.fousarchive.utility.annotations;
+package com.foudroyantfactotum.mod.fousarchive.tesr;
 
-import com.foudroyantfactotum.mod.fousarchive.init.InitBlock;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface Auto_Block
+public abstract class FA_TESR<E extends TileEntity> extends TileEntitySpecialRenderer<E>
 {
-    String name();
-
-    String tab() default InitBlock.ModTab.main;
-
-    Class<? extends TileEntity> tileEntity() default TileEntity.class;
-
-    Class<? extends ItemBlock> item() default ItemBlock.class;
 }
