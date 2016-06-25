@@ -27,6 +27,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,7 +59,7 @@ public class ClientRenderProxy implements IModRenderProxy
     public void preInit()
     {
         OBJLoader.INSTANCE.addDomain(TheMod.MOD_ID);
-        StructureNetwork.init();
+        StructureNetwork.init(new SimpleNetworkWrapper(TheMod.MOD_ID));
     }
 
     @Override

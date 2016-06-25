@@ -22,7 +22,7 @@ import com.foudroyantfactotum.mod.fousarchive.midi.generation.LiveImage;
 import com.foudroyantfactotum.mod.fousarchive.midi.generation.MidiTexture;
 import com.foudroyantfactotum.mod.fousarchive.utility.ply.ModelLoader;
 import com.foudroyantfactotum.mod.fousarchive.utility.ply.Quad;
-import com.foudroyantfactotum.tool.structure.block.StructureShapeBlock;
+import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
@@ -97,7 +97,7 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         final IBakedModel modelKeyWhite = brd.getBlockModelShapes().getModelForState(stateKeyWhite);
         final IBakedModel modelKeyBlack = brd.getBlockModelShapes().getModelForState(stateKeyBlack);
 
-        final EnumFacing orientation = statePiano.getValue(StructureShapeBlock.DIRECTION);
+        final EnumFacing orientation = statePiano.getValue(BlockHorizontal.FACING);
 
         bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 

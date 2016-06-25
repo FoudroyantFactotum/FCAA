@@ -24,11 +24,11 @@ import com.foudroyantfactotum.mod.fousarchive.midi.state.SongPlayingState;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Instance;
 import com.foudroyantfactotum.mod.fousarchive.utility.annotations.Auto_Structure;
 import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
-import com.foudroyantfactotum.tool.structure.block.StructureShapeBlock;
 import com.foudroyantfactotum.tool.structure.coordinates.BlockPosUtil;
 import com.foudroyantfactotum.tool.structure.tileentity.StructureTE;
 import com.foudroyantfactotum.tool.structure.utility.StructureDefinitionBuilder;
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -65,7 +65,7 @@ public final class BlockPlayerPiano extends FA_StructureBlock
         setDefaultState(
                 this.blockState
                         .getBaseState()
-                        .withProperty(StructureShapeBlock.DIRECTION, EnumFacing.SOUTH)
+                        .withProperty(BlockHorizontal.FACING, EnumFacing.SOUTH)
                         .withProperty(propPiano, PianoState.piano)
         );
     }
@@ -73,7 +73,7 @@ public final class BlockPlayerPiano extends FA_StructureBlock
     @Override
     protected BlockStateContainer createBlockState()
     {
-        return new BlockStateContainer(this, StructureShapeBlock.DIRECTION, propPiano);
+        return new BlockStateContainer(this, BlockHorizontal.FACING, propPiano);
     }
 
     @Override
@@ -91,7 +91,7 @@ public final class BlockPlayerPiano extends FA_StructureBlock
     @Override
     public TileEntity createTileEntity(World world, IBlockState state)
     {
-        return new TEPlayerPiano(getPattern(), state.getValue(StructureShapeBlock.DIRECTION));
+        return new TEPlayerPiano(getPattern(), state.getValue(BlockHorizontal.FACING));
     }
 
     @Override
