@@ -202,7 +202,6 @@ public final class BlockPlayerPiano extends FA_StructureBlock
 
                 if (md != MidiDetails.NO_DETAILS)
                 {
-                    Logger.info(UserLogger.GENERAL, "" + (int) ((double) te.songPosition/md.getMaxTicks() * 15));
                     return (int) ((double) te.songPosition/md.getMaxTicks() * 15);
                 }
             }

@@ -52,7 +52,7 @@ public class MidiTexture extends AbstractTexture
     public void loadTexture(IResourceManager resourceManager) throws IOException
     {
         final int xSize = getSmallTextureSize();
-        final int ySize = 85;
+        final int ySize = 88;
         byte[] res = null;
 
         try (final InputStream io = resourceManager.getResource(rl).getInputStream())
@@ -133,7 +133,7 @@ public class MidiTexture extends AbstractTexture
         final byte pixelComponents = 3;
 
         final byte[] img = new byte[xSize * ySize * pixelComponents];
-        final long[] lastEvent = new long[85];
+        final long[] lastEvent = new long[88];
 
         for (Track track : sequence.getTracks())
         {

@@ -41,8 +41,8 @@ import static com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPian
 
 public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
 {
-    private static final BitSet blackKeyNo = new BitSet(85);
-    private static final float keySize = 0.0375f;
+    private static final BitSet blackKeyNo = new BitSet(88);
+    private static final float keySize = (float) (0.0375*(85.0/88.0));
 
     private static Quad[][] objQUAD;
 
@@ -56,7 +56,7 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
 
     public TESRPlayerPiano()
     {
-        int[] bk = {1, 4, 6, 9, 11, 13, 16, 18, 21, 23, 25, 28, 30, 33, 35, 37, 40, 42, 45, 47, 49, 52, 54, 57, 59, 61, 64, 66, 69, 71, 73, 76, 78, 81, 83};
+        int[] bk = {1, 4, 6, 9, 11, 13, 16, 18, 21, 23, 25, 28, 30, 33, 35, 37, 40, 42, 45, 47, 49, 52, 54, 57, 59, 61, 64, 66, 69, 71, 73, 76, 78, 81, 83, 85};
 
         for (int v : bk)
             blackKeyNo.set(v, true);
@@ -119,7 +119,7 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
         brd.getBlockModelRenderer().renderModel(te.getWorld(), modelPianoBody, statePiano, te.getPos(), wr, false);
 
         //render keys
-        for (int key = 0; key < 85; ++key)
+        for (int key = 0; key < 88; ++key)
         {
             rx -= keySize * orientation.getFrontOffsetZ();
             rz += keySize * orientation.getFrontOffsetX();
