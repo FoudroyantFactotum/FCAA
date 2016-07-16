@@ -23,6 +23,7 @@ public final class Settings
         if (isCurrentVersion())
         {
             loadConfiguration(c, PianoPlayer.class);
+            loadConfiguration(c, DebugLog.class);
 
             if (c.hasChanged())
                 c.save();
@@ -76,7 +77,7 @@ public final class Settings
                 if (f2p.containsKey(f.getType()))
                     f2p.get(f.getType()).setProperty(category, f);
                 else
-                    Logger.info("Unable to create prop for " + f.getName());
+                    Logger.fatal("Unable to create prop for " + f.getName());
 
             } catch (IllegalAccessException | NullPointerException e)
             {
@@ -100,6 +101,12 @@ public final class Settings
         return sb.toString().trim().replace(' ', '_');
     }
 
+    public static class DebugLog
+    {
+        public static boolean b_general = true;
+        public static boolean b_midi_piano = false;
+    }
+
     public static class PianoPlayer
     {
         public static int b7_max_vol = 127;
@@ -108,6 +115,7 @@ public final class Settings
         public static int uy_max_texture_cap = 8048;
         public static int uy_max_sheet_shown = 500;
         public static double d_key_restore_time = 0.001;
+        public static int i_start_position_audio_fall_off = 35;
     }
 
     public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException

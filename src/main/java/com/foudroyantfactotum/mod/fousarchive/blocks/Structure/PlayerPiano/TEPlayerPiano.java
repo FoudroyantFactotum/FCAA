@@ -15,9 +15,12 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano;
 
+import com.foudroyantfactotum.mod.fousarchive.midi.LiveMidiDetails;
+import com.foudroyantfactotum.mod.fousarchive.midi.MidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer.MidiPianoPlayer;
 import com.foudroyantfactotum.mod.fousarchive.midi.state.SongPlayingState;
 import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
+import com.foudroyantfactotum.mod.fousarchive.utility.log.UserLogger;
 import com.foudroyantfactotum.tool.structure.registry.StructureDefinition;
 import com.foudroyantfactotum.tool.structure.tileentity.StructureTE;
 import net.minecraft.nbt.NBTTagCompound;
@@ -39,15 +42,17 @@ public class TEPlayerPiano extends StructureTE
     public static final Map<BlockPos, MidiPianoPlayer> existingPlayers_client = new HashMap<>();
     public static final Map<BlockPos, MidiPianoPlayer> existingPlayers_server = new HashMap<>();
     public static final String ITEM_LOADED_SONG = "itemPianoRoll";
-    public static final String SONG_POSITION = "songPos";
+    public static final String SONG_POSITION = "rollDisplayPosition";
     public static final String SONG_STATE = "songState";
 
     @SideOnly(Side.CLIENT)
     public volatile float[] keyOffset;
     @SideOnly(Side.CLIENT)
     public volatile boolean[] keyIsDown;
+    @SideOnly(Side.CLIENT)
+    public volatile double rollDisplayPosition;
 
-    public volatile double songPos;
+    public volatile long songPosition;
     public volatile SongPlayingState songState = SongPlayingState.TERMINATED;
 
     public ResourceLocation loadedSong = null;
@@ -79,8 +84,10 @@ public class TEPlayerPiano extends StructureTE
         super.writeToNBT(nbt);
 
         nbt.setString(ITEM_LOADED_SONG, loadedSong == null ? "" : loadedSong.toString());
-        nbt.setDouble(SONG_POSITION, songPos);
+        nbt.setLong(SONG_POSITION, songPosition);
         nbt.setByte(SONG_STATE, (byte) songState.ordinal());
+
+        Logger.info(UserLogger.MIDI_PIANO, "WriteToNBT: songPosition@"+songPosition + " : " + songState + " : " + FMLCommonHandler.instance().getEffectiveSide());
 
         return nbt;
     }
@@ -93,11 +100,19 @@ public class TEPlayerPiano extends StructureTE
         if (!nbt.hasKey(ITEM_LOADED_SONG)) return;
 
         final String resName = nbt.getString(ITEM_LOADED_SONG);
-        loadedSong = resName == null || resName.isEmpty() ? null : new ResourceLocation(resName);
-        songPos = nbt.getDouble(SONG_POSITION);
+        loadedSong = resName.isEmpty() ? null : new ResourceLocation(resName);
+        songPosition = nbt.getLong(SONG_POSITION);
         songState = SongPlayingState.values()[nbt.getByte(SONG_STATE)];
 
-        if (worldObj != null && worldObj.isRemote)
+        final MidiDetails md = LiveMidiDetails.INSTANCE.getDetailsOnSong(loadedSong);
+        if (md != MidiDetails.NO_DETAILS)
+        {
+            rollDisplayPosition = (double) songPosition / md.getMaxTicks();
+        }
+
+        Logger.info(UserLogger.MIDI_PIANO, "ReadFromNBT: songPosition@"+songPosition + " : " + songState + " : " + FMLCommonHandler.instance().getEffectiveSide());
+
+        if (worldObj != null)
         {
             configureMusicState();
         }
@@ -115,17 +130,17 @@ public class TEPlayerPiano extends StructureTE
         {
             final Map<BlockPos, MidiPianoPlayer> existingPlayers = worldObj.isRemote ? existingPlayers_client : existingPlayers_server;
             final MidiPianoPlayer possiblePlayer = existingPlayers.get(this.getPos());
-            Logger.info("existing Players: " + existingPlayers);
+            Logger.info(UserLogger.MIDI_PIANO, "existing Players: " + existingPlayers);
 
             if (possiblePlayer == null || possiblePlayer.isPlayerDead())
             {
                 if (possiblePlayer != null)
                     existingPlayers.remove(getPos());
 
-                MidiPianoPlayer player = new MidiPianoPlayer(this, songPos);
+                MidiPianoPlayer player = new MidiPianoPlayer(this, songPosition, FMLCommonHandler.instance().getEffectiveSide());
 
-                Logger.info("creating new PlayerPiano at " + getPos());
-                Logger.info("This side is running midiplayer " + FMLCommonHandler.instance().getEffectiveSide() + " : " + FMLCommonHandler.instance().getSide() + " : " + getWorld().isRemote);
+                Logger.info(UserLogger.MIDI_PIANO, "creating new PlayerPiano at " + getPos());
+                Logger.info(UserLogger.MIDI_PIANO, "This side is running midiplayer " + FMLCommonHandler.instance().getEffectiveSide() + " : " + FMLCommonHandler.instance().getSide() + " : " + getWorld().isRemote);
                 existingPlayers.put(getPos(), player);
                 midiService.execute(player);
             }
@@ -142,15 +157,15 @@ public class TEPlayerPiano extends StructureTE
     @Override
     public void onLoad()
     {
-        if (worldObj != null && !worldObj.isRemote)
+        if (worldObj != null)
         {
-            //configureMusicState();
+            configureMusicState();
         }
     }
 
     @Override
     public String toString()
     {
-        return "te.state: " + songState + " : " + songPos + " : " + loadedSong;
+        return "te.state: " + songState + " : " + rollDisplayPosition + " : " + loadedSong;
     }
 }

@@ -64,6 +64,8 @@ public class MidiDetails
     private final String rollAuthenticity;
     private final String rollCopyright;
 
+    private final long maxTicks;
+
     private static final String[] tags = {
             "/title:",
             "/subtitle:",
@@ -98,10 +100,10 @@ public class MidiDetails
 
     private MidiDetails()
     {
-        this(new String[14]);
+        this(new String[14], 1);
     }
 
-    private MidiDetails(String[] result)
+    private MidiDetails(String[] result, long maxTicks)
     {
         this.title              = result[0];
         this.subtitle           = result[1];
@@ -117,6 +119,8 @@ public class MidiDetails
         this.rollCondition      = result[11];
         this.rollAuthenticity   = result[12];
         this.rollCopyright      = result[13];
+
+        this.maxTicks = maxTicks;
 
         this.elem = result;
     }
@@ -165,7 +169,7 @@ public class MidiDetails
         if (result[0] == null || result[7] == null)
             return NO_DETAILS;
 
-        return new MidiDetails(result);
+        return new MidiDetails(result, sequence.getTickLength());
     }
 
     public String getSimpleDetails()
@@ -199,12 +203,14 @@ public class MidiDetails
                 builder.put(cTags[i], elem[i]);
         }
 
+        builder.put("maxTicks", String.valueOf(maxTicks));
+
         return builder.build();
     }
 
     public static MidiDetails fromMap(ImmutableMap<String, String> map)
     {
-        final String[] elem = new String[tags.length];
+        final String[] elem = new String[tags.length + 1];
 
         for (Map.Entry<String, String> entry : map.entrySet())
             if (ctt.containsKey(entry.getKey()))
@@ -213,7 +219,7 @@ public class MidiDetails
         if (elem[0] == null || elem[7] == null)
             return null;
 
-        return new MidiDetails(elem);
+        return new MidiDetails(elem, Long.parseLong(map.get("maxTicks")));
     }
 
     public String getTitle()
@@ -286,6 +292,11 @@ public class MidiDetails
         return rollCopyright;
     }
 
+    public long getMaxTicks()
+    {
+        return maxTicks;
+    }
+
     @Override
     public String toString()
     {
@@ -304,6 +315,7 @@ public class MidiDetails
                 .add("rollCondition", rollCondition)
                 .add("rollAuthenticity", rollAuthenticity)
                 .add("rollCopyright", rollCopyright)
+                .add("maxTicks", maxTicks)
                 .toString();
     }
 
@@ -313,6 +325,6 @@ public class MidiDetails
         str[0] = name;
         str[7] = composer;
 
-        return new MidiDetails(str);
+        return new MidiDetails(str, 1);
     }
 }

@@ -21,8 +21,10 @@ import com.foudroyantfactotum.mod.fousarchive.midi.MidiMultiplexSynth;
 import com.foudroyantfactotum.mod.fousarchive.midi.state.SongPlayingState;
 import com.foudroyantfactotum.mod.fousarchive.utility.Settings;
 import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
+import com.foudroyantfactotum.mod.fousarchive.utility.log.UserLogger;
 import com.sun.media.sound.RealTimeSequencerProvider;
 import net.minecraft.client.Minecraft;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
@@ -34,14 +36,16 @@ import java.io.InputStream;
 
 public class MidiPianoPlayer implements Runnable
 {
-    private final TEPlayerPiano te;
-    private final double startPos;
+    private TEPlayerPiano te;
+    private final long startPosition;
     private boolean deathState = false;
+    private Side side;
 
-    public MidiPianoPlayer(TEPlayerPiano te, double startPos)
+    public MidiPianoPlayer(TEPlayerPiano te, long startPosition, Side side)
     {
         this.te = te;
-        this.startPos = startPos;
+        this.startPosition = startPosition;
+        this.side = side;
     }
 
     @SideOnly(Side.CLIENT)
@@ -66,27 +70,34 @@ public class MidiPianoPlayer implements Runnable
 
         sequencer.getTransmitter().setReceiver(new EventSieve(receiver));
 
-        sequencer.setTickPosition((long) (startPos * sequencer.getTickLength()));
+        sequencer.setTickPosition(startPosition);
         sequencer.start();
         {
             try
             {
-                while (sequencer.isRunning() && !te.isInvalid() && Minecraft.getMinecraft().thePlayer != null && te.songState != SongPlayingState.TERMINATED)
+                while (!te.isInvalid() && Minecraft.getMinecraft().thePlayer != null && te.songState != SongPlayingState.TERMINATED)
                 {
+                    if (!sequencer.isRunning())
+                    {
+                        Logger.info(UserLogger.MIDI_PIANO, "Song has finished -> RUNNING " + side);
+                        te.songState = SongPlayingState.RUNNING;
+                    }
+                    //terminate player once keys are in the restored position
                     if (te.songState == SongPlayingState.RUNNING && allKeysInRightPosition(te.keyOffset))
                     {
+                        Logger.info(UserLogger.MIDI_PIANO, "All keys in right position-> TERMINATED " + side);
                         te.songState = SongPlayingState.TERMINATED;
-                        sequencer.stop();
                         continue;
                     }
 
+                    //restore key positions before the player stop
                     if (te.songState == SongPlayingState.RUNNING)
                     {
+                        receiver.turnNotesOff();
                         for (int key = 0; key < te.keyIsDown.length; ++key)
                         {
                             if (te.keyIsDown[key])
                             {
-                                receiver.turnNotesOff();
                                 te.keyIsDown[key] = false;
                             }
                         }
@@ -113,10 +124,11 @@ public class MidiPianoPlayer implements Runnable
                             final BlockPos playerPos = Minecraft.getMinecraft().thePlayer.getPosition();
                             final double distance = playerPos.distanceSq(te.getPos());
 
-                            if (distance > 35)
+                            if (distance > Settings.PianoPlayer.i_start_position_audio_fall_off)
                             {
                                 audioLevel = (int) ((
-                                        Math.abs(1 - Math.min((distance - 35) / 800, 1.0)) * Settings.PianoPlayer.b7_max_vol) *
+                                        Math.abs(1 - Math.min((distance - Settings.PianoPlayer.i_start_position_audio_fall_off) / 800, 1.0))
+                                                * Settings.PianoPlayer.b7_max_vol) *
                                         Minecraft.getMinecraft().gameSettings.getSoundLevel(SoundCategory.RECORDS)
                                 );
                             } else
@@ -132,7 +144,8 @@ public class MidiPianoPlayer implements Runnable
 
                     receiver.changeVolumeLevel(audioLevel);
 
-                    te.songPos = (double) sequencer.getTickPosition() / sequencer.getTickLength();
+                    te.songPosition = sequencer.getTickPosition();
+                    te.rollDisplayPosition = (double) sequencer.getTickPosition() / sequencer.getTickLength();
 
                     Thread.sleep(4);
                 }
@@ -142,14 +155,14 @@ public class MidiPianoPlayer implements Runnable
                 sequencer.stop();
             }
         }
-        te.songState = SongPlayingState.TERMINATED;
         sequencer.stop();
         receiver.close();
 
-        Logger.info("seqPos: " + sequencer.getTickPosition() + " : " + sequencer.getTickLength() + " : " + te.songPos);
+        Logger.info(UserLogger.MIDI_PIANO, "midiDest: " + sequencer.getTickPosition() + " : " + sequencer.getTickLength() + " : " + te.songState + " : " + side);
         if (sequencer.getTickPosition() == sequencer.getTickLength())
         {
-            te.songPos = 0.0;
+            te.rollDisplayPosition = 0.0;
+            te.songPosition = 0;
         }
     }
 
@@ -157,6 +170,14 @@ public class MidiPianoPlayer implements Runnable
     {
         if (te.isInvalid() || te.loadedSong == null)
             return;
+
+        if (te.songState == SongPlayingState.RUNNING)
+        {
+            Logger.info(UserLogger.MIDI_PIANO, "midi loaded with RUNNING -> TERMINATED");
+            te.songState = SongPlayingState.TERMINATED;
+            te.markDirty();
+            return;
+        }
 
         final InputStream midiStream;
         final Sequencer sequencer;
@@ -171,21 +192,27 @@ public class MidiPianoPlayer implements Runnable
         sequencer.open();
         sequencer.setSequence(midiStream);
 
-        sequencer.setTickPosition((long) (startPos * sequencer.getTickLength()));
+        sequencer.setTickPosition(startPosition);
         sequencer.start();
         {
             try
             {
-                while (sequencer.isRunning() && !te.isInvalid())
+                while (!te.isInvalid() && te.songState != SongPlayingState.TERMINATED && isServerAlive(te))
                 {
+                    if (!sequencer.isRunning() && te.songState == SongPlayingState.PLAYING)
+                    {
+                        Logger.info(UserLogger.MIDI_PIANO, "Song has finished -> RUNNING " + side);
+                        te.songState = SongPlayingState.RUNNING;
+                    }
+
                     if (te.songState == SongPlayingState.RUNNING)
                     {
                         if (transitionTime != -1)
                         {
                             if (transitionTime < System.currentTimeMillis())
                             {
+                                Logger.info(UserLogger.MIDI_PIANO, "Key Delay Done-> TERMINATED " + side);
                                 te.songState = SongPlayingState.TERMINATED;
-                                sequencer.stop();
                             }
                         } else {
                             transitionTime = System.currentTimeMillis() + (long)(0.03/Settings.PianoPlayer.d_key_restore_time*4);
@@ -194,7 +221,7 @@ public class MidiPianoPlayer implements Runnable
                         continue;
                     }
 
-                    te.songPos = (double) sequencer.getTickPosition() / sequencer.getTickLength();
+                    te.songPosition = sequencer.getTickPosition();
 
                     Thread.sleep(4);
                     te.markDirty();
@@ -205,13 +232,13 @@ public class MidiPianoPlayer implements Runnable
                 sequencer.stop();
             }
         }
-
-        te.songState = SongPlayingState.TERMINATED;
         sequencer.stop();
+
+        Logger.info(UserLogger.MIDI_PIANO, "midiDest: " + sequencer.getTickPosition() + " : " + sequencer.getTickLength() + " : " + te.songState + " : " + side);
 
         if (sequencer.getTickPosition() == sequencer.getTickLength())
         {
-            te.songPos = 0.0;
+            te.songPosition = 0;
         }
     }
 
@@ -223,6 +250,19 @@ public class MidiPianoPlayer implements Runnable
                 return false;
 
         return true;
+    }
+
+    private static boolean isServerAlive(TileEntity te)
+    {
+        if (te.getWorld() != null)
+        {
+            if (te.getWorld().getMinecraftServer() != null)
+            {
+                return te.getWorld().getMinecraftServer().isServerRunning();
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -240,7 +280,16 @@ public class MidiPianoPlayer implements Runnable
             e.printStackTrace();
         }
 
+        if (side == Side.CLIENT)
+        {
+            TEPlayerPiano.existingPlayers_client.remove(te.getPos());
+        } else {
+            TEPlayerPiano.existingPlayers_server.remove(te.getPos());
+        }
+
         te.markDirty();
+        te = null;
+
         deathState = true;
     }
 

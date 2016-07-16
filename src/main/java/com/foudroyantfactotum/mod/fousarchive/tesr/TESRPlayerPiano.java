@@ -151,7 +151,7 @@ public class TESRPlayerPiano extends FA_TESR<TEPlayerPiano>
                 wr.setTranslation(x - 0.02, y + 0.8, z - 0.8);
                 wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
                 {
-                    addRender(wr, tex, te.songPos, objQUAD[orientation.getHorizontalIndex()]);
+                    addRender(wr, tex, te.rollDisplayPosition, objQUAD[orientation.getHorizontalIndex()]);
                 }
                 tess.draw();
             }

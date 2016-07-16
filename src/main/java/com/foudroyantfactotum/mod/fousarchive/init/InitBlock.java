@@ -22,11 +22,15 @@ import com.foudroyantfactotum.mod.fousarchive.TheMod;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_ShapeTE;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.TEPlayerPiano;
 import com.foudroyantfactotum.tool.structure.StructureRegistry;
+import com.foudroyantfactotum.tool.structure.block.StructureBlock;
+import com.foudroyantfactotum.tool.structure.item.StructureBlockItem;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+
+import javax.annotation.Nonnull;
 
 public class InitBlock
 {
@@ -63,7 +67,7 @@ public class InitBlock
     private static void registerBlocks()
     {
         GameRegistry.register(ModBlocks.structureShape);
-        GameRegistry.registerWithItem(ModBlocks.playerPiano);
+        registerStructureBlock(ModBlocks.playerPiano);
 
         GameRegistry.registerTileEntity(TEPlayerPiano.class, ModNames.Blocks.playerPiano);
         GameRegistry.registerTileEntity(FA_ShapeTE.class, ModNames.Blocks.structureShape);
@@ -72,6 +76,12 @@ public class InitBlock
 
         ModBlocks.playerPiano.setCreativeTab(tab);
         ModItems.tuningFork.setCreativeTab(tab);
+    }
+
+    private static void registerStructureBlock(@Nonnull StructureBlock block)
+    {
+        GameRegistry.register(block);
+        GameRegistry.register(new StructureBlockItem(block).setRegistryName(block.getRegistryName()));
     }
 
     private static void registerStructures()

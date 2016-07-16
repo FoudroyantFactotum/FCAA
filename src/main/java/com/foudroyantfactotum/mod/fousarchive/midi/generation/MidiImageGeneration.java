@@ -16,6 +16,7 @@
 package com.foudroyantfactotum.mod.fousarchive.midi.generation;
 
 import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
+import com.foudroyantfactotum.mod.fousarchive.utility.log.UserLogger;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import javax.imageio.ImageIO;
@@ -164,7 +165,7 @@ public class MidiImageGeneration
             final ImmutablePair<String, BufferedImage> res = new MidiImageGeneration(is, 119, 5000).buildImage();
             final long endTime = System.currentTimeMillis();
 
-            Logger.info(String.format("startTime: %s endTime: %s totalTime: %s file: %s", startTime, endTime, endTime-startTime, res.getLeft()));
+            Logger.info(UserLogger.GENERAL, String.format("startTime: %s endTime: %s totalTime: %s file: %s", startTime, endTime, endTime-startTime, res.getLeft()));
             ImageIO.write(res.getRight(), "png", new File(String.format("/tmp/%s.png", res.getLeft())));
         }
     }

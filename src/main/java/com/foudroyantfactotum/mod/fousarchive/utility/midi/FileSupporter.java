@@ -5,6 +5,7 @@ import com.foudroyantfactotum.mod.fousarchive.midi.JsonMidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.midi.MidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.utility.FousArchiveException;
 import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
+import com.foudroyantfactotum.mod.fousarchive.utility.log.UserLogger;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -46,9 +47,9 @@ public class FileSupporter
         final File sourceDir = new File(source);
         final File outputDir = new File(output);
 
-        Logger.info("source directory: " + sourceDir.getAbsolutePath());
-        Logger.info("output directory: " + outputDir.getAbsolutePath());
-        Logger.info("processing midi files using " + noOfWorkers + " cores");
+        Logger.info(UserLogger.GENERAL, "source directory: " + sourceDir.getAbsolutePath());
+        Logger.info(UserLogger.GENERAL, "output directory: " + outputDir.getAbsolutePath());
+        Logger.info(UserLogger.GENERAL, "processing midi files using " + noOfWorkers + " cores");
 
         FileUtils.deleteDirectory(outputDir);
         FileUtils.touch(new File(outputDir + "/master.json.gz"));
@@ -75,10 +76,10 @@ public class FileSupporter
             }
         } catch (IOException e)
         {
-            Logger.info(e.toString());
+            Logger.info(UserLogger.GENERAL, e.toString());
         }
 
-        Logger.info("Processed " + processedMidiFiles.size() + " midi files out of " + fileCount + " files. " + (fileCount - processedMidiFiles.size()) + " removed");
+        Logger.info(UserLogger.GENERAL, "Processed " + processedMidiFiles.size() + " midi files out of " + fileCount + " files. " + (fileCount - processedMidiFiles.size()) + " removed");
     }
 
     private static ImmutableMap<String, String> midiDetailsToMap(File f)
@@ -171,11 +172,11 @@ public class FileSupporter
                         }
                     } else
                     {
-                        Logger.info(f + " Details Invalid");
+                        Logger.info(UserLogger.GENERAL, f + " Details Invalid");
                     }
                 } catch (FousArchiveException e)
                 {
-                    Logger.info("" + e);
+                    Logger.info(UserLogger.GENERAL, "" + e);
                 }
                 try
                 {

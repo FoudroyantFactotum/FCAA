@@ -2,6 +2,7 @@ package com.foudroyantfactotum.mod.fousarchive.midi;
 
 import com.foudroyantfactotum.mod.fousarchive.utility.Settings;
 import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
+import com.foudroyantfactotum.mod.fousarchive.utility.log.UserLogger;
 
 import javax.annotation.Nonnull;
 import javax.sound.midi.*;
@@ -34,7 +35,7 @@ public enum MidiMultiplexSynth
         final MultiplexMidiReceiver mmr = new MultiplexMidiReceiver(receivers.size(), synths.get(receivers.size()/channelsPerSynth));
         receivers.add(mmr);
 
-        Logger.info("Got new Multiplex " + mmr.channel);
+        Logger.info(UserLogger.MIDI_PIANO, "Got new Multiplex " + mmr.channel);
 
         return mmr;
     }
@@ -42,7 +43,7 @@ public enum MidiMultiplexSynth
     private synchronized void removeAllocatedChannel(final @Nonnull MultiplexMidiReceiver receiver)
     {
         final int channel = receiver.channel;
-        Logger.info("Removed Multiplex " + channel);
+        Logger.info(UserLogger.MIDI_PIANO, "Removed Multiplex " + channel);
 
         receivers.remove(channel);
         synths.get(channel/channelsPerSynth).getChannels()[channel%channelsPerSynth].resetAllControllers();
@@ -83,7 +84,7 @@ public enum MidiMultiplexSynth
             this.channelID = channel%channelsPerSynth;
             this.synthesizer = synthesizer;
 
-            Logger.info("Configured as " + channel + " : " + channelID +" : oldChan " + oldCha + " : " + synthesizer);
+            Logger.info(UserLogger.MIDI_PIANO, "Configured as " + channel + " : " + channelID +" : oldChan " + oldCha + " : " + synthesizer);
         }
 
         @Override

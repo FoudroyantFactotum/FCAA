@@ -59,17 +59,17 @@ public class CommandPianoRollID extends CommandBase
 
             sender.addChatMessage(new TextComponentString("==========Searching=========="));
 
-                song:
-                for (int i = 0; i < songList.length; ++i)
-                {
-                    final MidiDetails song = LiveMidiDetails.INSTANCE.getDetailsOnSong(songList[i]);
+            song:
+            for (int i = 0; i < songList.length; ++i)
+            {
+                final MidiDetails song = LiveMidiDetails.INSTANCE.getDetailsOnSong(songList[i]);
 
-                    for (Predicate<MidiDetails> p : func)
-                        if (!p.test(song))
-                            continue song;
+                for (Predicate<MidiDetails> p : func)
+                    if (!p.test(song))
+                        continue song;
 
-                    validList.add(Pair.of(songList[i], song));
-                }
+                validList.add(Pair.of(songList[i], song));
+            }
             int i = 0;
 
             for (Pair<ResourceLocation, MidiDetails> m : validList)

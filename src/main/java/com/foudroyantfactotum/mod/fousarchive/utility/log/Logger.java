@@ -23,9 +23,12 @@ public class Logger
 {
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(TheMod.MOD_ID);
 
-    public static void info(final String format, final Object... args)
+    public static void info(final UserLogger ul, final String format, final Object... args)
     {
-        logger.log(Level.INFO, format, args);
+        if (ul.canDebug())
+        {
+            logger.log(Level.INFO, format, args);
+        }
     }
 
     public static void fatal(final String format, final Object... args)

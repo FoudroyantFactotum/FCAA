@@ -15,13 +15,16 @@
  */
 package com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano;
 
-import com.foudroyantfactotum.mod.fousarchive.library.ModItems;
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.FA_StructureBlock;
 import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
+import com.foudroyantfactotum.mod.fousarchive.library.ModItems;
+import com.foudroyantfactotum.mod.fousarchive.midi.LiveMidiDetails;
+import com.foudroyantfactotum.mod.fousarchive.midi.MidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer.MidiPianoPlayer;
 import com.foudroyantfactotum.mod.fousarchive.midi.state.SongPlayingState;
 import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
+import com.foudroyantfactotum.mod.fousarchive.utility.log.UserLogger;
 import com.foudroyantfactotum.tool.structure.coordinates.BlockPosUtil;
 import com.foudroyantfactotum.tool.structure.tileentity.StructureTE;
 import com.foudroyantfactotum.tool.structure.utility.StructureDefinitionBuilder;
@@ -134,9 +137,9 @@ public final class BlockPlayerPiano extends FA_StructureBlock
                     {
                         te.loadedSong = ItemPianoRoll.NONE;
                     }
-                    Logger.info("has set playerPiano roll");
+                    Logger.info(UserLogger.MIDI_PIANO, "has set playerPiano roll " + te.loadedSong);
                 } else {
-                    Logger.info("no playerPiano roll in hand");
+                    Logger.info(UserLogger.MIDI_PIANO, "no playerPiano roll in hand");
                 }
             } else
             {
@@ -150,15 +153,15 @@ public final class BlockPlayerPiano extends FA_StructureBlock
                         }
 
                         te.loadedSong = null;
-                        te.songPos = 0.0;
-                        Logger.info("has removed playerPiano roll");
+                        te.rollDisplayPosition = 0.0;
+                        te.songPosition = 0;
+                        Logger.info(UserLogger.MIDI_PIANO, "removed playerPiano roll");
                     } else
                     {
                         te.songState = SongPlayingState.PLAYING;
-                        Logger.info("has song and now playing");
-                        Logger.info("This side is running midiplayer " + FMLCommonHandler.instance().getEffectiveSide() + " : " + FMLCommonHandler.instance().getSide() + " : " + world.isRemote);
+                        Logger.info(UserLogger.MIDI_PIANO, "------------started playing @" + te.songPosition + "------------");
 
-                        final MidiPianoPlayer mpp = new MidiPianoPlayer(te, te.songPos);
+                        final MidiPianoPlayer mpp = new MidiPianoPlayer(te, te.songPosition, FMLCommonHandler.instance().getEffectiveSide());
                         (world.isRemote ? TEPlayerPiano.existingPlayers_client : TEPlayerPiano.existingPlayers_server).put(pos, mpp);
                         TEPlayerPiano.midiService.execute(mpp);
                     }
@@ -166,7 +169,7 @@ public final class BlockPlayerPiano extends FA_StructureBlock
                 {
                     te.songState = SongPlayingState.RUNNING;
 
-                    Logger.info("has song and playing -> RUNNING -> TERMINATED");
+                    Logger.info(UserLogger.MIDI_PIANO, "============is Stopping============");
                 }
             }
 
@@ -176,6 +179,38 @@ public final class BlockPlayerPiano extends FA_StructureBlock
         }
 
         return super.onStructureBlockActivated(world, pos, player, hand, callPos, side, local, sx, sy, sz);
+    }
+
+    @Override
+    public boolean hasComparatorInputOverride(IBlockState state)
+    {
+        return true;
+    }
+
+    @Override
+    public int getComparatorInputOverride(IBlockState blockState, World worldIn, BlockPos pos)
+    {
+        final TileEntity ute = worldIn.getTileEntity(pos);
+
+        if (ute instanceof TEPlayerPiano)
+        {
+            final TEPlayerPiano te = (TEPlayerPiano) ute;
+
+            if (te.loadedSong != null)
+            {
+                final MidiDetails md = LiveMidiDetails.INSTANCE.getDetailsOnSong(te.loadedSong);
+
+                if (md != MidiDetails.NO_DETAILS)
+                {
+                    Logger.info(UserLogger.GENERAL, "" + (int) ((double) te.songPosition/md.getMaxTicks() * 15));
+                    return (int) ((double) te.songPosition/md.getMaxTicks() * 15);
+                }
+            }
+
+            return 0;
+        }
+
+        return super.getComparatorInputOverride(blockState, worldIn, pos);
     }
 
     @Override

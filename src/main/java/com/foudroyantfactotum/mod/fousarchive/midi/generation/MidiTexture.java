@@ -18,6 +18,7 @@ package com.foudroyantfactotum.mod.fousarchive.midi.generation;
 import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.utility.Settings;
 import com.foudroyantfactotum.mod.fousarchive.utility.log.Logger;
+import com.foudroyantfactotum.mod.fousarchive.utility.log.UserLogger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -222,7 +223,7 @@ public class MidiTexture extends AbstractTexture
 
         io.close();
 
-        Logger.info(String.format("startTime: %s endTime: %s totalTime: %s", startTime, endTime, endTime - startTime));
+        Logger.info(UserLogger.GENERAL, String.format("startTime: %s endTime: %s totalTime: %s", startTime, endTime, endTime - startTime));
 
 
         ImageIO.write(toBufferImage(test, 8192, 88), "png", new File("/tmp/Song.png"));
