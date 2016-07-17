@@ -14,20 +14,20 @@
     "normal": [{ }],
     "inventory": [{
       "transform": {
-        "thirdperson": {
-          "translation": [0, 0, 0.0],
-          "rotation": [{"y": 0}, {"z": 180}],
-          "scale": 0.2
+        "thirdperson_righthand": {
+          "translation": [0, 0, 0],
+          "rotation": {"y": 0},
+          "scale": 0.5
         },
-        "firstperson": {
+        "firstperson_righthand": {
           "rotation": {"y": -90 },
           "translation": [0, 0.18, 0],
           "scale": 0.55
         },
         "gui": {
-          "translation": [0.5, 0.02, -0.09],
-          "rotation": {"y": 90 },
-          "scale": 0.55
+          "translation": [0.15,-0.25,0],
+          "rotation":{"y":45},
+          "scale": 0.45
         }
       }
     }],
