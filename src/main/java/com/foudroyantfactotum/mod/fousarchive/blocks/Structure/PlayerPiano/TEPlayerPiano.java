@@ -105,7 +105,7 @@ public class TEPlayerPiano extends StructureTE
         songState = SongPlayingState.values()[nbt.getByte(SONG_STATE)];
 
         final MidiDetails md = LiveMidiDetails.INSTANCE.getDetailsOnSong(loadedSong);
-        if (md != MidiDetails.NO_DETAILS)
+        if (md != MidiDetails.NO_DETAILS && FMLCommonHandler.instance().getSide() == Side.CLIENT)
         {
             rollDisplayPosition = (double) songPosition / md.getMaxTicks();
         }

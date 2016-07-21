@@ -44,6 +44,8 @@ public class CommandPianoRollID extends CommandBase
             final List<Pair<SearchMatch, String>> pt = parse(getAsSingleString(args));
             if (pt.size() > 10)
                 throw new CommandException("Too many matches");
+            if (pt.size() == 0)
+                pt.add(Pair.of(SearchMatch.Title, ""));
 
             final List<Predicate<MidiDetails>> func = new ArrayList<>(pt.size());
             final List<SearchMatch> outfString = new LinkedList<>();

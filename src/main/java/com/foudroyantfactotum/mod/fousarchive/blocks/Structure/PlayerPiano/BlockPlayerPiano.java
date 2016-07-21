@@ -46,6 +46,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -159,7 +160,8 @@ public final class BlockPlayerPiano extends FA_StructureBlock
                         }
 
                         te.loadedSong = null;
-                        te.rollDisplayPosition = 0.0;
+                        if (FMLCommonHandler.instance().getSide() == Side.CLIENT)
+                            te.rollDisplayPosition = 0.0;
                         te.songPosition = 0;
                         Logger.info(UserLogger.MIDI_PIANO, "removed playerPiano roll");
                     } else
