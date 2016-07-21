@@ -180,11 +180,11 @@ public class MidiDetails
     public String getLongDetails()
     {
         return String.format(
-                "%s #%s class %s\n" +
-                        "Manufacturer: %s\n" +
-                        "Performer: %s\n" +
-                        "Composer: %s (%s)\n" +
-                        "(c) %s"
+                "%s \u00A7o#%s\u00A77 class %s\n" +
+                        "\u00A76Manufacturer:\u00A77 %s\n" +
+                        "\u00A76Performer:\u00A77 %s\n" +
+                        "\u00A76Composer:\u00A77 %s (%s)\n" +
+                        "\u00A76(c)\u00A77 %s"
                 , rollBrand, rollNumber, rollClass
                 , rollManufacturer
                 , performer

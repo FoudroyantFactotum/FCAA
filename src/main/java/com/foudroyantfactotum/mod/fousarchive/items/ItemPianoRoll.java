@@ -18,27 +18,16 @@ package com.foudroyantfactotum.mod.fousarchive.items;
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
 import com.foudroyantfactotum.mod.fousarchive.midi.LiveMidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.midi.MidiDetails;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class ItemPianoRoll extends FA_Item
 {
@@ -114,7 +103,7 @@ public class ItemPianoRoll extends FA_Item
 
         if (stack.getTagCompound() == null)
         {
-            tooltip.add(MidiDetails.NO_DETAILS.getSimpleDetails());
+            tooltip.add("Blank Roll");
             return;
         }
 
@@ -142,7 +131,7 @@ public class ItemPianoRoll extends FA_Item
     public String getHighlightTip(ItemStack stack, String displayName)
     {
         if (stack.getTagCompound() == null)
-            return MidiDetails.NO_DETAILS.getSimpleDetails();
+            return "Blank Roll";
 
         final ResourceLocation song = getTagResourceOrElse(stack.getTagCompound(), ROLL, NONE);
         final MidiDetails detail = LiveMidiDetails.INSTANCE.getDetailsOnSong(song);

@@ -73,7 +73,7 @@ public class CommandPianoRollID extends CommandBase
             int i = 0;
 
             for (Pair<ResourceLocation, MidiDetails> m : validList)
-                sender.addChatMessage(new TextComponentString((++i) + ". " + toStringer(m.getRight(), outfString)));
+                sender.addChatMessage(new TextComponentString("\u00A7l" + (++i) + ". \u00A7r\u00A7o" + toStringer(m.getRight(), outfString) + "\u00A7r"));
 
             sender.addChatMessage(new TextComponentString("=========End  Search========="));
 
@@ -134,6 +134,10 @@ public class CommandPianoRollID extends CommandBase
                 s = s.substring(2);
 
                 final int ifq = s.indexOf('\"');
+
+                if (ifq < 0)
+                    throw new CommandException("Missing matching \" for '" + sm + '\'');
+
                 final String s1 = s.substring(0, ifq);
 
                 s = s.substring(ifq + 1).trim();
