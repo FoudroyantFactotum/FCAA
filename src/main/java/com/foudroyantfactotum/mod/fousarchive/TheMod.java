@@ -15,12 +15,9 @@
  */
 package com.foudroyantfactotum.mod.fousarchive;
 
-import com.foudroyantfactotum.mod.fousarchive.library.ModItems;
-import com.foudroyantfactotum.mod.fousarchive.init.IMCEvents;
-import com.foudroyantfactotum.mod.fousarchive.init.InitBlock;
-import com.foudroyantfactotum.mod.fousarchive.init.InitCommand;
-import com.foudroyantfactotum.mod.fousarchive.init.InitItem;
+import com.foudroyantfactotum.mod.fousarchive.init.*;
 import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
+import com.foudroyantfactotum.mod.fousarchive.library.ModItems;
 import com.foudroyantfactotum.mod.fousarchive.midi.JsonMidiDetails;
 import com.foudroyantfactotum.mod.fousarchive.midi.MidiMultiplexSynth;
 import com.foudroyantfactotum.mod.fousarchive.proxy.IModRenderProxy;
@@ -71,9 +68,11 @@ public class TheMod
 
         Settings.setConfigurationFile(event.getSuggestedConfigurationFile());
 
-        TransformLAG.initStatic();
-        InitBlock.init();
-        InitItem.init();
+        TransformLAG        .initStatic();
+        InitBlock           .init();
+        InitItem            .init();
+        InitCraftingRecipes .init();
+        InitLootSys.INSTANCE.init();
 
         proxy.preInit();
 

@@ -143,7 +143,13 @@ public final class BlockPlayerPiano extends FA_StructureBlock
                 }
             } else
             {
-                if (te.songState == SongPlayingState.TERMINATED)
+                if (te.loadedSong.getResourcePath().equals(ItemPianoRoll.NONE.getResourcePath()))
+                {
+                    te.songState = SongPlayingState.TERMINATED;
+                    te.loadedSong = null;
+                    te.rollDisplayPosition = 0.0;
+                    te.songPosition = 0;
+                } else if (te.songState == SongPlayingState.TERMINATED)
                 {
                     if (player.isSneaking())
                     {

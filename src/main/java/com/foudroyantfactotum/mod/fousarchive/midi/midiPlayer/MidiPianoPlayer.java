@@ -17,6 +17,7 @@ package com.foudroyantfactotum.mod.fousarchive.midi.midiPlayer;
 
 import com.foudroyantfactotum.mod.fousarchive.TheMod;
 import com.foudroyantfactotum.mod.fousarchive.blocks.Structure.PlayerPiano.TEPlayerPiano;
+import com.foudroyantfactotum.mod.fousarchive.items.ItemPianoRoll;
 import com.foudroyantfactotum.mod.fousarchive.midi.MidiMultiplexSynth;
 import com.foudroyantfactotum.mod.fousarchive.midi.state.SongPlayingState;
 import com.foudroyantfactotum.mod.fousarchive.utility.Settings;
@@ -51,9 +52,6 @@ public class MidiPianoPlayer implements Runnable
     @SideOnly(Side.CLIENT)
     public void playClient() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException
     {
-        if (te.isInvalid() || te.loadedSong == null)
-            return;
-
         final InputStream midiStream;
         final Sequencer sequencer;
         final MidiMultiplexSynth.MultiplexMidiReceiver receiver;
@@ -168,9 +166,6 @@ public class MidiPianoPlayer implements Runnable
 
     private void playServer() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException
     {
-        if (te.isInvalid() || te.loadedSong == null)
-            return;
-
         if (te.songState == SongPlayingState.RUNNING)
         {
             Logger.info(UserLogger.MIDI_PIANO, "midi loaded with RUNNING -> TERMINATED");
@@ -268,23 +263,27 @@ public class MidiPianoPlayer implements Runnable
     @Override
     public void run()
     {
-        try
+        if (!(te.isInvalid() || te.loadedSong == null || te.loadedSong.getResourcePath().equals(ItemPianoRoll.NONE.getResourcePath())))
         {
-            if (te.getWorld().isRemote)
-                playClient();
-            else
-                playServer();
-        } catch (MidiUnavailableException | InvalidMidiDataException | IOException | InterruptedException e)
-        {
-            te.songState = SongPlayingState.TERMINATED;
-            e.printStackTrace();
-        }
+            try
+            {
+                if (te.getWorld().isRemote)
+                    playClient();
+                else
+                    playServer();
+            } catch (MidiUnavailableException | InvalidMidiDataException | IOException | InterruptedException e)
+            {
+                te.songState = SongPlayingState.TERMINATED;
+                e.printStackTrace();
+            }
 
-        if (side == Side.CLIENT)
-        {
-            TEPlayerPiano.existingPlayers_client.remove(te.getPos());
-        } else {
-            TEPlayerPiano.existingPlayers_server.remove(te.getPos());
+            if (side == Side.CLIENT)
+            {
+                TEPlayerPiano.existingPlayers_client.remove(te.getPos());
+            } else
+            {
+                TEPlayerPiano.existingPlayers_server.remove(te.getPos());
+            }
         }
 
         te.markDirty();

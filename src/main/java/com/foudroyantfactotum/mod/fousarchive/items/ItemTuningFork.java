@@ -20,6 +20,8 @@ import com.foudroyantfactotum.mod.fousarchive.TheMod;
 import com.foudroyantfactotum.tool.structure.block.StructureBlock;
 import com.foudroyantfactotum.tool.structure.item.StructureFormTool;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
@@ -36,17 +38,40 @@ public class ItemTuningFork extends StructureFormTool
     @Override
     public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
-        if (world.isRemote || player == null)
-        {
-            return EnumActionResult.SUCCESS;
-        }
-
         final EnumFacing[] orientation = orientationPriority[MathHelper.floor_double(player.rotationYaw * 4.0f / 360.0f + 0.5) & 3];
         final boolean[] mirror = mirrorPriority[player.isSneaking()?1:0];
 
         doSearch(world, pos, orientation, mirror, validStructures);
 
+        stack.damageItem(2, player);
+
         return EnumActionResult.SUCCESS;
+    }
+
+    @Override
+    public int getMaxDamage()
+    {
+        return 10;
+    }
+
+    @Override
+    public boolean isDamageable()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean onBlockDestroyed(ItemStack stack, World worldIn, IBlockState state, BlockPos pos, EntityLivingBase entityLiving)
+    {
+        stack.damageItem(getMaxDamage()*2, entityLiving);
+        return false;
+    }
+
+    @Override
+    public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker)
+    {
+        stack.damageItem(getMaxDamage()*2, attacker);
+        return false;
     }
 
     @Override
@@ -60,5 +85,11 @@ public class ItemTuningFork extends StructureFormTool
     public String getUnlocalizedName(ItemStack stack)
     {
         return getUnlocalizedName();
+    }
+
+    @Override
+    public int getItemStackLimit()
+    {
+        return 1;
     }
 }

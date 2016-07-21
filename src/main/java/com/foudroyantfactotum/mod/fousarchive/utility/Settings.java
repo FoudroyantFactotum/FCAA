@@ -109,7 +109,7 @@ public final class Settings
 
     public static class PianoPlayer
     {
-        public static int b7_max_vol = 127;
+        public static int b7_max_vol = 111; //127
         public static int ums_texture_unload_time = 5000;
         public static int ums_texture_poll_time = 5000;
         public static int uy_max_texture_cap = 8048;
